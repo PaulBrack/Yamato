@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MzmlParser", "MzmlReader\MzmlParser.csproj", "{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzmlParser", "MzmlReader\MzmlParser.csproj", "{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prognosticator", "Prognosticator\Prognosticator.csproj", "{38B33794-85A8-401C-B5CE-FE547F2B5A4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prognosticator", "Prognosticator\Prognosticator.csproj", "{38B33794-85A8-401C-B5CE-FE547F2B5A4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console", "Console\Console.csproj", "{2B326BE2-1FCC-4888-BA86-ECD72CDDEF54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yamato.Console", "Console\Yamato.Console.csproj", "{2B326BE2-1FCC-4888-BA86-ECD72CDDEF54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaMe", "SwaMe\SwaMe.csproj", "{A11DE82D-AF14-4F5B-BE52-10EF64E51944}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMe", "SwaMe\SwaMe.csproj", "{A11DE82D-AF14-4F5B-BE52-10EF64E51944}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

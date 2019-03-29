@@ -15,9 +15,11 @@ namespace MzmlParser
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private string lastScanRead = String.Empty;
 
-        public void LoadMzml(string path)
+        public Run LoadMzml(string path)
         {
             logger.Info("Loading file: {0}", path);
+
+            Run run = new Run();
             using (XmlReader reader = XmlReader.Create(path))
             {
                 while (reader.Read())
@@ -26,8 +28,47 @@ namespace MzmlParser
                     {
                         switch (reader.LocalName)
                         {
-                            case "Protein":
-                                //do summat
+                            case "spectrum":
+                                ReadSpectrum(reader, run);
+                                break;
+                        }
+                    }
+                }
+            }
+            return run;
+        }
+
+        public void ReadSpectrum(XmlReader reader, Run run)
+        {
+            Scan scan = new Scan();
+            bool cvParamsRead = false;
+            while(reader.Read() && !cvParamsRead)
+            {
+                if (reader.IsStartElement())
+                {
+                    if(reader.LocalName == "cvParam")
+                    {
+                        switch (reader.GetAttribute("accession"))
+                        {
+                            case "MS:1000511":
+                                scan.MsLevel = int.Parse(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000505":
+                                scan.BasePeakIntensity = double.Parse(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000504":
+                                scan.BasePeakMz = double.Parse(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000285":
+                                scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000016":
+                                scan.ScanStartTime = double.Parse(reader.GetAttribute("value"));
+                                if (scan.MsLevel == 1)
+                                    run.Ms1Scans.Add(scan);
+                                if (scan.MsLevel == 2)
+                                    run.Ms2Scans.Add(scan);
+                                cvParamsRead = true;
                                 break;
                         }
                     }
