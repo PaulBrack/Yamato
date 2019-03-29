@@ -1,5 +1,5 @@
 # Yamato
-SWATH-QC metrics generation tools
+SWATH-MS QC metrics generation tools
 
 ## MzmlReader
 A library to extract chromatograms and metadata from an MZML file
