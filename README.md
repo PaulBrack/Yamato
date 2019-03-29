@@ -6,7 +6,7 @@ A library to extract chromatograms and metadata from an MZML file
 
 ## SwaMe
 A Quameter-based SWATH metrics library  
-Author: **Marina Pauw**
+Author: **Marina Pauw**  
 pauwmarina@sun.ac.za
 
 ## Prognosticator
