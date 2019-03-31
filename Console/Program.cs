@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 
 
-namespace Console
+namespace Yamato.Console
 {
     class Program
     {
@@ -14,20 +14,22 @@ namespace Console
 
         static void Main(string[] args)
         {
-            var options = new Options();
-            UpdateLoggingLevels(options);
+            Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
+            {
+                UpdateLoggingLevels(options);
 
-            string path = options.InputFile;
-            logger.Info("Loading file: {0}", path);
+                string path = options.InputFile;
+                logger.Info("Loading file: {0}", path);
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
 
-            MzmlParser.Run run = new MzmlParser.MzmlParser().LoadMzml(path);
+                MzmlParser.Run run = new MzmlParser.MzmlParser().LoadMzml(path);
+                run = new SwaMe.MetricGenerator().CalculateSwameMetrics(run);
 
-            logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-            logger.Info("Done!");
-
+                logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                logger.Info("Done!");
+            });
         }
 
         private static void UpdateLoggingLevels(Options options)

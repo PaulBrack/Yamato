@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Console": {
+      "commandName": "Project",
+      "commandLineArgs": "-i C:\\wiffs\\SWATH_OC_107_1.mzML"
+    }
+  }
+}
