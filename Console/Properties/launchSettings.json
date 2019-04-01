@@ -2,7 +2,7 @@
   "profiles": {
     "Console": {
       "commandName": "Project",
-      "commandLineArgs": "-i C:\\wiffs\\SWATH_OC_107_1.mzML"
+      "commandLineArgs": "-i C:\\wiffs\\Cal20170905142542028-cal.mzML"
     }
   }
 }

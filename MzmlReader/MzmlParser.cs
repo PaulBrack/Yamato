@@ -40,6 +40,11 @@ namespace MzmlParser
 
         public void ReadSpectrum(XmlReader reader, Run run)
         {
+            if (reader == null)
+            {
+                throw new System.ArgumentNullException(nameof(reader));
+            }
+
             Scan scan = new Scan();
             bool cvParamsRead = false;
             while(reader.Read() && !cvParamsRead)
@@ -64,16 +69,33 @@ namespace MzmlParser
                                 break;
                             case "MS:1000016":
                                 scan.ScanStartTime = double.Parse(reader.GetAttribute("value"));
-                                if (scan.MsLevel == 1)
-                                    run.Ms1Scans.Add(scan);
-                                if (scan.MsLevel == 2)
-                                    run.Ms2Scans.Add(scan);
-                                cvParamsRead = true;
+                                break;
+                            case "MS:1000827":
+                                scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000829":
+                                scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000828":
+                                scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"));
                                 break;
                         }
                     }
                 }
+                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum") 
+                {
+                    AddScanToRun(scan, run);
+                    cvParamsRead = true;
+                }
             }
+        }
+
+        public void AddScanToRun(Scan scan, Run run)
+        {
+            if (scan.MsLevel == 1)
+                run.Ms1Scans.Add(scan);
+            if (scan.MsLevel == 2)
+                run.Ms2Scans.Add(scan);
         }
     }
 }

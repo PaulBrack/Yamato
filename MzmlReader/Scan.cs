@@ -12,5 +12,8 @@ namespace MzmlParser
         public double BasePeakMz { get; set; }
         public double TotalIonCurrent { get; set; }  
         public double ScanStartTime { get; set; }
+        public double IsolationWindowTargetMz { get; set; }
+        public double IsolationWindowUpperOffset { get; set; }
+        public double IsolationWindowLowerOffset { get; set; }
     }
 }

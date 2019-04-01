@@ -25,7 +25,7 @@ namespace Yamato.Console
                 sw.Start();
 
                 MzmlParser.Run run = new MzmlParser.MzmlParser().LoadMzml(path);
-                run = new SwaMe.MetricGenerator().CalculateSwameMetrics(run);
+                //run = new SwaMe.MetricGenerator().CalculateSwameMetrics(run);
 
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
