@@ -15,5 +15,7 @@ namespace MzmlParser
         public double IsolationWindowTargetMz { get; set; }
         public double IsolationWindowUpperOffset { get; set; }
         public double IsolationWindowLowerOffset { get; set; }
+        public float[] IntensityArray { get; set; }
+        public float[] MzArray { get; set; }
     }
 }

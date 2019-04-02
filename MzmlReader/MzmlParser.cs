@@ -41,10 +41,8 @@ namespace MzmlParser
         public void ReadSpectrum(XmlReader reader, Run run)
         {
             if (reader == null)
-            {
-                throw new System.ArgumentNullException(nameof(reader));
-            }
-
+               throw new System.ArgumentNullException(nameof(reader));
+            
             Scan scan = new Scan();
             bool cvParamsRead = false;
             while(reader.Read() && !cvParamsRead)
@@ -79,15 +77,63 @@ namespace MzmlParser
                             case "MS:1000828":
                                 scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"));
                                 break;
+                            case "MS:1000514":
+                                scan.MzArray = GetSucceedingBinaryDataArray(reader);
+                                break;
+                            case "MS:1000515":
+                                scan.IntensityArray = GetSucceedingBinaryDataArray(reader);
+                                break;
                         }
                     }
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum") 
                 {
+                   
+                 
+
                     AddScanToRun(scan, run);
                     cvParamsRead = true;
                 }
             }
+        }
+
+        private static float[] GetSucceedingBinaryDataArray(XmlReader reader)
+        {
+            float[] floats = new float[] { };
+            //const int bufferSize = 1024;
+            //byte[] temp = new byte[] { };
+            while (reader.Read())
+            {
+                if (reader.IsStartElement())
+                {
+                    if (reader.LocalName == "binary")
+                    {
+                        //Keep this streaming code for later 
+                        //int readBytes = 0;
+                        //byte[] buffer = new byte[bufferSize];
+
+                        //while ((readBytes = reader.ReadElementContentAsBase64(buffer, 0, bufferSize)) > 0)
+                        //{
+                        //    byte[] ret = new byte[temp.Length + bufferSize];
+                        //    Buffer.BlockCopy(temp, 0, ret, 0, temp.Length);
+                        //    Buffer.BlockCopy(buffer, 0, ret, temp.Length, buffer.Length);
+                        //    temp = ret;
+                        //}
+
+                        byte[] bytes = Convert.FromBase64String(reader.ReadElementContentAsString());
+
+                        floats = new float[bytes.Length / 4];
+
+                        for (int i = 0; i < floats.Length; i++)
+                            floats[i] = BitConverter.ToSingle(bytes, i * 4);
+
+                        float[] f = new float[] { floats.Max() };
+                        return f;
+                        
+                    }
+                }
+            }
+            return floats;
         }
 
         public void AddScanToRun(Scan scan, Run run)
