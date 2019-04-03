@@ -1,34 +1,38 @@
 ﻿using System;
 using MzmlParser;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SwaMe
 {
     public class MetricGenerator
     {
-        const double massTolerance = 5;
+        const double massTolerance = 0.05;
 
         public Run CalculateSwameMetrics(Run run)
-        {           
-            RemoveDuplicateScans(run.Ms1Scans);
-            RemoveDuplicateScans(run.Ms2Scans);
+        {
+            List<Scan> filteredBasePeaks = GetFilteredBasePeaks(run.Ms2Scans);
             return run;
         }
 
-        private static void RemoveDuplicateScans(List<Scan> ms1Scans)
+        private static List<Scan> GetFilteredBasePeaks(List<Scan>Scans)
         {
-            for (int i = 1; i < ms1Scans.Count; ++i)
+            List<Scan> filteredScans = new List<Scan>();
+            Scans = Scans.OrderBy(x => x.BasePeakMz).ToList();
+            for (int i = 1; i < Scans.Count; ++i)
             {
-                var scan = ms1Scans[i];
-                var prevscan = ms1Scans[i - 1];
+                var scan = Scans[i];
+                var prevscan = Scans[i - 1];
 
                 double mzDiff = Math.Abs(scan.BasePeakMz - prevscan.BasePeakMz);
 
-                if (mzDiff <= massTolerance)
+                if (mzDiff >= massTolerance)
                 {
-                    ms1Scans.Remove(scan);
+                    filteredScans.Add(scan);
                 }
             }
+            filteredScans = filteredScans.OrderBy(x => x.ScanStartTime).ToList();
+            return filteredScans;
         }
     }
 }

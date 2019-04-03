@@ -8,7 +8,6 @@ namespace MzmlParser
 {
     public class MzmlParser
     {
-       
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private string lastScanRead = String.Empty;
 
@@ -79,7 +78,8 @@ namespace MzmlParser
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum") 
                 {
-                    ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run));
+                    // Put processor intensive work in a thread so we can get on with I/O
+                    ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run)); 
                     cvParamsRead = true;
                 }
             }
