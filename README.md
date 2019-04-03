@@ -2,7 +2,7 @@
 SWATH-MS QC metrics generation tools
 
 ## MzmlReader
-An optimised library to extract chromatograms and metadata from an MZML file. Uses the fast, forward-only System.Xml.XmlReader class. Currently will only support BPC information from Proteowizard MZML files - this information is not provided in the Sciex tool.
+An optimised library to extract chromatograms and metadata from an MZML file. Uses the fast, forward-only System.Xml.XmlReader class. 
 
 ## SwaMe
 A Quameter-based SWATH metrics library  
