@@ -2,9 +2,6 @@
 using System;
 using System.Diagnostics;
 using NLog;
-using System.Collections.Generic;
-using System.IO;
-
 
 namespace Yamato.Console
 {

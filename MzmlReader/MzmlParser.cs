@@ -1,11 +1,8 @@
 ﻿using NLog;
 using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Xml;
-using System.Xml.Linq;
+using System.Threading;
 using System.Linq;
-
 
 namespace MzmlParser
 {
@@ -42,8 +39,8 @@ namespace MzmlParser
         {
             if (reader == null)
                throw new System.ArgumentNullException(nameof(reader));
-            
-            Scan scan = new Scan();
+
+            ScanAndTempProperties scan = new ScanAndTempProperties();
             bool cvParamsRead = false;
             while(reader.Read() && !cvParamsRead)
             {
@@ -54,89 +51,79 @@ namespace MzmlParser
                         switch (reader.GetAttribute("accession"))
                         {
                             case "MS:1000511":
-                                scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                break;
-                            case "MS:1000505":
-                                scan.BasePeakIntensity = double.Parse(reader.GetAttribute("value"));
-                                break;
-                            case "MS:1000504":
-                                scan.BasePeakMz = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000285":
-                                scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000016":
-                                scan.ScanStartTime = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000827":
-                                scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000829":
-                                scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000828":
-                                scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000514":
-                                scan.MzArray = GetSucceedingBinaryDataArray(reader);
+                                scan.Base64MzArray = GetSucceedingBinaryDataArray(reader);
                                 break;
                             case "MS:1000515":
-                                scan.IntensityArray = GetSucceedingBinaryDataArray(reader);
+                                scan.Base64IntensityArray = GetSucceedingBinaryDataArray(reader);
                                 break;
                         }
                     }
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum") 
                 {
-                   
-                 
-
-                    AddScanToRun(scan, run);
+                    ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run));
                     cvParamsRead = true;
                 }
             }
         }
 
-        private static float[] GetSucceedingBinaryDataArray(XmlReader reader)
+        private static string GetSucceedingBinaryDataArray(XmlReader reader)
         {
-            float[] floats = new float[] { };
-            //const int bufferSize = 1024;
-            //byte[] temp = new byte[] { };
+            string base64 = String.Empty;
             while (reader.Read())
             {
                 if (reader.IsStartElement())
                 {
                     if (reader.LocalName == "binary")
                     {
-                        //Keep this streaming code for later 
-                        //int readBytes = 0;
-                        //byte[] buffer = new byte[bufferSize];
+                        return reader.ReadElementContentAsString();
 
-                        //while ((readBytes = reader.ReadElementContentAsBase64(buffer, 0, bufferSize)) > 0)
-                        //{
-                        //    byte[] ret = new byte[temp.Length + bufferSize];
-                        //    Buffer.BlockCopy(temp, 0, ret, 0, temp.Length);
-                        //    Buffer.BlockCopy(buffer, 0, ret, temp.Length, buffer.Length);
-                        //    temp = ret;
-                        //}
-
-                        byte[] bytes = Convert.FromBase64String(reader.ReadElementContentAsString());
-
-                        floats = new float[bytes.Length / 4];
-
-                        for (int i = 0; i < floats.Length; i++)
-                            floats[i] = BitConverter.ToSingle(bytes, i * 4);
-
-                        float[] f = new float[] { floats.Max() };
-                        return f;
-                        
                     }
                 }
             }
+            return base64;
+        }
+
+        static void ParseBase64Data(ScanAndTempProperties scan, Run run)
+        {
+            float[] intensities = ExtractFloatArray(scan.Base64IntensityArray);
+            float[] mzs = ExtractFloatArray(scan.Base64MzArray);
+
+            scan.Scan.BasePeakIntensity = intensities.Max();
+            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
+
+            AddScanToRun(scan.Scan, run);
+        }
+
+        private static float[] ExtractFloatArray(string Base64Array)
+        {
+            byte[] bytes = Convert.FromBase64String(Base64Array);
+            float[] floats = new float[bytes.Length / 4];
+
+            for (int i = 0; i < floats.Length; i++)
+                floats[i] = BitConverter.ToSingle(bytes, i * 4);
             return floats;
         }
 
-        public void AddScanToRun(Scan scan, Run run)
+        static void AddScanToRun(Scan scan, Run run)
         {
             if (scan.MsLevel == 1)
                 run.Ms1Scans.Add(scan);

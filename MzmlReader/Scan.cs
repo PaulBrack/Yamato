@@ -18,4 +18,15 @@ namespace MzmlParser
         public float[] IntensityArray { get; set; }
         public float[] MzArray { get; set; }
     }
+
+    public class ScanAndTempProperties
+    {
+        public ScanAndTempProperties() {
+            Scan = new Scan();
+            }
+
+        public Scan Scan { get; set; }
+        public string Base64IntensityArray { get; set; }
+        public string Base64MzArray { get; set; }
+    }
 }
