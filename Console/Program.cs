@@ -22,7 +22,8 @@ namespace Yamato.Console
                 sw.Start();
 
                 MzmlParser.Run run = new MzmlParser.MzmlParser().LoadMzml(path);
-                run = new SwaMe.MetricGenerator().CalculateSwameMetrics(run);
+                //run = new SwaMe.MetricGenerator().CalculateSwameMetrics(run);
+                run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
 
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
@@ -31,14 +32,12 @@ namespace Yamato.Console
 
         private static void UpdateLoggingLevels(Options options)
         {
-
             logger.Info("Verbose output selected: enabled logging for all levels");
             foreach (var rule in LogManager.Configuration.LoggingRules)
             {
                 rule.EnableLoggingForLevels(LogLevel.Trace, LogLevel.Debug);
             }
             LogManager.ReconfigExistingLoggers();
-
         }
     }
 

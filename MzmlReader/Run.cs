@@ -9,12 +9,22 @@ namespace MzmlParser
         {
             Ms1Scans = new List<Scan>();
             Ms2Scans = new List<Scan>();
-            Ms1Tic = new List<Tuple<float, float>>();
-            Ms2Tic = new List<Tuple<float, float>>();
+            Chromatograms = new Chromatograms();
         }
+        public String SourceFileType { get; set; }
+        public String SourceFileName { get; set; }
+        public String SourceFilePath { get; set; }
+        public String SourceFileChecksum { get; set; }
         public List<Scan> Ms1Scans { get; set; }
         public List<Scan> Ms2Scans { get; set; }
-        public List<Tuple<float, float>> Ms1Tic { get; set; }
-        public List<Tuple<float, float>> Ms2Tic { get; set; }
+        public List<BasePeak> BasePeaks { get;set; }
+        public Chromatograms Chromatograms { get; set; }
+        public List<(double, double)> IsolationWindows { get; set; }
+    }
+
+    public class Chromatograms
+    {
+        public List<(double, double)> Ms1Tic { get; set; }
+        public List<(double, double)> Ms2Tic { get; set; }
     }
 }

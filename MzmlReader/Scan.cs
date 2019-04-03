@@ -6,7 +6,7 @@ namespace MzmlParser
 {
     public class Scan
     {
-        public int ExperimentIndex { get; set; }
+        public int Cycle { get; set; }
         public int MsLevel { get; set; }
         public double BasePeakIntensity { get; set; }
         public double BasePeakMz { get; set; }
@@ -15,8 +15,6 @@ namespace MzmlParser
         public double IsolationWindowTargetMz { get; set; }
         public double IsolationWindowUpperOffset { get; set; }
         public double IsolationWindowLowerOffset { get; set; }
-        public float[] IntensityArray { get; set; }
-        public float[] MzArray { get; set; }
     }
 
     public class ScanAndTempProperties
