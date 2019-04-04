@@ -131,7 +131,6 @@ namespace MzmlParser
                         else
                             scan.Scan.MsLevel = 2;
                     }
-                    
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                 {
@@ -139,7 +138,6 @@ namespace MzmlParser
                     cvParamsRead = true;
                 }
             }
-           
         }
 
         private static string GetSucceedingBinaryDataArray(XmlReader reader)
