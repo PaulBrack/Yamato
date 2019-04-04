@@ -13,15 +13,11 @@ namespace MzmlParser
         private const float BasePeakMaximumDeltaRt = 2;
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
-        public int numberOfTasks = 0;
-        ManualResetEvent signal = new ManualResetEvent(false);
-        
 
         public Run LoadMzml(string path)
         {
             Run run = new Run();
-            using (CountdownEvent e = new CountdownEvent(1))
-            {
+ 
                 logger.Info("Loading file: {0}", path);
                 using (XmlReader reader = XmlReader.Create(path))
                 {
@@ -35,7 +31,7 @@ namespace MzmlParser
                                     ReadSourceFileMetaData(reader, run);
                                     break;
                                 case "spectrum":
-                                    ReadSpectrum(reader, run, e);
+                                    ReadSpectrum(reader, run);
                                     break;
                                 case "referenceableParamGroup":
                                     if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
@@ -45,11 +41,7 @@ namespace MzmlParser
                         }
                     }
                 }
-                e.Signal();
-                e.Wait();
-            }
             FindMs2IsolationWindows(run);
-            
             return run;
         }
 
@@ -83,7 +75,7 @@ namespace MzmlParser
             }
         }
 
-        public void ReadSpectrum(XmlReader reader, Run run, CountdownEvent e)
+        public void ReadSpectrum(XmlReader reader, Run run)
         {
             ScanAndTempProperties scan = new ScanAndTempProperties();
 
@@ -142,10 +134,7 @@ namespace MzmlParser
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                 {
-                    e.AddCount();
-                    
-                    // Put processor intensive work in a thread so we can get on with I/O
-                    ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ref e));
+                    ParseBase64Data(scan, run);
                     cvParamsRead = true;
                 }
             }
@@ -168,16 +157,13 @@ namespace MzmlParser
             return base64;
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, ref CountdownEvent e)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run)
         {
-  
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray);
-
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
             AddScanToRun(scan.Scan, run);
-            e.Signal();
         }
 
         private static float[] ExtractFloatArray(string Base64Array)
