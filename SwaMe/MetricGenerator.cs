@@ -1,9 +1,4 @@
-﻿using System;
-using MzmlParser;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace SwaMe
+﻿namespace SwaMe
 {
     public class MetricGenerator
     {
