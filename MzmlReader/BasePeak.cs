@@ -6,6 +6,6 @@ namespace MzmlParser
     {
         public double Mz { get; set; }
         public double retentionTime { get; set; }
-        public List<(float, float)> Spectrum { get; set; } //intensity, m/z
+        public List<(float, float, float)> Spectrum { get; set; } //intensity, m/z, RT
     }
 }

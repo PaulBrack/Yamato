@@ -160,10 +160,10 @@ namespace MzmlParser
         {
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray);
-            var spectrum = new List<(float, float)>();
+            var spectrum = new List<(float, float, float)>();
             for (int i=0; i < intensities.Length; i++)
             {
-                spectrum.Add((intensities[i], mzs[i]));
+                spectrum.Add((intensities[i], mzs[i], (float)scan.Scan.ScanStartTime));
             }
             
             scan.Scan.BasePeakIntensity = intensities.Max();
@@ -183,7 +183,7 @@ namespace MzmlParser
             {
                 foreach(BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.retentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
                 {
-                    bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Item2 - bp.Mz) <= massTolerance)).OrderBy(x => x.Item2).ToList();
+                    bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Item2 - bp.Mz) <= massTolerance)).OrderBy(x => x.Item3).ToList();
                 }
             }
             AddScanToRun(scan.Scan, run);
