@@ -1,4 +1,4 @@
-﻿using CommandLine;
+using CommandLine;
 using System;
 using System.Diagnostics;
 using NLog;
@@ -44,5 +44,14 @@ namespace Yamato.Console
     {
         [Option('i', "inputfile", Required = true, HelpText = "Input file path.")]
         public String InputFile { get; set; }
+
+        [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
+        public int Division{ get; set; }
+
+        [Option('u', "upperoffset", Required = false, HelpText = "Upper offset for m/z tolerance in m/z")]
+        public float UpperOffset{ get; set; }
+
+        [Option('l', "loweroffset", Required = false, HelpText = "Lower offset for m/z tolerance in m/z")]
+        public float LowerOffset{ get; set; }
     }
 }
