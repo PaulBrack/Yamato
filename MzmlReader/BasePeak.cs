@@ -6,8 +6,8 @@ namespace MzmlParser
 {
     public class BasePeak
     {
-        public float Mz { get; set; }
-        public float retentionTime { get; set; }
-        public List<(float, float)> Xic { get; set; }
+        public double Mz { get; set; }
+        public double retentionTime { get; set; }
+        public List<(float, float)> Spectrum { get; set; } //intensity, m/z
     }
 }

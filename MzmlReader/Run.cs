@@ -10,6 +10,7 @@ namespace MzmlParser
             Ms1Scans = new List<Scan>();
             Ms2Scans = new List<Scan>();
             Chromatograms = new Chromatograms();
+            BasePeaks = new List<BasePeak>();
         }
         public String SourceFileType { get; set; }
         public String SourceFileName { get; set; }
@@ -26,5 +27,7 @@ namespace MzmlParser
     {
         public List<(double, double)> Ms1Tic { get; set; }
         public List<(double, double)> Ms2Tic { get; set; }
+        public List<(double, double)> Ms1Bpc { get; set; }
+        public List<(double, double)> Ms2Bpc { get; set; }
     }
 }
