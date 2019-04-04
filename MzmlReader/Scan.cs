@@ -7,7 +7,7 @@ namespace MzmlParser
     public class Scan
     {
         public int Cycle { get; set; }
-        public int MsLevel { get; set; }
+        public int? MsLevel { get; set; }
         public double BasePeakIntensity { get; set; }
         public double BasePeakMz { get; set; }
         public double TotalIonCurrent { get; set; }  

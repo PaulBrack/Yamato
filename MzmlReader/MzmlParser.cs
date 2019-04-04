@@ -3,6 +3,7 @@ using System;
 using System.Xml;
 using System.Threading;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace MzmlParser
 {
@@ -11,32 +12,44 @@ namespace MzmlParser
         private const float BasePeakMinimumIntensity = 100;
         private const float BasePeakMaximumDeltaRt = 2;
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        private string lastScanRead = String.Empty;
+        private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
+        public int numberOfTasks = 0;
+        ManualResetEvent signal = new ManualResetEvent(false);
+        
 
         public Run LoadMzml(string path)
         {
-            logger.Info("Loading file: {0}", path);
-
             Run run = new Run();
-            using (XmlReader reader = XmlReader.Create(path))
+            using (CountdownEvent e = new CountdownEvent(1))
             {
-                while (reader.Read())
+                logger.Info("Loading file: {0}", path);
+                using (XmlReader reader = XmlReader.Create(path))
                 {
-                    if (reader.IsStartElement())
+                    while (reader.Read())
                     {
-                        switch (reader.LocalName)
+                        if (reader.IsStartElement())
                         {
-                            case "sourceFile":
-                                ReadSourceFileMetaData(reader, run);
-                                break;
-                            case "spectrum":
-                                ReadSpectrum(reader, run);
-                                break;
+                            switch (reader.LocalName)
+                            {
+                                case "sourceFile":
+                                    ReadSourceFileMetaData(reader, run);
+                                    break;
+                                case "spectrum":
+                                    ReadSpectrum(reader, run, e);
+                                    break;
+                                case "referenceableParamGroup":
+                                    if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
+                                        SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
+                                    break;
+                            }
                         }
                     }
                 }
+                e.Signal();
+                e.Wait();
             }
             FindMs2IsolationWindows(run);
+            
             return run;
         }
 
@@ -70,7 +83,7 @@ namespace MzmlParser
             }
         }
 
-        public void ReadSpectrum(XmlReader reader, Run run)
+        public void ReadSpectrum(XmlReader reader, Run run, CountdownEvent e)
         {
             ScanAndTempProperties scan = new ScanAndTempProperties();
 
@@ -82,13 +95,13 @@ namespace MzmlParser
             //
             //Paul Brack 2019/04/03
             scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
-        
+
             bool cvParamsRead = false;
-            while(reader.Read() && !cvParamsRead)
+            while (reader.Read() && !cvParamsRead)
             {
                 if (reader.IsStartElement())
                 {
-                    if(reader.LocalName == "cvParam")
+                    if (reader.LocalName == "cvParam")
                     {
                         switch (reader.GetAttribute("accession"))
                         {
@@ -118,14 +131,25 @@ namespace MzmlParser
                                 break;
                         }
                     }
+                    if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
+                    {
+                        if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
+                            scan.Scan.MsLevel = 1;
+                        else
+                            scan.Scan.MsLevel = 2;
+                    }
+                    
                 }
-                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum") 
+                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                 {
+                    e.AddCount();
+                    
                     // Put processor intensive work in a thread so we can get on with I/O
-                    ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run)); 
+                    ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ref e));
                     cvParamsRead = true;
                 }
             }
+           
         }
 
         private static string GetSucceedingBinaryDataArray(XmlReader reader)
@@ -138,28 +162,22 @@ namespace MzmlParser
                     if (reader.LocalName == "binary")
                     {
                         return reader.ReadElementContentAsString();
-
                     }
                 }
             }
             return base64;
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, ref CountdownEvent e)
         {
+  
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray);
 
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
-
-            
-
             AddScanToRun(scan.Scan, run);
-
-
-
-            //if (scan.Scan.BasePeakIntensity run.BasePeaks.Select(x => x.Mz ))
+            e.Signal();
         }
 
         private static float[] ExtractFloatArray(string Base64Array)
@@ -176,8 +194,9 @@ namespace MzmlParser
         {
             if (scan.MsLevel == 1)
                 run.Ms1Scans.Add(scan);
-            if (scan.MsLevel == 2)
+            else if (scan.MsLevel == 2)
                 run.Ms2Scans.Add(scan);
+            else { }
         }
 
         private void FindMs2IsolationWindows(Run run)

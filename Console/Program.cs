@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using NLog;
+using System.Threading;
 
 namespace Yamato.Console
 {
@@ -20,8 +21,8 @@ namespace Yamato.Console
 
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-
-                MzmlParser.Run run = new MzmlParser.MzmlParser().LoadMzml(path);
+                MzmlParser.MzmlParser mzmlParser = new MzmlParser.MzmlParser();
+                MzmlParser.Run run = mzmlParser.LoadMzml(path);
                 //run = new SwaMe.MetricGenerator().CalculateSwameMetrics(run);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
 
