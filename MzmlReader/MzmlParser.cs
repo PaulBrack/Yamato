@@ -174,14 +174,14 @@ namespace MzmlParser
             {
                 spectrum.Select(x => Math.Abs(x.Item2 - scan.Scan.BasePeakMz) <= massTolerance);
                 BasePeak basePeak = new BasePeak() { Mz = scan.Scan.BasePeakMz,
-                    retentionTime = scan.Scan.ScanStartTime,
+                    RetentionTime = scan.Scan.ScanStartTime,
                     Spectrum = spectrum.Where(x => Math.Abs(x.Item2 - scan.Scan.BasePeakMz) <= massTolerance).ToList() };
                 run.BasePeaks.Add(basePeak);
             }
             //Check to see if we have a basepeak we can add points to
             else 
             {
-                foreach(BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.retentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
+                foreach(BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
                 {
                     bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Item2 - bp.Mz) <= massTolerance)).OrderBy(x => x.Item3).ToList();
                 }
