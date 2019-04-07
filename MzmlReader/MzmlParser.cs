@@ -102,19 +102,23 @@ namespace MzmlParser
                                 scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000285":
-                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"));
+                                
+                                string s = reader.GetAttribute("value");
+                                s = s.ToUpper();
+                                scan.Scan.TotalIonCurrent = double.Parse(s, System.Globalization.CultureInfo.InvariantCulture);
+                                //scan.Scan.TotalIonCurrent = double.Parse(s);
                                 break;
                             case "MS:1000016":
-                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000827":
-                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000829":
-                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000828":
-                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000514":
                                 scan.Base64MzArray = GetSucceedingBinaryDataArray(reader);
@@ -167,7 +171,7 @@ namespace MzmlParser
             }
             
             scan.Scan.BasePeakIntensity = intensities.Max();
-            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
+            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];
 
             //Create a new basepeak if no matching one exists
             if(!run.BasePeaks.Exists(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance) && scan.Scan.BasePeakIntensity >= BasePeakMinimumIntensity) 

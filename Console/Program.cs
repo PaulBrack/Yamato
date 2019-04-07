@@ -27,6 +27,7 @@ namespace Yamato.Console
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
             });
+            LogManager.Shutdown();
         }
 
         private static void UpdateLoggingLevels(Options options)
@@ -48,10 +49,10 @@ namespace Yamato.Console
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
         public int Division{ get; set; }
 
-        [Option('u', "upperoffset", Required = false, HelpText = "Upper offset for m/z tolerance in m/z")]
+        [Option('u', "upperoffset", Required = false, HelpText = "m/z tolerance upper offset. The closest m/z value to the m/z of the basepeak that is still within the upper and lower offest from the basepeak m/z are part of the same chromatogram.")]
         public float UpperOffset{ get; set; }
 
-        [Option('l', "loweroffset", Required = false, HelpText = "Lower offset for m/z tolerance in m/z")]
+        [Option('l', "loweroffset", Required = false, HelpText = "m/z tolerance lower offset. The closest m/z value to the m/z of the basepeak that is still within the upper and lower offest from the basepeak m/z are part of the same chromatogram.")]
         public float LowerOffset{ get; set; }
     }
-}
+
