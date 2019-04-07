@@ -160,10 +160,10 @@ namespace MzmlParser
         {
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray);
-            var spectrum = new List<(float, float, float)>();
+            var spectrum = new List<SpectrumPoint>();
             for (int i=0; i < intensities.Length; i++)
             {
-                spectrum.Add((intensities[i], mzs[i], (float)scan.Scan.ScanStartTime));
+                spectrum.Add(new SpectrumPoint { Intensity = intensities[i], Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime });
             }
             
             scan.Scan.BasePeakIntensity = intensities.Max();
@@ -172,10 +172,10 @@ namespace MzmlParser
             //Create a new basepeak if no matching one exists
             if(!run.BasePeaks.Exists(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance) && scan.Scan.BasePeakIntensity >= BasePeakMinimumIntensity) 
             {
-                spectrum.Select(x => Math.Abs(x.Item2 - scan.Scan.BasePeakMz) <= massTolerance);
+                spectrum.Select(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance);
                 BasePeak basePeak = new BasePeak() { Mz = scan.Scan.BasePeakMz,
                     RetentionTime = scan.Scan.ScanStartTime,
-                    Spectrum = spectrum.Where(x => Math.Abs(x.Item2 - scan.Scan.BasePeakMz) <= massTolerance).ToList() };
+                    Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance).ToList() };
                 run.BasePeaks.Add(basePeak);
             }
             //Check to see if we have a basepeak we can add points to
@@ -183,7 +183,7 @@ namespace MzmlParser
             {
                 foreach(BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
                 {
-                    bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Item2 - bp.Mz) <= massTolerance)).OrderBy(x => x.Item3).ToList();
+                    bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance)).OrderBy(x => x.RetentionTime).ToList();
                 }
             }
             AddScanToRun(scan.Scan, run);
