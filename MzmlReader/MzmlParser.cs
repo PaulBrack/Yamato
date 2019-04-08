@@ -1,4 +1,4 @@
-﻿using NLog;
+using NLog;
 using System;
 using System.Xml;
 using System.Linq;
@@ -102,19 +102,19 @@ namespace MzmlParser
                                 scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000285":
-                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000016":
-                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000827":
-                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000829":
-                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000828":
-                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"));
+                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000514":
                                 scan.Base64MzArray = GetSucceedingBinaryDataArray(reader);
