@@ -102,11 +102,7 @@ namespace MzmlParser
                                 scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000285":
-                                
-                                string s = reader.GetAttribute("value");
-                                s = s.ToUpper();
-                                scan.Scan.TotalIonCurrent = double.Parse(s, System.Globalization.CultureInfo.InvariantCulture);
-                                //scan.Scan.TotalIonCurrent = double.Parse(s);
+                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000016":
                                 scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
@@ -171,7 +167,7 @@ namespace MzmlParser
             }
             
             scan.Scan.BasePeakIntensity = intensities.Max();
-            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];
+            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities,  scan.Scan.BasePeakIntensity())];
 
             //Create a new basepeak if no matching one exists
             if(!run.BasePeaks.Exists(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance) && scan.Scan.BasePeakIntensity >= BasePeakMinimumIntensity) 
