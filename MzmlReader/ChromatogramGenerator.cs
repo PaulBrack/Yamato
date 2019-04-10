@@ -46,8 +46,8 @@ namespace MzmlParser
             {
                 var selectedScans = run.Ms2Scans.Where(x => x.Cycle == cycle);
                 double startTime = selectedScans.First().ScanStartTime;
-                double tic = selectedScans.Select(x => x.BasePeakIntensity).Sum();
-                chromatogram.Add((startTime, tic));
+                double bp = selectedScans.Select(x => x.BasePeakIntensity).Max();
+                chromatogram.Add((startTime, bp));
             }
             return chromatogram;
         }
