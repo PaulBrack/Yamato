@@ -20,7 +20,11 @@ namespace Yamato.Console
 
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
+
                 MzmlParser.MzmlParser mzmlParser = new MzmlParser.MzmlParser();
+                if (options.ParseBinaryData == false)
+                    mzmlParser.ParseBinaryData = false;
+
                 MzmlParser.Run run = mzmlParser.LoadMzml(path);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                 new SwaMe.MetricGenerator().GenerateMetrics(run);
@@ -54,6 +58,9 @@ namespace Yamato.Console
 
         [Option('l', "loweroffset", Required = false, HelpText = "m/z tolerance lower offset. The closest m/z value to the m/z of the basepeak that is still within the upper and lower offest from the basepeak m/z are part of the same chromatogram.")]
         public float LowerOffset { get; set; }
+
+        [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]
+        public bool ParseBinaryData { get; set; }
     }
 }
 
