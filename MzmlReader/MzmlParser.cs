@@ -9,9 +9,29 @@ namespace MzmlParser
 {
     public class MzmlParser
     {
+        public MzmlParser()
+        {
+            ParseBinaryData = true;
+            ExtractBasePeaks = true;
+        }
+        public MzmlParser(bool extractBasePeaks)
+        {
+            ParseBinaryData = true;
+            ExtractBasePeaks = extractBasePeaks;
+        }
+        public MzmlParser(bool parseBinaryData, bool extractBasePeaks)
+        {
+            ParseBinaryData = parseBinaryData;
+            ExtractBasePeaks = extractBasePeaks;
+        }
+
+        public bool ExtractBasePeaks { get; set; }
+        public bool ParseBinaryData { get; set; }
+
         private const double BasePeakMinimumIntensity = 100;
         private const double massTolerance = 0.05;
         private const double rtTolerance = 2.5; //2.5 mins on either side
+
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static CountdownEvent cde = new CountdownEvent(1);
@@ -21,29 +41,30 @@ namespace MzmlParser
         public Run LoadMzml(string path)
         {
             Run run = new Run();
-                logger.Info("Loading file: {0}", path);
-                using (XmlReader reader = XmlReader.Create(path))
+            logger.Info("Loading file: {0}", path);
+
+            using (XmlReader reader = XmlReader.Create(path))
+            {
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    if (reader.IsStartElement())
                     {
-                        if (reader.IsStartElement())
+                        switch (reader.LocalName)
                         {
-                            switch (reader.LocalName)
-                            {
-                                case "sourceFile":
-                                    ReadSourceFileMetaData(reader, run);
-                                    break;
-                                case "spectrum":
-                                    ReadSpectrum(reader, run);
-                                    break;
-                                case "referenceableParamGroup":
-                                    if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
-                                        SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
-                                    break;
-                            }
+                            case "sourceFile":
+                                ReadSourceFileMetaData(reader, run);
+                                break;
+                            case "spectrum":
+                                ReadSpectrum(reader, run);
+                                break;
+                            case "referenceableParamGroup":
+                                if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
+                                    SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
+                                break;
                         }
                     }
-                }            
+                }
+            }
             cde.Signal();
             cde.Wait();
             FindMs2IsolationWindows(run);
@@ -138,8 +159,15 @@ namespace MzmlParser
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                 {
-                    cde.AddCount();
-                    ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run));
+                    if (ParseBinaryData)
+                    {
+                        cde.AddCount();
+                        ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks));
+                    }
+                    else
+                    {
+                        AddScanToRun(scan.Scan, run);
+                    }
                     cvParamsRead = true;
                 }
             }
@@ -161,44 +189,47 @@ namespace MzmlParser
             return base64;
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks)
         {
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray);
             var spectrum = new List<SpectrumPoint>();
-            for (int i=0; i < intensities.Length; i++)
+            for (int i = 0; i < intensities.Length; i++)
             {
                 spectrum.Add(new SpectrumPoint { Intensity = intensities[i], Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime });
             }
-            
+
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
             AddScanToRun(scan.Scan, run);
 
-            lock (Lock)
+            if (extractBasePeaks)
             {
-                //Create a new basepeak if no matching one exists
-                if (!run.BasePeaks.Exists(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance) && scan.Scan.BasePeakIntensity >= BasePeakMinimumIntensity)
+                lock (Lock)
                 {
-                    spectrum.Select(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance);
-                    BasePeak basePeak = new BasePeak()
+                    //Create a new basepeak if no matching one exists
+                    if (!run.BasePeaks.Exists(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance) && scan.Scan.BasePeakIntensity >= BasePeakMinimumIntensity)
                     {
-                        Mz = scan.Scan.BasePeakMz,
-                        RetentionTime = scan.Scan.ScanStartTime,
-                        Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance).ToList()
-                    };
-                    run.BasePeaks.Add(basePeak);
-                }
-                //Check to see if we have a basepeak we can add points to
-                else
-                {
-                    foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
+                        spectrum.Select(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance);
+                        BasePeak basePeak = new BasePeak()
+                        {
+                            Mz = scan.Scan.BasePeakMz,
+                            RetentionTime = scan.Scan.ScanStartTime,
+                            Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance).ToList()
+                        };
+                        run.BasePeaks.Add(basePeak);
+                    }
+                    //Check to see if we have a basepeak we can add points to
+                    else
                     {
-                        bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance)).OrderBy(x => x.RetentionTime).ToList();
+                        foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
+                        {
+                            bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance)).OrderBy(x => x.RetentionTime).ToList();
+                        }
                     }
                 }
             }
-            
+
             cde.Signal();
         }
 
