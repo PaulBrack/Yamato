@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NLog;
 
 namespace MzmlParser
 {
     public class ChromatogramGenerator
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         public Run CreateAllChromatograms(Run run)
         {
             run.Chromatograms.Ms1Tic = ExtractMs1TotalIonChromatogram(run);
