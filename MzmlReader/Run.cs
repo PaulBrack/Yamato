@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace MzmlParser
 {
@@ -8,7 +9,7 @@ namespace MzmlParser
         public Run()
         {
             Ms1Scans = new List<Scan>();
-            Ms2Scans = new List<Scan>();
+            Ms2Scans = new ConcurrentBag<Scan>();
             Chromatograms = new Chromatograms();
             BasePeaks = new List<BasePeak>();
         }
@@ -17,7 +18,7 @@ namespace MzmlParser
         public String SourceFilePath { get; set; }
         public String SourceFileChecksum { get; set; }
         public List<Scan> Ms1Scans { get; set; }
-        public List<Scan> Ms2Scans { get; set; }
+        public ConcurrentBag<Scan> Ms2Scans { get; set; }
         public List<BasePeak> BasePeaks { get;set; }
         public Chromatograms Chromatograms { get; set; }
         public List<(double, double)> IsolationWindows { get; set; }

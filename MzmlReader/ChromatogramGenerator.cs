@@ -33,7 +33,6 @@ namespace MzmlParser
         public List<(double, double)> ExtractMs2BasePeakChromatogram(Run run)
         {
             return run.Ms2Scans.GroupBy(x => x.Cycle).Select(x => new ValueTuple<double, double>(x.First().ScanStartTime, x.Select(y => y.BasePeakIntensity).Max())).ToList();
-
         }
     }
 }
