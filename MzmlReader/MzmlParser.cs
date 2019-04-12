@@ -225,6 +225,17 @@ namespace MzmlParser
                         foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
                         {
                             bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance)).OrderBy(x => x.RetentionTime).ToList();
+
+                            for (int yyy = 1; yyy < bp.Spectrum.Count(); yyy++)
+                            {
+                                if (Math.Abs(bp.Spectrum[yyy].RetentionTime) - Math.Abs(bp.Spectrum[yyy-1].RetentionTime) < 0.01) 
+                                {
+                                    if (bp.Spectrum[yyy].Intensity > bp.Spectrum[yyy - 1].Intensity)
+                                          bp.Spectrum.Remove(bp.Spectrum[yyy-1]);
+                                    else { bp.Spectrum.Remove(bp.Spectrum[yyy]); }
+                                }
+                                        
+                            }
                         }
                     }
                 }
