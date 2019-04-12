@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace SwaMe
 {
     class sgSmooth
@@ -35,8 +34,7 @@ namespace SwaMe
             {
                 i[j] = j;
             }
-
-           
+          
 
             // loop over permuted indices
             for (j = 0; j < A.GetLength(0); ++j)

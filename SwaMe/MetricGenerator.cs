@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System;
+using System.IO;
 
 namespace SwaMe
 {
@@ -10,8 +11,7 @@ namespace SwaMe
     {
         public void GenerateMetrics(Run run)
         {
-            StreamWriter sw = new StreamWriter("C:\\Users\\pauwmarina\\Desktop\\HannoSwath\\Text.txt");
-            int counter = 0;
+            
             foreach (BasePeak basepeak in run.BasePeaks)
             {
                 double[] intensities = new double[basepeak.Spectrum.Count()];

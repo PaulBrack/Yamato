@@ -14,10 +14,4 @@
     <ProjectReference Include="..\MzmlReader\MzmlParser.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="PresentationCore">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\PresentationCore.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
