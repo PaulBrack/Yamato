@@ -226,13 +226,20 @@ namespace MzmlParser
                         {
                             bp.Spectrum = bp.Spectrum.Concat(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance)).OrderBy(x => x.RetentionTime).ToList();
 
+                            //For every point in this base peak's spectrum....
                             for (int yyy = 1; yyy < bp.Spectrum.Count(); yyy++)
                             {
+                                //Is the RT within 1/100 of a minute of the last point? [proxy for "are we on the same cycle"]
                                 if (Math.Abs(bp.Spectrum[yyy].RetentionTime) - Math.Abs(bp.Spectrum[yyy-1].RetentionTime) < 0.01) 
                                 {
+                                    //Is the intensity of this point greater than the point before it?
                                     if (bp.Spectrum[yyy].Intensity > bp.Spectrum[yyy - 1].Intensity)
-                                          bp.Spectrum.Remove(bp.Spectrum[yyy-1]);
-                                    else { bp.Spectrum.Remove(bp.Spectrum[yyy]); }
+                                        //if so remove the point before
+                                        bp.Spectrum.Remove(bp.Spectrum[yyy-1]);
+                                    else {
+                                        //if not, keep it
+                                        bp.Spectrum.Remove(bp.Spectrum[yyy]);
+                                    }
                                 }
                                         
                             }
