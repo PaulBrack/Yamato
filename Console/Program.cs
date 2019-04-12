@@ -60,7 +60,7 @@ namespace Yamato.Console
         public float LowerOffset { get; set; }
 
         [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]
-        public bool ParseBinaryData { get; set; }
+        public bool? ParseBinaryData { get; set; }
     }
 }
 
