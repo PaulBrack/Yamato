@@ -141,13 +141,11 @@ namespace MzmlParser
                             case "MS:1000828":
                                 scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
-                            case "MS:1000514":
-                                scan.Base64MzArray = GetSucceedingBinaryDataArray(reader);
-                                break;
-                            case "MS:1000515":
-                                scan.Base64IntensityArray = GetSucceedingBinaryDataArray(reader);
-                                break;
                         }
+                    }
+                    else if (reader.LocalName == "binaryDataArray")
+                    {
+                        GetBinaryData(reader, scan);
                     }
                     if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
                     {
@@ -173,26 +171,74 @@ namespace MzmlParser
             }
         }
 
-        private static string GetSucceedingBinaryDataArray(XmlReader reader)
+        private static void GetBinaryData(XmlReader reader, ScanAndTempProperties scan)
         {
             string base64 = String.Empty;
-            while (reader.Read())
+            int bits = 0;
+            bool intensityArray = false;
+            bool mzArray = false;
+            bool binaryDataArrayRead = false;
+            bool IsZlibCompressed = false;
+
+            while (reader.Read() && binaryDataArrayRead == false)
             {
                 if (reader.IsStartElement())
                 {
-                    if (reader.LocalName == "binary")
+                    if (reader.LocalName == "cvParam")
                     {
-                        return reader.ReadElementContentAsString();
+                        switch (reader.GetAttribute("accession"))
+                        {
+                            case "MS:1000574":
+                                if (reader.GetAttribute("name") == "zlib compression")
+                                    IsZlibCompressed = true;
+                                break;
+                            case "MS:1000521":
+                                //32 bit float
+                                bits = 32;
+                                break;
+                            case "MS:1000523":
+                                //64 bit float
+                                bits = 64;
+                                break;
+                            case "MS:1000515":
+                                //intensity array
+                                intensityArray = true;
+                                break;
+                            case "MS:1000514":
+                                //mz array
+                                mzArray = true;
+                                break;
+                        }
+                    }
+                    else if (reader.LocalName == "binary")
+                    {
+                        base64 = reader.ReadElementContentAsString();
+                    }
+
+                }
+                if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "binaryDataArray")
+                {
+                    binaryDataArrayRead = true;
+                    if (intensityArray)
+                    {
+                        scan.Base64IntensityArray = base64;
+                        scan.IntensityBitLength = bits;
+                        scan.IntensityZlibCompressed = IsZlibCompressed;
+                    }
+                    else if (mzArray)
+                    {
+                        scan.Base64MzArray = base64;
+                        scan.MzBitLength = bits;
+                        scan.MzZlibCompressed = IsZlibCompressed;
                     }
                 }
             }
-            return base64;
         }
 
         private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks)
         {
-            float[] intensities = ExtractFloatArray(scan.Base64IntensityArray);
-            float[] mzs = ExtractFloatArray(scan.Base64MzArray);
+            float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
+            float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
             var spectrum = new List<SpectrumPoint>();
             for (int i = 0; i < intensities.Length; i++)
             {
@@ -233,13 +279,13 @@ namespace MzmlParser
             cde.Signal();
         }
 
-        private static float[] ExtractFloatArray(string Base64Array)
+        private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed, int bits)
         {
             byte[] bytes = Convert.FromBase64String(Base64Array);
-            float[] floats = new float[bytes.Length / 4];
+            float[] floats = new float[bytes.Length / (bits / 8)];
 
             for (int i = 0; i < floats.Length; i++)
-                floats[i] = BitConverter.ToSingle(bytes, i * 4);
+                floats[i] = BitConverter.ToSingle(bytes, i * (bits / 8));
             return floats;
         }
 
