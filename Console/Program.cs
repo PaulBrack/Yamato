@@ -24,6 +24,8 @@ namespace Yamato.Console
                 MzmlParser.MzmlParser mzmlParser = new MzmlParser.MzmlParser();
                 if (options.ParseBinaryData == false)
                     mzmlParser.ParseBinaryData = false;
+                if (options.Threading == false)
+                    mzmlParser.Threading = false;
 
                 MzmlParser.Run run = mzmlParser.LoadMzml(path);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
@@ -61,6 +63,9 @@ namespace Yamato.Console
 
         [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]
         public bool? ParseBinaryData { get; set; }
+
+        [Option('t', "threading", Required = false, HelpText = "whether threading is used")]
+        public bool? Threading { get; set; }
     }
 }
 

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 using System.IO.Compression;
+using ICSharpCode;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace MzmlParser
 {
@@ -15,20 +17,13 @@ namespace MzmlParser
         {
             ParseBinaryData = true;
             ExtractBasePeaks = true;
+            Threading = true;
         }
-        public MzmlParser(bool extractBasePeaks)
-        {
-            ParseBinaryData = true;
-            ExtractBasePeaks = extractBasePeaks;
-        }
-        public MzmlParser(bool parseBinaryData, bool extractBasePeaks)
-        {
-            ParseBinaryData = parseBinaryData;
-            ExtractBasePeaks = extractBasePeaks;
-        }
+
 
         public bool ExtractBasePeaks { get; set; }
         public bool ParseBinaryData { get; set; }
+        public bool Threading { get; set; }
 
         private const double BasePeakMinimumIntensity = 100;
         private const double massTolerance = 0.05;
@@ -161,8 +156,13 @@ namespace MzmlParser
                 {
                     if (ParseBinaryData)
                     {
-                        cde.AddCount();
-                        ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks));
+                        if (Threading)
+                        {
+                            cde.AddCount();
+                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading));
+                        }
+                        else
+                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading);
                     }
                     else
                     {
@@ -237,7 +237,7 @@ namespace MzmlParser
             }
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading)
         {
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
@@ -277,35 +277,144 @@ namespace MzmlParser
                     }
                 }
             }
-
-            cde.Signal();
+            if(threading)
+                cde.Signal();
         }
 
         private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed, int bits)
+        {
+            float[] floats = new float[0];
+            if (bits == 32)
+            {
+                floats = GetFloats(Base64Array, IsZlibCompressed);
+            }
+            else if(bits == 64)
+            {
+                floats = GetFloatsFromDoubles(Base64Array, IsZlibCompressed);
+            }
+            return floats;
+        }
+
+        private static float[] GetFloats(string Base64Array, bool IsZlibCompressed)
         {
             float[] floats;
             byte[] bytes = Convert.FromBase64String(Base64Array);
             if (!IsZlibCompressed)
             {
-                floats = new float[bytes.Length / (bits / 8)];
+                floats = new float[bytes.Length / 4];
                 for (int i = 0; i < floats.Length; i++)
-                    floats[i] = BitConverter.ToSingle(bytes, i * (bits / 8));
+                    floats[i] = BitConverter.ToSingle(bytes, i * 4);
             }
             else
             {
-                using (var memoryStream = new MemoryStream())
+                using (var memoryStream = new MemoryStream(bytes))
                 {
-                    int dataLength = BitConverter.ToInt32(bytes, 0);
-                    memoryStream.Write(bytes, (bits / 8), bytes.Length - (bits / 8));
-                    var buffer = new byte[dataLength];
-                    memoryStream.Position = 0;
-                    using (var deflateStream = new DeflateStream(memoryStream, CompressionMode.Decompress))
+                    //This skips past some encoding stuff
+                    memoryStream.ReadByte();
+                    memoryStream.ReadByte();
+                    List<byte> d_bytes = new List<byte>();
+                    using (var deflateStream = new Ionic.Zlib.DeflateStream(memoryStream, Ionic.Zlib.CompressionMode.Decompress))
                     {
-                        deflateStream.Read(buffer, 0, buffer.Length);
-                        floats = new float[buffer.Length / (bits / 8)];
-
+             
+                        using (BinaryReader reader = new BinaryReader(deflateStream))
+                        {
+                            //TODO: Exception handling like this is NOT how this should be done
+                            //
+                            //Paul Brack 2019/04/15
+                            try
+                            {
+                                while (true)
+                                {
+                                    d_bytes.Add(reader.ReadByte());
+                                }
+                            }
+                            catch { }
+                        }
+                        floats = new float[d_bytes.Count / 4];
+                        var d_bytes_array = d_bytes.ToArray();
                         for (int i = 0; i < floats.Length; i++)
-                            floats[i] = BitConverter.ToSingle(buffer, i * (bits / 8));
+                            floats[i] = BitConverter.ToSingle(d_bytes_array, i * 4);
+                    }
+                }
+            }
+            return floats;
+        }
+
+        private static float[] GetFloatsFromDoubles(string Base64Array, bool IsZlibCompressed)
+        {
+            float[] floats;
+            byte[] bytes = Convert.FromBase64String(Base64Array);
+            if (!IsZlibCompressed)
+            {
+                floats = new float[bytes.Length / 8];
+                for (int i = 0; i < floats.Length; i++)
+                    floats[i] = (float)(BitConverter.ToDouble(bytes, i * 8));
+            }
+            else
+            {
+                using (var memoryStream = new MemoryStream(bytes))
+                {
+                    //This skips past some encoding stuff
+                    memoryStream.ReadByte();
+                    memoryStream.ReadByte();
+                    List<double> doubles = new List<double>();
+                    using (var deflateStream = new Ionic.Zlib.DeflateStream(memoryStream, Ionic.Zlib.CompressionMode.Decompress))
+                    {
+                        using (BinaryReader reader = new BinaryReader(deflateStream))
+                        {
+                            //TODO: Exception handling like this is NOT how this should be done
+                            //
+                            //Paul Brack 2019/04/15
+                            try
+                            {
+                                while (true)
+                                {
+                                    doubles.Add(reader.ReadDouble());
+                                }
+                            }
+                            catch { }
+                        }
+                        floats = doubles.Select(x => (float)x).ToArray();
+                    }
+                }
+            }
+            return floats;
+        }
+
+        private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed)
+        {
+            float[] floats;
+            byte[] bytes = Convert.FromBase64String(Base64Array);
+            if (!IsZlibCompressed)
+            {
+                floats = new float[bytes.Length / 4];
+                for (int i = 0; i < floats.Length; i++)
+                    floats[i] = BitConverter.ToSingle(bytes, i * 4);
+            }
+            else
+            {
+                using (var memoryStream = new MemoryStream(bytes))
+                {
+                    int a = memoryStream.ReadByte();
+                    int b = memoryStream.ReadByte();
+                    List<byte> d_bytes = new List<byte>();
+                    using (var deflateStream = new Ionic.Zlib.DeflateStream(memoryStream, Ionic.Zlib.CompressionMode.Decompress))
+                    {
+                        int pos = 0;
+                        using (BinaryReader reader = new BinaryReader(deflateStream))
+                        {
+
+                            while (reader.PeekChar() != -1)
+                            {
+                                d_bytes.Add(reader.ReadByte());
+                                pos++;
+                            }
+
+                        }
+                        floats = new float[d_bytes.Count / 4];
+                        var d_bytes_array = d_bytes.ToArray();
+                        for (int i = 0; i < floats.Length; i++)
+                            floats[i] = BitConverter.ToSingle(d_bytes_array, i * 4);
                     }
                 }
             }
