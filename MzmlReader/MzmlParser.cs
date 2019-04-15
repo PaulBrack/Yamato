@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
+using Ionic.Zlib;
 
 namespace MzmlParser
 {
@@ -284,7 +285,7 @@ namespace MzmlParser
             byte[] bytes = Convert.FromBase64String(Base64Array);
             if (IsZlibCompressed)
             {
-                bytes = Ionic.Zlib.ZlibStream.UncompressBuffer(bytes);
+                bytes = ZlibStream.UncompressBuffer(bytes);
             }
             if (bits == 32)
             {
