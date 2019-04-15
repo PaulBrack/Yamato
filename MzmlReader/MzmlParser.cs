@@ -299,44 +299,13 @@ namespace MzmlParser
         {
             float[] floats;
             byte[] bytes = Convert.FromBase64String(Base64Array);
-            if (!IsZlibCompressed)
+            if (IsZlibCompressed)
             {
-                floats = new float[bytes.Length / 4];
-                for (int i = 0; i < floats.Length; i++)
-                    floats[i] = BitConverter.ToSingle(bytes, i * 4);
+                bytes = Ionic.Zlib.ZlibStream.UncompressBuffer(bytes);
             }
-            else
-            {
-                using (var memoryStream = new MemoryStream(bytes))
-                {
-                    //This skips past some encoding stuff
-                    memoryStream.ReadByte();
-                    memoryStream.ReadByte();
-                    List<byte> d_bytes = new List<byte>();
-                    using (var deflateStream = new Ionic.Zlib.DeflateStream(memoryStream, Ionic.Zlib.CompressionMode.Decompress))
-                    {
-             
-                        using (BinaryReader reader = new BinaryReader(deflateStream))
-                        {
-                            //TODO: Exception handling like this is NOT how this should be done
-                            //
-                            //Paul Brack 2019/04/15
-                            try
-                            {
-                                while (true)
-                                {
-                                    d_bytes.Add(reader.ReadByte());
-                                }
-                            }
-                            catch { }
-                        }
-                        floats = new float[d_bytes.Count / 4];
-                        var d_bytes_array = d_bytes.ToArray();
-                        for (int i = 0; i < floats.Length; i++)
-                            floats[i] = BitConverter.ToSingle(d_bytes_array, i * 4);
-                    }
-                }
-            }
+            floats = new float[bytes.Length / 4];
+            for (int i = 0; i < floats.Length; i++)
+                floats[i] = BitConverter.ToSingle(bytes, i * 4);
             return floats;
         }
 
@@ -344,40 +313,13 @@ namespace MzmlParser
         {
             float[] floats;
             byte[] bytes = Convert.FromBase64String(Base64Array);
-            if (!IsZlibCompressed)
+            if (IsZlibCompressed)
             {
-                floats = new float[bytes.Length / 8];
-                for (int i = 0; i < floats.Length; i++)
-                    floats[i] = (float)(BitConverter.ToDouble(bytes, i * 8));
+                bytes = Ionic.Zlib.ZlibStream.UncompressBuffer(bytes);
             }
-            else
-            {
-                using (var memoryStream = new MemoryStream(bytes))
-                {
-                    //This skips past some encoding stuff
-                    memoryStream.ReadByte();
-                    memoryStream.ReadByte();
-                    List<double> doubles = new List<double>();
-                    using (var deflateStream = new Ionic.Zlib.DeflateStream(memoryStream, Ionic.Zlib.CompressionMode.Decompress))
-                    {
-                        using (BinaryReader reader = new BinaryReader(deflateStream))
-                        {
-                            //TODO: Exception handling like this is NOT how this should be done
-                            //
-                            //Paul Brack 2019/04/15
-                            try
-                            {
-                                while (true)
-                                {
-                                    doubles.Add(reader.ReadDouble());
-                                }
-                            }
-                            catch { }
-                        }
-                        floats = doubles.Select(x => (float)x).ToArray();
-                    }
-                }
-            }
+            floats = new float[bytes.Length / 8];
+            for (int i = 0; i < floats.Length; i++)
+                floats[i] = (float)BitConverter.ToDouble(bytes, i * 8);
             return floats;
         }
 

@@ -71,7 +71,7 @@ namespace SwaMe
         {
             for (int i = 0; i < intensities.Length; i++)
             {
-                Debug.Assert(intensities[i] == interpolation.Interpolate(intensities[i]));
+                //Debug.Assert(intensities[i] == interpolation.Interpolate(intensities[i]));
             }
         }
     }
