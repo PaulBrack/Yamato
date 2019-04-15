@@ -4,6 +4,8 @@ using System.Xml;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using System.IO;
+using System.IO.Compression;
 
 namespace MzmlParser
 {
@@ -281,11 +283,32 @@ namespace MzmlParser
 
         private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed, int bits)
         {
+            float[] floats;
             byte[] bytes = Convert.FromBase64String(Base64Array);
-            float[] floats = new float[bytes.Length / (bits / 8)];
+            if (!IsZlibCompressed)
+            {
+                floats = new float[bytes.Length / (bits / 8)];
+                for (int i = 0; i < floats.Length; i++)
+                    floats[i] = BitConverter.ToSingle(bytes, i * (bits / 8));
+            }
+            else
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    int dataLength = BitConverter.ToInt32(bytes, 0);
+                    memoryStream.Write(bytes, (bits / 8), bytes.Length - (bits / 8));
+                    var buffer = new byte[dataLength];
+                    memoryStream.Position = 0;
+                    using (var deflateStream = new DeflateStream(memoryStream, CompressionMode.Decompress))
+                    {
+                        deflateStream.Read(buffer, 0, buffer.Length);
+                        floats = new float[bytes.Length / (bits / 8)];
 
-            for (int i = 0; i < floats.Length; i++)
-                floats[i] = BitConverter.ToSingle(bytes, i * (bits / 8));
+                        for (int i = 0; i < floats.Length; i++)
+                            floats[i] = BitConverter.ToSingle(bytes, i * (bits / 8));
+                    }
+                }
+            }
             return floats;
         }
 
