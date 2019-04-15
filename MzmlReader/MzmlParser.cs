@@ -283,18 +283,17 @@ namespace MzmlParser
         {
             float[] floats = new float[0];
             byte[] bytes = Convert.FromBase64String(Base64Array);
+
             if (IsZlibCompressed)
-            {
                 bytes = ZlibStream.UncompressBuffer(bytes);
-            }
+
             if (bits == 32)
-            {
                 floats = GetFloats(bytes);
-            }
             else if(bits == 64)
-            {
                 floats = GetFloatsFromDoubles(bytes);
-            }
+            else
+                throw new ArgumentOutOfRangeException("bits", "Numbers must be 32 or 64 bits");
+
             return floats;
         }
 
