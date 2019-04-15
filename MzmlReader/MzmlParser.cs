@@ -302,10 +302,10 @@ namespace MzmlParser
                     using (var deflateStream = new DeflateStream(memoryStream, CompressionMode.Decompress))
                     {
                         deflateStream.Read(buffer, 0, buffer.Length);
-                        floats = new float[bytes.Length / (bits / 8)];
+                        floats = new float[buffer.Length / (bits / 8)];
 
                         for (int i = 0; i < floats.Length; i++)
-                            floats[i] = BitConverter.ToSingle(bytes, i * (bits / 8));
+                            floats[i] = BitConverter.ToSingle(buffer, i * (bits / 8));
                     }
                 }
             }
