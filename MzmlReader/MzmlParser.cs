@@ -5,9 +5,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
-using System.IO.Compression;
-using ICSharpCode;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace MzmlParser
 {
@@ -284,82 +281,35 @@ namespace MzmlParser
         private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed, int bits)
         {
             float[] floats = new float[0];
-            if (bits == 32)
-            {
-                floats = GetFloats(Base64Array, IsZlibCompressed);
-            }
-            else if(bits == 64)
-            {
-                floats = GetFloatsFromDoubles(Base64Array, IsZlibCompressed);
-            }
-            return floats;
-        }
-
-        private static float[] GetFloats(string Base64Array, bool IsZlibCompressed)
-        {
-            float[] floats;
             byte[] bytes = Convert.FromBase64String(Base64Array);
             if (IsZlibCompressed)
             {
                 bytes = Ionic.Zlib.ZlibStream.UncompressBuffer(bytes);
             }
-            floats = new float[bytes.Length / 4];
+            if (bits == 32)
+            {
+                floats = GetFloats(bytes);
+            }
+            else if(bits == 64)
+            {
+                floats = GetFloatsFromDoubles(bytes);
+            }
+            return floats;
+        }
+
+        private static float[] GetFloats(byte[] bytes)
+        {
+            float[] floats = new float[bytes.Length / 4];
             for (int i = 0; i < floats.Length; i++)
                 floats[i] = BitConverter.ToSingle(bytes, i * 4);
             return floats;
         }
 
-        private static float[] GetFloatsFromDoubles(string Base64Array, bool IsZlibCompressed)
+        private static float[] GetFloatsFromDoubles(byte[] bytes)
         {
-            float[] floats;
-            byte[] bytes = Convert.FromBase64String(Base64Array);
-            if (IsZlibCompressed)
-            {
-                bytes = Ionic.Zlib.ZlibStream.UncompressBuffer(bytes);
-            }
-            floats = new float[bytes.Length / 8];
+            float[] floats = new float[bytes.Length / 8];
             for (int i = 0; i < floats.Length; i++)
                 floats[i] = (float)BitConverter.ToDouble(bytes, i * 8);
-            return floats;
-        }
-
-        private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed)
-        {
-            float[] floats;
-            byte[] bytes = Convert.FromBase64String(Base64Array);
-            if (!IsZlibCompressed)
-            {
-                floats = new float[bytes.Length / 4];
-                for (int i = 0; i < floats.Length; i++)
-                    floats[i] = BitConverter.ToSingle(bytes, i * 4);
-            }
-            else
-            {
-                using (var memoryStream = new MemoryStream(bytes))
-                {
-                    int a = memoryStream.ReadByte();
-                    int b = memoryStream.ReadByte();
-                    List<byte> d_bytes = new List<byte>();
-                    using (var deflateStream = new Ionic.Zlib.DeflateStream(memoryStream, Ionic.Zlib.CompressionMode.Decompress))
-                    {
-                        int pos = 0;
-                        using (BinaryReader reader = new BinaryReader(deflateStream))
-                        {
-
-                            while (reader.PeekChar() != -1)
-                            {
-                                d_bytes.Add(reader.ReadByte());
-                                pos++;
-                            }
-
-                        }
-                        floats = new float[d_bytes.Count / 4];
-                        var d_bytes_array = d_bytes.ToArray();
-                        for (int i = 0; i < floats.Length; i++)
-                            floats[i] = BitConverter.ToSingle(d_bytes_array, i * 4);
-                    }
-                }
-            }
             return floats;
         }
 
@@ -369,7 +319,9 @@ namespace MzmlParser
                 run.Ms1Scans.Add(scan);
             else if (scan.MsLevel == 2)
                 run.Ms2Scans.Add(scan);
-            else { }
+            else {
+                throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
+            }
         }
 
         private void FindMs2IsolationWindows(Run run)
