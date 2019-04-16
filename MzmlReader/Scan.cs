@@ -1,4 +1,6 @@
-﻿namespace MzmlParser
+﻿using System.Collections.Generic;
+
+namespace MzmlParser
 {
     public class Scan
     {
@@ -11,6 +13,8 @@
         public double IsolationWindowTargetMz { get; set; }
         public double IsolationWindowUpperOffset { get; set; }
         public double IsolationWindowLowerOffset { get; set; }
+
+        public List<SpectrumPoint> Spectrum { get; set; }
     }
 
     public class ScanAndTempProperties
