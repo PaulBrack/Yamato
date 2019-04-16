@@ -239,11 +239,7 @@ namespace MzmlParser
         {
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
-            var spectrum = new List<SpectrumPoint>();
-            for (int i = 0; i < intensities.Length; i++)
-            {
-                spectrum.Add(new SpectrumPoint { Intensity = intensities[i], Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime });
-            }
+            var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
 
             //Want to potentially chuck 30GB of scan data into RAM? This is how you do it...
             //scan.Scan.Spectrum = spectrum;
