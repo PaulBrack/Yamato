@@ -21,7 +21,7 @@ namespace SwaMe
                 }
             }
 
-            for (int it = mIIndex; it > 0; it--)
+            for (int it = mIIndex; it < intensities.Length; it++)
             {
                 if (intensities[it] < halfMax)
                 {
@@ -46,7 +46,7 @@ namespace SwaMe
                 }
             }
 
-            for (int it = mIIndex; it > 0; it--)
+            for (int it = mIIndex; it < intensities.Length ; it++)
             {
                 if (intensities[it] < fiveMax)
                 {
