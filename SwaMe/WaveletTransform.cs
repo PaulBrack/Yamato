@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,8 +48,6 @@ namespace WaveletLibrary
             while (((data.NoCols + extraCols) >> levels) << levels != (data.NoCols + extraCols))
                 extraCols++;
 
-            Console.WriteLine(string.Format("Padding for {0} level(s), PadRows = {1}, PadCols = {2}", levels, extraRows, extraCols));
-
             var result = new Matrix(data.NoRows + extraRows, data.NoCols + extraCols);
             for (int j = 0; j < data.NoCols; j++)
                 for (int i = 0; i < data.NoRows; i++)
@@ -63,7 +61,6 @@ namespace WaveletLibrary
             int n = data.NoCols / (int)Math.Pow(2, level - 1);
             for (int i = 0; i < n; i++)
             {
-                //Console.WriteLine(string.Format("Level = {0}, Col = {1}", level, i));
                 data.SelectCol(i);
                 if (direction == Direction.Forward)
                     _lifter.ForwardTrans(data, level);
@@ -79,7 +76,6 @@ namespace WaveletLibrary
             int n = data.NoRows / (int)Math.Pow(2, level - 1);
             for (int i = 0; i < n; i++)
             {
-                //Console.WriteLine(String.Format("Level = {0}, Row = {1}", level, i));
                 data.SelectRow(i);
                 if (direction == Direction.Forward)
                     _lifter.ForwardTrans(data, level);

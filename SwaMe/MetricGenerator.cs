@@ -1,14 +1,20 @@
 using MzmlParser;
 using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System;
 using System.IO;
+using MathNet.Numerics.Interpolation;
 
 namespace SwaMe
 {
     public class MetricGenerator
     {
+        public struct RTandInt
+        {
+            public double[] starttimes;
+            public double[] intensities;
+        }
+
         public void GenerateMetrics(Run run)
         {
             
@@ -21,57 +27,16 @@ namespace SwaMe
                     intensities[iii] = basepeak.Spectrum[iii].Intensity;
                     starttimes[iii] = basepeak.Spectrum[iii].RetentionTime;
                 }
-              
 
-                List<double> intensityList = new List<double>();
-                List<double> starttimesList = new List<double>();
+                //if there are less than two datapoints we cannot calculate chromatogrammetrics:
+                if (starttimes.Count() < 2) { continue; }
+               
                 //if there are not enough datapoints, interpolate:
                 if (starttimes.Count() < 100)
                 {
-                    //First step is interpolating a spline, then choosing the pointsat which to add values:
-                    MathNet.Numerics.Interpolation.NevillePolynomialInterpolation interpolation = MathNet.Numerics.Interpolation.NevillePolynomialInterpolation.InterpolateSorted(starttimes, intensities);
-                    //Check to see the original datapoints are still there:
-                    FitsAtSamplePoints(intensities, interpolation);
-
-                    double stimesinterval = starttimes.Last() - starttimes[0];
-                    int numNeeded = 100 - starttimes.Count();
-                    double intervals = stimesinterval / numNeeded;
-                    intensityList = intensities.OfType<double>().ToList();
-                    starttimesList = starttimes.OfType<double>().ToList();
-                    for (int uuu = 0; uuu < numNeeded; uuu++)
-                    {
-                        double placetobe = starttimes[0] + (intervals * uuu);
-                        
-                        //insert newIntensity into the correct spot in the array
-                        for (int yyy = 0; yyy < 100; yyy++)
-                        {
-                            if (starttimesList[yyy] < placetobe) { continue; }
-                            else
-                            {
-                                
-                                if (yyy > 0)
-                                {
-                                    if (starttimesList[yyy] == placetobe) { placetobe = placetobe + 0.01; }
-                                    double newIntensity = interpolation.Interpolate(placetobe);
-                                    intensityList.Insert(yyy, newIntensity);
-                                    starttimesList.Insert(yyy , placetobe);
-                                }
-                                else {
-                                    if (starttimesList[yyy] == placetobe) { placetobe = placetobe - 0.01; }
-                                    double newIntensity = interpolation.Interpolate(placetobe);
-                                    intensityList.Insert(yyy, newIntensity);
-                                    starttimesList.Insert(yyy, placetobe);
-                                }
-                                
-                                break;
-                                /*double[] newintensities = new double[starttimes.Count()+1];
-                                myArrSegMid2.CopyTo(z, yyy+1);*/
-                            }
-                        }
-                    }
-
-                    intensities = intensityList.Select(item => Convert.ToDouble(item)).ToArray();
-                    starttimes = starttimesList.Select(item => Convert.ToDouble(item)).ToArray();
+                    RTandInt ri = Interpolate(starttimes, intensities);
+                    intensities = ri.intensities;
+                    starttimes = ri.starttimes;
                 }
 
                 double[,] array3 = new double[1,intensities.Length];
@@ -83,12 +48,9 @@ namespace SwaMe
                 WaveletLibrary.Matrix dataMatrix = new WaveletLibrary.Matrix(array3);
                 
                 
-                Console.WriteLine("Setup wavelet transform...");
                 var transform = new WaveletLibrary.WaveletTransform(new WaveletLibrary.HaarLift(), 1);
-                Console.WriteLine("Wavelet transform...");
                 dataMatrix = transform.DoForward(dataMatrix);
 
-                // intensities = dataMatrix[0];                //sgSmooth smooth = new sgSmooth { };
                 double[] Smoothedms2bpc = new double[intensities.Length];
                 for (int aaa = 0; aaa < intensities.Length; aaa++)
                 {
@@ -103,7 +65,58 @@ namespace SwaMe
                 double FpctHM = cm.CalculateFpctHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
             }
         }
-         
+
+        private RTandInt Interpolate(double[] starttimes,double [] intensities)
+        {
+            List<double> intensityList = new List<double>();
+            List<double> starttimesList = new List<double>();
+
+            //First step is interpolating a spline, then choosing the pointsat which to add values:
+            CubicSpline interpolation = CubicSpline.InterpolateNatural(starttimes, intensities);
+
+            //Now we work out how many to add so we reach at least 100 datapoints and add them:
+            double stimesinterval = starttimes.Last() - starttimes[0];
+            int numNeeded = 100 - starttimes.Count();
+            double intervals = stimesinterval / numNeeded;
+            intensityList = intensities.OfType<double>().ToList();
+            starttimesList = starttimes.OfType<double>().ToList();
+            for (int uuu = 0; uuu < numNeeded; uuu++)
+            {
+                double placetobe = starttimes[0] + (intervals * uuu);
+
+                //insert newIntensity into the correct spot in the array
+                for (int currentintensity = 0; currentintensity < 100; currentintensity++)
+                {
+                    if (starttimesList[currentintensity] < placetobe) { continue; }
+                    else
+                    {
+
+                        if (currentintensity > 0)
+                        {
+                            if (starttimesList[currentintensity] == placetobe) { placetobe = placetobe + 0.01; }
+                            double newIntensity = interpolation.Interpolate(placetobe);
+                            intensityList.Insert(currentintensity, newIntensity);
+                            starttimesList.Insert(currentintensity, placetobe);
+                        }
+                        else
+                        {
+                            if (starttimesList[currentintensity] == placetobe) { placetobe = placetobe - 0.01; }
+                            double newIntensity = interpolation.Interpolate(placetobe);
+                            intensityList.Insert(currentintensity, newIntensity);
+                            starttimesList.Insert(currentintensity, placetobe);
+                        }
+
+                        break;
+                    }
+                }
+            }
+            RTandInt ri = new RTandInt();
+            ri.intensities = intensityList.Select(item => Convert.ToDouble(item)).ToArray();
+            ri.starttimes = starttimesList.Select(item => Convert.ToDouble(item)).ToArray();
+
+            return ri;
+
+        }
 
     }
 }
