@@ -2,7 +2,6 @@ using MzmlParser;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using System.IO;
 using MathNet.Numerics.Interpolation;
 
 namespace SwaMe
@@ -15,11 +14,31 @@ namespace SwaMe
             public double[] intensities;
         }
 
-        public void GenerateMetrics(Run run)
+        public void GenerateMetrics(Run run, int division)
         {
-            
+
+            //Acquire RTDuration:
+            double RTDuration =  run.BasePeaks[run.BasePeaks.Count()-1].RetentionTime - run.BasePeaks[0].RetentionTime;
+            double RTsegment = RTDuration / division;
+            double[] RTsegs = new double[division];
+
+            for (int uuu = 0; uuu < division; uuu++)
+            {
+                RTsegs[uuu] = run.BasePeaks[0].RetentionTime + RTsegment*uuu;
+            }
+
             foreach (BasePeak basepeak in run.BasePeaks)
             {
+                //Check to see in which RTsegment this basepeak is:
+                for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
+                {
+                    if (basepeak.RetentionTime < RTsegs[0] ) basepeak.RTsegment = 0;
+                    if (basepeak.RetentionTime > RTsegs[segmentboundary-1] && basepeak.RetentionTime < RTsegs[segmentboundary])
+                    {
+                        basepeak.RTsegment = segmentboundary;
+                    }
+                }
+                
                 double[] intensities = new double[basepeak.Spectrum.Count()];
                 double[] starttimes = new double[basepeak.Spectrum.Count()];
                 for (int iii = 0; iii< basepeak.Spectrum.Count(); iii++)
@@ -61,9 +80,13 @@ namespace SwaMe
                 int mIIndex = Array.IndexOf(Smoothedms2bpc, Smoothedms2bpc.Max());
                 double baseline = Smoothedms2bpc.Where(i => i > 0).DefaultIfEmpty(int.MinValue).Min();
                 ChromatogramMetrics cm = new ChromatogramMetrics { };
-                double FWHM = cm.CalculateFWHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
-                double FpctHM = cm.CalculateFpctHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                basepeak.FWHM = cm.CalculateFWHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                basepeak.FpctHM = cm.CalculateFpctHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                
+
             }
+            RTDivider Rd = new RTDivider { };
+            Rd.DivideByRT(run, division);
         }
 
         private RTandInt Interpolate(double[] starttimes,double [] intensities)
