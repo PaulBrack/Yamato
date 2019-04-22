@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace MzmlParser
 {
@@ -7,5 +7,8 @@ namespace MzmlParser
         public double Mz { get; set; }
         public double RetentionTime { get; set; }
         public List<SpectrumPoint> Spectrum { get; set; }
+        public double RTsegment { get; set; }
+        public double FWHM;
+        public double peaksym;
     }
 }

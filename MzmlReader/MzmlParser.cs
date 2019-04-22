@@ -4,7 +4,6 @@ using System.Xml;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
-using System.IO;
 using Ionic.Zlib;
 
 namespace MzmlParser
