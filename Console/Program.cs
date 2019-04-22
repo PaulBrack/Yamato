@@ -7,13 +7,16 @@ namespace Yamato.Console
 {
     class Program
     {
+        
         private static Logger logger = LogManager.GetCurrentClassLogger();
+     
 
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
                 UpdateLoggingLevels(options);
+                int division = options.Division;
 
                 string path = options.InputFile;
                 logger.Info("Loading file: {0}", path);
@@ -29,7 +32,7 @@ namespace Yamato.Console
 
                 MzmlParser.Run run = mzmlParser.LoadMzml(path);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run);
+                new SwaMe.MetricGenerator().GenerateMetrics(run, division);
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
             });
@@ -47,7 +50,7 @@ namespace Yamato.Console
         }
     }
 
-    class Options
+    public class Options
     {
         [Option('i', "inputfile", Required = true, HelpText = "Input file path.")]
         public String InputFile { get; set; }

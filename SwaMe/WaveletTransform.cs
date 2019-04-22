@@ -22,7 +22,6 @@ namespace WaveletLibrary
 
             for (var level = 1; level <= _levels; level++)
             {
-                Console.WriteLine(string.Format("Level = {0}", level)); 
                 TransformRows(data2, level, Direction.Forward);
                 TransformCols(data2, level, Direction.Forward);
             }
@@ -33,8 +32,7 @@ namespace WaveletLibrary
 
         private void Shrink(Matrix larger, Matrix smaller)
         {
-            Console.WriteLine(string.Format("Removing padding..."));
-            for (int j = 0; j < smaller.NoCols; j++)
+           for (int j = 0; j < smaller.NoCols; j++)
                 for (int i = 0; i < smaller.NoRows; i++)
                     smaller[i, j] = larger[i, j];
         }
