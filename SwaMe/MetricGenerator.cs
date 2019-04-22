@@ -80,12 +80,8 @@ namespace SwaMe
                 int mIIndex = Array.IndexOf(Smoothedms2bpc, Smoothedms2bpc.Max());
                 double baseline = Smoothedms2bpc.Where(i => i > 0).DefaultIfEmpty(int.MinValue).Min();
                 ChromatogramMetrics cm = new ChromatogramMetrics { };
-                basepeak.FWHM = cm.CalculateFWHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
-                double peakTime = starttimes[mIIndex];
-                double fwfpct = cm.CalculateFpctHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
-                double f = Math.Abs(peakTime - fwfpct);
-                basepeak.peaksym = fwfpct / (2 * f);
-
+                double FWHM = cm.CalculateFWHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                double FpctHM = cm.CalculateFpctHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
             }
             RTDivider Rd = new RTDivider { };
             Rd.DivideByRT(run, division);
@@ -145,3 +141,9 @@ namespace SwaMe
 
     }
 }
+
+                basepeak.FWHM = cm.CalculateFWHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                double peakTime = starttimes[mIIndex];
+                double fwfpct = cm.CalculateFpctHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                double f = Math.Abs(peakTime - fwfpct);
+                basepeak.peaksym = fwfpct / (2 * f);
