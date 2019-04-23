@@ -9,18 +9,18 @@ namespace SwaMe
     {
         public void DivideByRT(MzmlParser.Run run, int division)
         {
-            StreamWriter sw = new StreamWriter("PeakWidths.csv");
-            sw.Write("Filename , ");
-            StreamWriter sym = new StreamWriter("Symmetry.csv");
-            sym.Write("Filename, ");
+            StreamWriter sw = new StreamWriter("PeakWidths.tsv");
+            sw.Write("Filename \t ");
+            StreamWriter sym = new StreamWriter("Symmetry.tsv");
+            sym.Write("Filename\t ");
             for (int divider = 0; divider < division; divider++)
             {
                 sw.Write("RTsegment");
                 sw.Write(division);
-                sw.Write(" , ");
+                sw.Write(" \t ");
                 sym.Write("RTsegment");
                 sym.Write(division);
-                sym.Write(" , ");
+                sym.Write(" \t ");
             }
             sw.Write("\n");
             sw.Write(run.SourceFileName);
@@ -41,9 +41,10 @@ namespace SwaMe
                     }
                 }
                 double pwMean = PeakwidthsTemp.Average();
-                sym.Write(" , ");
-                sym.Write(pwMean.ToString());
-                sw.Write(" , ");
+                double psMean = PeaksymTemp.Average();
+                sym.Write(" \t ");
+                sym.Write(psMean.ToString());
+                sw.Write(" \t ");
                 sw.Write(pwMean.ToString());
             }
             sw.Close();

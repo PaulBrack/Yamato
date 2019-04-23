@@ -80,11 +80,44 @@ namespace SwaMe
                 int mIIndex = Array.IndexOf(Smoothedms2bpc, Smoothedms2bpc.Max());
                 double baseline = Smoothedms2bpc.Where(i => i > 0).DefaultIfEmpty(int.MinValue).Min();
                 ChromatogramMetrics cm = new ChromatogramMetrics { };
-                double FWHM = cm.CalculateFWHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
-                double FpctHM = cm.CalculateFpctHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                basepeak.FWHM = cm.CalculateFWHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                double peakTime = starttimes[mIIndex];
+                double fwfpct = cm.CalculateFpctHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
+                double f = Math.Abs(peakTime - fwfpct);
+                basepeak.peaksym = fwfpct / (2 * f);
             }
+            //Retrieving swath size difference
+            double largestSwath = 0;
+            double smallestSwath = 400;
+            foreach (Scan scan in run.Ms2Scans)
+            {
+                double swathsize = scan.IsolationWindowTargetMz + scan.IsolationWindowUpperOffset - (scan.IsolationWindowTargetMz - scan.IsolationWindowLowerOffset);
+                if (swathsize > largestSwath) { largestSwath = swathsize;continue; }
+                if (swathsize < smallestSwath) { smallestSwath = swathsize;  }
+                
+            }
+
+            double swathSizeDifference = largestSwath - smallestSwath;
+            
+            //Retrieveing num OfSwathscans
+            int maxswath = 0;
+            var result = run.Ms2Scans.GroupBy(s => s.Cycle).Select(g => new { Count = g.Count() });
+            foreach (var e in result)
+                if (e.Count > maxswath) { maxswath = e.Count; }
+
+            //Retrieving cycletimesmetrics
+            var CycleTimes = run.Ms2Scans.GroupBy(s => s.Cycle).Select(g => g.OrderByDescending(d => d.ScanStartTime))
+            .Select(e =>e.First().ScanStartTime - e.Last().ScanStartTime)
+            .ToList();
+
+            //Retrieving Density metrics
+            var Density =  run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
+
+
             RTDivider Rd = new RTDivider { };
             Rd.DivideByRT(run, division);
+            UndividedMetrics Um = new UndividedMetrics { };
+            Um.UndividedMetrix(run, RTDuration, swathSizeDifference, run.Ms2Scans.Count(),maxswath, CycleTimes[CycleTimes.Count()/2],IQR(CycleTimes,CycleTimes.Count()-1),Density[Density.Count()/2],IQR(Density, Density.Count()-1), run.Ms1Scans.Count());
         }
 
         private RTandInt Interpolate(double[] starttimes,double [] intensities)
@@ -139,11 +172,29 @@ namespace SwaMe
 
         }
 
+        public double IQR(List<double> list,int length)
+        {
+
+            // Note list must already be sorted.
+            double median = list[length/2];
+            double Q1 = list[length/4];
+            double Q3 = list[length / 4*3];
+            return (Q3 - Q1);
+
+        }
+
+        public int IQR(List<int> list, int length)
+        {
+
+            // Note list must already be sorted.
+            int median = list[length / 2];
+            int Q1 = list[length / 4];
+            int Q3 = list[length / 4 * 3];
+            return (Q3 - Q1);
+
+        }
+
     }
 }
 
-                basepeak.FWHM = cm.CalculateFWHM( starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
-                double peakTime = starttimes[mIIndex];
-                double fwfpct = cm.CalculateFpctHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
-                double f = Math.Abs(peakTime - fwfpct);
-                basepeak.peaksym = fwfpct / (2 * f);
+                

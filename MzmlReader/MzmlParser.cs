@@ -242,7 +242,7 @@ namespace MzmlParser
 
             //Want to potentially chuck 30GB of scan data into RAM? This is how you do it...
             //scan.Scan.Spectrum = spectrum;
-
+            scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
             AddScanToRun(scan.Scan, run);
