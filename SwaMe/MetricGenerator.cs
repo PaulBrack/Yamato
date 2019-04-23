@@ -89,12 +89,23 @@ namespace SwaMe
             //Retrieving swath size difference
             double largestSwath = 0;
             double smallestSwath = 400;
+
             foreach (Scan scan in run.Ms2Scans)
             {
                 double swathsize = scan.IsolationWindowTargetMz + scan.IsolationWindowUpperOffset - (scan.IsolationWindowTargetMz - scan.IsolationWindowLowerOffset);
                 if (swathsize > largestSwath) { largestSwath = swathsize;continue; }
                 if (swathsize < smallestSwath) { smallestSwath = swathsize;  }
-                
+                //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
+                for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
+                {
+                    if (scan.ScanStartTime < RTsegs[0]) { scan.RTsegment = 0; break; }
+                    else if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
+                    {
+                        scan.RTsegment = segmentboundary;
+                        break;
+                    }
+                    else if (scan.ScanStartTime > RTsegs[segmentboundary] && segmentboundary==RTsegs.Count()) { scan.RTsegment = segmentboundary + 1; break; }
+                }
             }
 
             double swathSizeDifference = largestSwath - smallestSwath;
@@ -113,9 +124,26 @@ namespace SwaMe
             //Retrieving Density metrics
             var Density =  run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
 
+            //Retrieve TICChange metrics and divide into rtsegs
+            List<double> TICchange50List = new List<double>();
+            List<double> TICchangeIQRList = new List<double>();
+            var TempTIC = run.Ms2Scans.GroupBy(x=>x.RTsegment).Select(d=>d.OrderBy(x => x.ScanStartTime).Select(g => g.TotalIonCurrent).ToList());
+            for (int eee = 1; eee < TempTIC.Count(); eee++)
+            {
+                var Temp = TempTIC.ElementAt(eee);
+                List<double> Templist = new List<double>();
+                for (int uuu = 1; uuu < Temp.Count(); uuu++)
+                {
+                    Templist.Add(Temp.ElementAt(uuu) - Temp.ElementAt(uuu - 1));
+                   
+                }
+                TICchange50List.Add(Templist.Average());
+                TICchangeIQRList.Add(IQR(Templist, Templist.Count()));
+            }
+
 
             RTDivider Rd = new RTDivider { };
-            Rd.DivideByRT(run, division);
+            Rd.DivideByRT(run, division, TICchange50List, TICchangeIQRList);
             UndividedMetrics Um = new UndividedMetrics { };
             Um.UndividedMetrix(run, RTDuration, swathSizeDifference, run.Ms2Scans.Count(),maxswath, CycleTimes[CycleTimes.Count()/2],IQR(CycleTimes,CycleTimes.Count()-1),Density[Density.Count()/2],IQR(Density, Density.Count()-1), run.Ms1Scans.Count());
         }
