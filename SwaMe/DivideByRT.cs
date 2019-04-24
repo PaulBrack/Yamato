@@ -7,21 +7,29 @@ namespace SwaMe
 {
     class RTDivider
     {
-        public void DivideByRT(MzmlParser.Run run, int division)
+        public void DivideByRT(MzmlParser.Run run, int division, List<double> TICchange50List, List<double> TICchangeIQRList)
         {
             StreamWriter sw = new StreamWriter("PeakWidths.tsv");
             sw.Write("Filename \t ");
             StreamWriter sym = new StreamWriter("Symmetry.tsv");
             sym.Write("Filename\t ");
+            StreamWriter RT = new StreamWriter("MetricsDividedByRT.tsv");
+            RT.Write("Filename\t");
             for (int divider = 0; divider < division; divider++)
             {
                 sw.Write("RTsegment");
                 sw.Write(division);
                 sw.Write(" \t ");
+                RT.Write("RTsegment");
+                RT.Write(division);
+                RT.Write(" \t ");
                 sym.Write("RTsegment");
                 sym.Write(division);
                 sym.Write(" \t ");
             }
+
+            RT.Write("\n");
+            RT.Write(run.SourceFileName);
             sw.Write("\n");
             sw.Write(run.SourceFileName);
             sym.Write("\n");
@@ -46,10 +54,14 @@ namespace SwaMe
                 sym.Write(psMean.ToString());
                 sw.Write(" \t ");
                 sw.Write(pwMean.ToString());
+                RT.Write(TICchange50List.ElementAt(segment -1));
+                RT.Write(" \t ");
+                RT.Write(TICchangeIQRList.ElementAt(segment-1));
+                RT.Write(" \t ");
             }
             sw.Close();
             sym.Close();
-
+            RT.Close();
         }
     }
 }
