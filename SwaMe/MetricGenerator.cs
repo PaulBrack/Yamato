@@ -1,8 +1,8 @@
-using MzmlParser;
-using System.Linq;
-using System.Collections.Generic;
-using System;
 using MathNet.Numerics.Interpolation;
+using MzmlParser;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SwaMe
 {
@@ -18,13 +18,13 @@ namespace SwaMe
         {
 
             //Acquire RTDuration:
-            double RTDuration =  run.BasePeaks[run.BasePeaks.Count()-1].RetentionTime - run.BasePeaks[0].RetentionTime;
+            double RTDuration = run.BasePeaks[run.BasePeaks.Count() - 1].RetentionTime - run.BasePeaks[0].RetentionTime;
             double RTsegment = RTDuration / division;
             double[] RTsegs = new double[division];
 
             for (int uuu = 0; uuu < division; uuu++)
             {
-                RTsegs[uuu] = run.BasePeaks[0].RetentionTime + RTsegment*uuu;
+                RTsegs[uuu] = run.BasePeaks[0].RetentionTime + RTsegment * uuu;
             }
 
             foreach (BasePeak basepeak in run.BasePeaks)
@@ -32,16 +32,16 @@ namespace SwaMe
                 //Check to see in which RTsegment this basepeak is:
                 for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
                 {
-                    if (basepeak.RetentionTime < RTsegs[0] ) basepeak.RTsegment = 0;
-                    if (basepeak.RetentionTime > RTsegs[segmentboundary-1] && basepeak.RetentionTime < RTsegs[segmentboundary])
+                    if (basepeak.RetentionTime < RTsegs[0]) basepeak.RTsegment = 0;
+                    if (basepeak.RetentionTime > RTsegs[segmentboundary - 1] && basepeak.RetentionTime < RTsegs[segmentboundary])
                     {
                         basepeak.RTsegment = segmentboundary;
                     }
                 }
-                
+
                 double[] intensities = new double[basepeak.Spectrum.Count()];
                 double[] starttimes = new double[basepeak.Spectrum.Count()];
-                for (int iii = 0; iii< basepeak.Spectrum.Count(); iii++)
+                for (int iii = 0; iii < basepeak.Spectrum.Count(); iii++)
                 {
                     intensities[iii] = basepeak.Spectrum[iii].Intensity;
                     starttimes[iii] = basepeak.Spectrum[iii].RetentionTime;
@@ -49,7 +49,7 @@ namespace SwaMe
 
                 //if there are less than two datapoints we cannot calculate chromatogrammetrics:
                 if (starttimes.Count() < 2) { continue; }
-               
+
                 //if there are not enough datapoints, interpolate:
                 if (starttimes.Count() < 100)
                 {
@@ -58,22 +58,22 @@ namespace SwaMe
                     starttimes = ri.starttimes;
                 }
 
-                double[,] array3 = new double[1,intensities.Length];
-                for (int aaa=0;aaa<intensities.Length; aaa++)
+                double[,] array3 = new double[1, intensities.Length];
+                for (int aaa = 0; aaa < intensities.Length; aaa++)
                 {
                     array3[0, aaa] = intensities[aaa];
                 }
-                  
+
                 WaveletLibrary.Matrix dataMatrix = new WaveletLibrary.Matrix(array3);
-                
-                
+
+
                 var transform = new WaveletLibrary.WaveletTransform(new WaveletLibrary.HaarLift(), 1);
                 dataMatrix = transform.DoForward(dataMatrix);
 
                 double[] Smoothedms2bpc = new double[intensities.Length];
                 for (int aaa = 0; aaa < intensities.Length; aaa++)
                 {
-                    Smoothedms2bpc[aaa] = dataMatrix.toArray[0,aaa];
+                    Smoothedms2bpc[aaa] = dataMatrix.toArray[0, aaa];
                 }
                 //Find the fwhm:
                 double maxIntens = Smoothedms2bpc.Max();
@@ -92,35 +92,33 @@ namespace SwaMe
             foreach (Scan scan in run.Ms2Scans)
             {
                 double swathsize = scan.IsolationWindowTargetMz + scan.IsolationWindowUpperOffset - (scan.IsolationWindowTargetMz - scan.IsolationWindowLowerOffset);
-                if (swathsize > largestSwath) { largestSwath = swathsize;continue; }
-                if (swathsize < smallestSwath) { smallestSwath = swathsize;  }
-                
+                if (swathsize > largestSwath) { largestSwath = swathsize; continue; }
+                if (swathsize < smallestSwath) { smallestSwath = swathsize; }
+
             }
 
             double swathSizeDifference = largestSwath - smallestSwath;
-            
+
             //Retrieveing num OfSwathscans
-            int maxswath = 0;
-            var result = run.Ms2Scans.GroupBy(s => s.Cycle).Select(g => new { Count = g.Count() });
-            foreach (var e in result)
-                if (e.Count > maxswath) { maxswath = e.Count; }
+            divideBySwath Sd = new divideBySwath { };
+            int maxswath = Sd.SwathDivider(run);
 
             //Retrieving cycletimesmetrics
             var CycleTimes = run.Ms2Scans.GroupBy(s => s.Cycle).Select(g => g.OrderByDescending(d => d.ScanStartTime))
-            .Select(e =>e.First().ScanStartTime - e.Last().ScanStartTime)
+            .Select(e => e.First().ScanStartTime - e.Last().ScanStartTime)
             .ToList();
 
             //Retrieving Density metrics
-            var Density =  run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
-
+            var Density = run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
 
             RTDivider Rd = new RTDivider { };
             Rd.DivideByRT(run, division);
             UndividedMetrics Um = new UndividedMetrics { };
-            Um.UndividedMetrix(run, RTDuration, swathSizeDifference, run.Ms2Scans.Count(),maxswath, CycleTimes[CycleTimes.Count()/2],IQR(CycleTimes,CycleTimes.Count()-1),Density[Density.Count()/2],IQR(Density, Density.Count()-1), run.Ms1Scans.Count());
+            IQR iqr = new IQR { };
+            Um.UndividedMetrix(run, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), maxswath, CycleTimes[CycleTimes.Count() / 2],iqr.calcIQR(CycleTimes, CycleTimes.Count() - 1), Density[Density.Count() / 2], iqr.calcIQR(Density, Density.Count() - 1), run.Ms1Scans.Count());
         }
 
-        private RTandInt Interpolate(double[] starttimes,double [] intensities)
+        private RTandInt Interpolate(double[] starttimes, double[] intensities)
         {
             List<double> intensityList = new List<double>();
             List<double> starttimesList = new List<double>();
@@ -172,29 +170,9 @@ namespace SwaMe
 
         }
 
-        public double IQR(List<double> list,int length)
-        {
-
-            // Note list must already be sorted.
-            double median = list[length/2];
-            double Q1 = list[length/4];
-            double Q3 = list[length / 4*3];
-            return (Q3 - Q1);
-
-        }
-
-        public int IQR(List<int> list, int length)
-        {
-
-            // Note list must already be sorted.
-            int median = list[length / 2];
-            int Q1 = list[length / 4];
-            int Q3 = list[length / 4 * 3];
-            return (Q3 - Q1);
-
-        }
+        
 
     }
 }
 
-                
+

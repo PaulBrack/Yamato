@@ -14,6 +14,9 @@ namespace MzmlParser
         public double IsolationWindowUpperOffset { get; set; }
         public double IsolationWindowLowerOffset { get; set; }
         public int Density { get; set; }
+        public int swathNumber { get; set; }//This will be used to divide ms2 scans into mzsegments
+        public double lowestmz { get; set; }//This is the lowest mz in all the swaths - will be used for calculating mz range covered by all swaths
+        public double highestmz { get; set; }
         public List<SpectrumPoint> Spectrum { get; set; }
     }
 
