@@ -13,13 +13,13 @@ namespace SwaMe
             sw.Write("Filename \t ");
             StreamWriter sym = new StreamWriter("Symmetry.tsv");
             sym.Write("Filename\t ");
-           
+
             for (int divider = 0; divider < division; divider++)
             {
                 sw.Write("RTsegment");
                 sw.Write(division);
                 sw.Write(" \t ");
-                
+
                 sym.Write("RTsegment");
                 sym.Write(division);
                 sym.Write(" \t ");
@@ -142,6 +142,7 @@ namespace SwaMe
             sw.Close();
             sym.Close();
             rM.Close();
+
 
         }
     }

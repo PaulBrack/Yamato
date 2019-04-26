@@ -88,6 +88,7 @@ namespace SwaMe
                 basepeak.peakCapacity = 1 + (peakTime / basepeak.FWHM);
             }
 
+
             //dividing ms1scans into segments of RT
             foreach (Scan scan in run.Ms1Scans)
             {
@@ -100,6 +101,7 @@ namespace SwaMe
                         scan.RTsegment = segmentboundary;
                     }
                 }
+
 
             }
 
@@ -124,6 +126,7 @@ namespace SwaMe
                     }
                     else if (scan.ScanStartTime > RTsegs[segmentboundary] && segmentboundary == RTsegs.Count()) { scan.RTsegment = segmentboundary + 1; break; }
                 }
+
 
             }
 
@@ -153,8 +156,8 @@ namespace SwaMe
                 List<double> Templist = new List<double>();
                 for (int uuu = 1; uuu < Temp.Count(); uuu++)
                 {
-                    Templist.Add(Math.Abs(Temp.ElementAt(uuu) - Temp.ElementAt(uuu - 1)));
 
+                    Templist.Add(Math.Abs(Temp.ElementAt(uuu) - Temp.ElementAt(uuu - 1)));
                 }
                 Templist.Sort();
                 TICchange50List.Add(Templist.Average());
@@ -228,4 +231,4 @@ namespace SwaMe
 
 
 
-
+
