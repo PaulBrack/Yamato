@@ -244,10 +244,10 @@ namespace MzmlParser
             //scan.Scan.Spectrum = spectrum;
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
-            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
+            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];
             AddScanToRun(scan.Scan, run);
 
-            if (extractBasePeaks)
+            if (extractBasePeaks && scan.Scan.MsLevel == 2)
             {
                 lock (Lock)
                 {
@@ -259,6 +259,7 @@ namespace MzmlParser
                         {
                             Mz = scan.Scan.BasePeakMz,
                             RetentionTime = scan.Scan.ScanStartTime,
+                            intensity = scan.Scan.BasePeakIntensity,
                             Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList()
                         };
                         run.BasePeaks.Add(basePeak);

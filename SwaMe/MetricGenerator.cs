@@ -26,7 +26,7 @@ namespace SwaMe
             {
                 RTsegs[uuu] = run.BasePeaks[0].RetentionTime + RTsegment * uuu;
             }
-
+            //dividing basepeaks into segments of RT
             foreach (BasePeak basepeak in run.BasePeaks)
             {
                 //Check to see in which RTsegment this basepeak is:
@@ -85,15 +85,45 @@ namespace SwaMe
                 double fwfpct = cm.CalculateFpctHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
                 double f = Math.Abs(peakTime - fwfpct);
                 basepeak.peaksym = fwfpct / (2 * f);
+                basepeak.peakCapacity = 1 + (peakTime / basepeak.FWHM);
             }
-            //Retrieving swath size difference
+
+            //dividing ms1scans into segments of RT
+            foreach (Scan scan in run.Ms1Scans)
+            {
+                //Check to see in which RTsegment this basepeak is:
+                for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
+                {
+                    if (scan.ScanStartTime < RTsegs[0]) scan.RTsegment = 0;
+                    if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
+                    {
+                        scan.RTsegment = segmentboundary;
+                    }
+                }
+
+            }
+
+
+            //dividing ms2scans into segments of RT and calculating swathsize in the process
             double largestSwath = 0;
             double smallestSwath = 400;
             foreach (Scan scan in run.Ms2Scans)
             {
                 double swathsize = scan.IsolationWindowTargetMz + scan.IsolationWindowUpperOffset - (scan.IsolationWindowTargetMz - scan.IsolationWindowLowerOffset);
+
                 if (swathsize > largestSwath) { largestSwath = swathsize; continue; }
                 if (swathsize < smallestSwath) { smallestSwath = swathsize; }
+                //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
+                for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
+                {
+                    if (scan.ScanStartTime < RTsegs[0]) { scan.RTsegment = 0; break; }
+                    else if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
+                    {
+                        scan.RTsegment = segmentboundary;
+                        break;
+                    }
+                    else if (scan.ScanStartTime > RTsegs[segmentboundary] && segmentboundary == RTsegs.Count()) { scan.RTsegment = segmentboundary + 1; break; }
+                }
 
             }
 
@@ -110,11 +140,31 @@ namespace SwaMe
 
             //Retrieving Density metrics
             var Density = run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
+            //Create IQR so you can calculate IQR:
+            IQR iqr = new IQR { };
+
+            //Retrieve TICChange metrics and divide into rtsegs
+            List<double> TICchange50List = new List<double>();
+            List<double> TICchangeIQRList = new List<double>();
+            var TempTIC = run.Ms2Scans.GroupBy(x => x.RTsegment).Select(d => d.OrderBy(x => x.ScanStartTime).Select(g => g.TotalIonCurrent).ToList());
+            for (int eee = 0; eee < TempTIC.Count(); eee++)
+            {
+                var Temp = TempTIC.ElementAt(eee);
+                List<double> Templist = new List<double>();
+                for (int uuu = 1; uuu < Temp.Count(); uuu++)
+                {
+                    Templist.Add(Math.Abs(Temp.ElementAt(uuu) - Temp.ElementAt(uuu - 1)));
+
+                }
+                Templist.Sort();
+                TICchange50List.Add(Templist.Average());
+                TICchangeIQRList.Add(iqr.calcIQR(Templist, Templist.Count()));
+            }
 
             RTDivider Rd = new RTDivider { };
-            Rd.DivideByRT(run, division);
+            Rd.DivideByRT(run, division, TICchange50List, TICchangeIQRList);
             UndividedMetrics Um = new UndividedMetrics { };
-            IQR iqr = new IQR { };
+            
             Um.UndividedMetrix(run, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), maxswath, CycleTimes[CycleTimes.Count() / 2],iqr.calcIQR(CycleTimes, CycleTimes.Count() - 1), Density[Density.Count() / 2], iqr.calcIQR(Density, Density.Count() - 1), run.Ms1Scans.Count());
         }
 
@@ -176,3 +226,6 @@ namespace SwaMe
 }
 
 
+
+
+
