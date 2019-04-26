@@ -244,7 +244,7 @@ namespace MzmlParser
             //scan.Scan.Spectrum = spectrum;
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
-            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, scan.Scan.BasePeakIntensity)];
+            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
             AddScanToRun(scan.Scan, run);
 
             if (extractBasePeaks && scan.Scan.MsLevel == 2)
