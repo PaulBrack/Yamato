@@ -259,6 +259,7 @@ namespace MzmlParser
                         {
                             Mz = scan.Scan.BasePeakMz,
                             RetentionTime = scan.Scan.ScanStartTime,
+                            intensity = scan.Scan.BasePeakIntensity,
                             Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList()
                         };
                         run.BasePeaks.Add(basePeak);
@@ -273,7 +274,8 @@ namespace MzmlParser
                     }
                 }
             }
-            if(threading)
+
+            if (threading)
                 cde.Signal();
         }
 
