@@ -58,8 +58,8 @@ namespace SwaMe
                 double peakTime = starttimes[mIIndex];
                 double fwfpct = CalculateFpctHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
                 double f = Math.Abs(peakTime - fwfpct);
-                basepeak.peaksym = fwfpct / (2 * f);
-                basepeak.peakCapacity = 1 + (peakTime / basepeak.FWHM);
+                basepeak.Peaksym = fwfpct / (2 * f);
+                basepeak.PeakCapacity = 1 + (peakTime / basepeak.FWHM);
             }
 
         }
@@ -172,7 +172,6 @@ namespace SwaMe
             ri.starttimes = starttimesList.Select(item => Convert.ToDouble(item)).ToArray();
 
             return ri;
-
         }
 
         public struct RTandInt

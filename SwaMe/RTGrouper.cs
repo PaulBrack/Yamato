@@ -9,7 +9,6 @@ namespace SwaMe
     {
         public void DivideByRT(MzmlParser.Run run, int division, double RTDuration)
         {
-
             double RTsegment = RTDuration / division;
             double[] RTsegs = new double[division];
 
@@ -35,7 +34,6 @@ namespace SwaMe
             //dividing ms2scans into segments of RT
             foreach (MzmlParser.Scan scan in run.Ms2Scans)
             {
-
                 //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
                 for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
                 {
@@ -47,8 +45,6 @@ namespace SwaMe
                     }
                     else if (scan.ScanStartTime > RTsegs[segmentboundary] && segmentboundary == RTsegs.Count()) { scan.RTsegment = segmentboundary + 1; break; }
                 }
-
-
             }
 
             //dividing ms1scans into segments of RT
@@ -63,8 +59,6 @@ namespace SwaMe
                         scan.RTsegment = segmentboundary;
                     }
                 }
-
-
             }
 
             //Retrieve TICChange metrics and divide into rtsegs
@@ -87,7 +81,7 @@ namespace SwaMe
 
             //Calculations for peakprecision MS2:
 
-            var meanIntensityOfAllBpks = run.BasePeaks.Select(x=>x.intensity).Average();
+            var meanIntensityOfAllBpks = run.BasePeaks.Select(x=>x.Intensity).Average();
             var meanMzOfAllBpks = run.BasePeaks.Select(x => x.Mz).Average();
 
             //Calculations for peakprecision MS1:
@@ -116,11 +110,12 @@ namespace SwaMe
                     if (basepeak.RTsegment == segment)
                     {
                         PeakwidthsTemp.Add(basepeak.FWHM);
-                        PeaksymTemp.Add(basepeak.peaksym);
-                        PeakprecisionTemp.Add(basepeak.intensity / (meanIntensityOfAllBpks * Math.Pow(2,meanMzOfAllBpks / basepeak.Mz)));
-                        PeakCapacityTemp.Add(basepeak.peakCapacity);
+                        PeaksymTemp.Add(basepeak.Peaksym);
+                        PeakprecisionTemp.Add(basepeak.Intensity / (meanIntensityOfAllBpks * Math.Pow(2,meanMzOfAllBpks / basepeak.Mz)));
+                        PeakCapacityTemp.Add(basepeak.PeakCapacity);
                     }
                 }
+
                 double firstScanStartTime = 1000;
                 double lastScanStartTime = 0;
                 int firstCycle = 1000;
@@ -131,7 +126,6 @@ namespace SwaMe
                 
                 foreach (MzmlParser.Scan scan in run.Ms1Scans)
                 {
-                    
                     if (scan.RTsegment == segment)
                     {
 
@@ -172,7 +166,6 @@ namespace SwaMe
             }
             FileMaker fm = new FileMaker { };
             fm.MakeMetricsPerRTsegmentFile(run, Peakwidths, PeakSymmetry, PeakCapacity, PeakPrecision, MS1PeakPrecision ,cycleTime, TICchange50List, TICchangeIQRList,MS1Density,MS2Density,MS1TICTotal,MS2TICTotal,division);
-
         }
     }
 }

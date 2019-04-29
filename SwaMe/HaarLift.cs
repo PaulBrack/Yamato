@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace WaveletLibrary
 {
     public class HaarLift : BaseLift
     {
-
         protected override void Predict(Matrix data, int N, Direction direction)
         {
             int half = N >> 1;

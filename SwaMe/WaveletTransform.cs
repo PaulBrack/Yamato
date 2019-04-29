@@ -32,7 +32,7 @@ namespace WaveletLibrary
 
         private void Shrink(Matrix larger, Matrix smaller)
         {
-           for (int j = 0; j < smaller.NoCols; j++)
+            for (int j = 0; j < smaller.NoCols; j++)
                 for (int i = 0; i < smaller.NoRows; i++)
                     smaller[i, j] = larger[i, j];
         }
@@ -92,6 +92,5 @@ namespace WaveletLibrary
                 TransformCols(data, level, Direction.Inverse);
             }
         }
-
     }
 }

@@ -1,21 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SwaMe
 {
-
     class MatrixMultiplier
     {
-        public double[,] Multiply(double[,] A, double[,] B)
+        public double[,] Multiply(double[,] a, double[,] b)
         {
-
-            int m = A.GetLength(0), n = A.GetLength(1), p = B.GetLength(0), q = B.GetLength(1), i, j;
-            double[,] M = new double[m, q];
+            int m = a.GetLength(0), n = a.GetLength(1), p = b.GetLength(0), q = b.GetLength(1), i, j;
+            double[,] outputMatrix = new double[m, q];
             if (n != p)
             {
                 Console.WriteLine("Matrix multiplication not possible");
-                return M;
+                return outputMatrix;
             }
             else
             {
@@ -23,10 +19,10 @@ namespace SwaMe
                 {
                     for (j = 0; j < q; j++)
                     {
-                        M[i, j] = 0;
+                        outputMatrix[i, j] = 0;
                         for (int k = 0; k < n; k++)
                         {
-                            M[i, j] += A[i, k] * B[k, j];
+                            outputMatrix[i, j] += a[i, k] * b[k, j];
                         }
                     }
                 }
@@ -40,8 +36,7 @@ namespace SwaMe
                     Console.WriteLine();
                 }*/
 
-                return M;
-
+                return outputMatrix;
             }
         }
     }
