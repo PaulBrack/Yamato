@@ -275,10 +275,6 @@ namespace MzmlParser
                 }
             }
 
-            //Find mzRange. This is done at this stage so the mzs array order is not screwed up for later analysis.
-            Array.Sort(mzs);
-            scan.Scan.lowestmz = mzs[0];
-            scan.Scan.highestmz = mzs[mzs.Count()-1];
             if (threading)
                 cde.Signal();
         }
