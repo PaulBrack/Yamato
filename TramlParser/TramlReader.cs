@@ -105,9 +105,6 @@ namespace TramlParser
                 }
             }
 
-
-
-
             library.PeptideList.Add(peptide.Id, peptide);
         }
 
@@ -126,11 +123,59 @@ namespace TramlParser
             }
         }
 
-        private void AddTransition(Library library, XmlReader xmlReader)
+        private void AddTransition(Library library, XmlReader reader)
         {
             var transition = new Library.Transition();
-            transition.PeptideId = xmlReader.GetAttribute("peptideRef");
-            transition.Id = xmlReader.GetAttribute("id");
+            transition.PeptideId = reader.GetAttribute("peptideRef");
+            transition.Id = reader.GetAttribute("id");
+            Enums.IonType? ionType = null;
+            bool cvParamsRead = false;
+            while (reader.Read() && !cvParamsRead)
+            {
+                if (reader.IsStartElement())
+                {
+                    if (reader.LocalName == "Precursor")
+                        ionType = Enums.IonType.Precursor;
+                    else if (reader.LocalName == "Product")
+                        ionType = Enums.IonType.Product;
+
+                    if (reader.LocalName == "cvParam")
+                    {
+                        switch (reader.GetAttribute("accession"))
+                        {
+                            case "MS:1000827":
+                                if (ionType == Enums.IonType.Precursor)
+                                    transition.PrecursorMz = Convert.ToDouble(reader.GetAttribute("value"));
+                                else if (ionType == Enums.IonType.Product)
+                                    transition.ProductMz = Convert.ToDouble(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000041":
+                                transition.ProductIonChargeState = Convert.ToInt32(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000903":
+                                transition.ProductIonSeriesOrdinal = Convert.ToInt32(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000926":
+                                transition.ProductInterpretationRank = Convert.ToInt32(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1001220":
+                                transition.IonType = reader.GetAttribute("value");
+                                break;
+                            case "MS:1001226":
+                                transition.ProductIonIntensity = Convert.ToDouble(reader.GetAttribute("value"));
+                                break;
+                        }
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "Transition")
+                {
+                    if (reader.LocalName == "Precursor" || reader.LocalName == "Product")
+                        ionType = null;
+                    if(reader.LocalName == "Transition")
+                        cvParamsRead = true;
+                }
+            }
+
             library.TransitionList.Add(transition.Id, transition);
             var correspondingPeptide = (Library.Peptide)(library.PeptideList[transition.PeptideId]);
             correspondingPeptide.AssociatedTransitionIds.Add(transition.Id);

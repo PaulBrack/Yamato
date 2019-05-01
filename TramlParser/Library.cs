@@ -38,11 +38,11 @@ namespace TramlParser
             public string Id;
             public double PrecursorMz;
             public double ProductMz;
+            public int ProductIonChargeState;
             public int ProductIonSeriesOrdinal;
             public int ProductInterpretationRank;
             public double ProductIonIntensity;
             public string IonType;
-            public int location;
             public string PeptideId;
         }
 
