@@ -27,6 +27,7 @@ namespace TramlParser
             public string Id;
             public string ProteinId;
             public string Sequence;
+            public string GroupLabel;
             public int ChargeState;
             public double RetentionTime;
             public List<string> AssociatedTransitionIds;

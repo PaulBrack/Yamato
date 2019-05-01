@@ -2,21 +2,20 @@ using NLog;
 using System;
 using System.Xml;
 using System.Linq;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using Ionic.Zlib;
 
 namespace MzmlParser
 {
-    public class MzmlParser
+    public class MzmlReader
     {
-        public MzmlParser()
+        public MzmlReader()
         {
             ParseBinaryData = true;
             ExtractBasePeaks = true;
             Threading = true;
         }
-
 
         public bool ExtractBasePeaks { get; set; }
         public bool ParseBinaryData { get; set; }
@@ -29,7 +28,7 @@ namespace MzmlParser
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static CountdownEvent cde = new CountdownEvent(1);
-        private static Object Lock = new Object();
+        private static readonly Object Lock = new Object();
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
 
         public Run LoadMzml(string path)
@@ -121,19 +120,19 @@ namespace MzmlParser
                                 scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000285":
-                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
+                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000016":
-                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
+                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000827":
-                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
+                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000829":
-                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
+                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000828":
-                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
+                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                         }
                     }

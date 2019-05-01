@@ -71,11 +71,43 @@ namespace TramlParser
             }
         }
 
-        private void AddPeptide(Library library, XmlReader xmlReader)
+        private void AddPeptide(Library library, XmlReader reader)
         {
             var peptide = new Library.Peptide();
-            peptide.Id = xmlReader.GetAttribute("id");
+            peptide.Id = reader.GetAttribute("id");
+            peptide.Sequence = reader.GetAttribute("sequence");
             peptide.AssociatedTransitionIds = new List<string>();
+            bool cvParamsRead = false;
+
+            while (reader.Read() && !cvParamsRead)
+            {
+                if (reader.IsStartElement())
+                {
+                    if (reader.LocalName == "cvParam")
+                    {
+                        switch (reader.GetAttribute("accession"))
+                        {
+                            case "MS:1000041":
+                                peptide.ChargeState = Convert.ToInt32(reader.GetAttribute("value"));
+                                break;
+                            case "MS:1000893":
+                                peptide.GroupLabel = reader.GetAttribute("value");
+                                break;
+                            case "MS:1000896":
+                                peptide.RetentionTime = Convert.ToInt32(reader.GetAttribute("value"));
+                                break;
+                        }
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "Peptide")
+                {
+                    cvParamsRead = true;
+                }
+            }
+
+
+
+
             library.PeptideList.Add(peptide.Id, peptide);
         }
 

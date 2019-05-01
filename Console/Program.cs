@@ -24,7 +24,7 @@ namespace Yamato.Console
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                MzmlParser.MzmlParser mzmlParser = new MzmlParser.MzmlParser();
+                MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
                 if (options.ParseBinaryData == false)
                     mzmlParser.ParseBinaryData = false;
                 if (options.Threading == false)
