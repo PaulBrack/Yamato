@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using System.Linq;
 
 
-namespace TramlParser
+namespace LibraryParser
 {
     public class TraMLReader
     {

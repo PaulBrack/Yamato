@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace TramlParser
+namespace LibraryParser
 {
     public class Library
     {
@@ -30,6 +30,7 @@ namespace TramlParser
             public string GroupLabel;
             public int ChargeState;
             public double RetentionTime;
+            public double CollisionEnergy;
             public List<string> AssociatedTransitionIds;
         }
 

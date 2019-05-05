@@ -6,8 +6,30 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division)
+        public void GenerateMetrics(Run run, int division, string iRTpath = "none")
         {
+            //iRTmetrics: first establish which reader to call, then call that reader:
+            if (iRTpath != "none")
+            {
+                LibraryParser.Library irtLibrary = new LibraryParser.Library();
+                if (iRTpath.Contains("traml"))
+                {
+                    LibraryParser.TraMLReader lp = new LibraryParser.TraMLReader();
+                    irtLibrary = lp.LoadLibrary(iRTpath);
+                }
+                else if (iRTpath.Contains("sky"))
+                {
+                    LibraryParser.SkyReader sp = new LibraryParser.SkyReader();
+                    irtLibrary = sp.LoadLibrary(iRTpath);
+                }
+
+                for (int iterator = 0; iterator<irtLibrary.PeptideList.Count ; iterator++)
+                {
+                    //Now search in the MS1 binary arrays for peptide m/z
+
+                    //Amongst all the matches, search the next couple of ms2 scans for the correct m/z windows for matches to find out which ms1 matches are the correct ones.
+                }
+            }
             //Acquire RTDuration:
             double RTDuration = run.BasePeaks[run.BasePeaks.Count() - 1].RetentionTime - run.BasePeaks[0].RetentionTime;
 
