@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yamato.Console", "Console\Y
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMe", "SwaMe\SwaMe.csproj", "{A11DE82D-AF14-4F5B-BE52-10EF64E51944}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TramlParser", "TramlParser\TramlParser.csproj", "{32B329B9-A23E-47B7-8B10-38DD235574F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryParser", "TramlParser\LibraryParser.csproj", "{32B329B9-A23E-47B7-8B10-38DD235574F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

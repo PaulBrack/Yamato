@@ -16,14 +16,15 @@ namespace Yamato.Console
             Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
                 UpdateLoggingLevels(options);
-                int division = options.Division;
-
+                
                 string path = options.InputFile;
                 logger.Info("Loading file: {0}", path);
 
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
+                int division = options.Division;
+                string iRTpath = options.iRTFile;
                 MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
                 if (options.ParseBinaryData == false)
                     mzmlParser.ParseBinaryData = false;
@@ -32,7 +33,7 @@ namespace Yamato.Console
 
                 MzmlParser.Run run = mzmlParser.LoadMzml(path);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run, division);
+                new SwaMe.MetricGenerator().GenerateMetrics(run, division,iRTpath);
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
             });
@@ -69,6 +70,9 @@ namespace Yamato.Console
 
         [Option('t', "threading", Required = false, HelpText = "whether threading is used")]
         public bool? Threading { get; set; }
+
+        [Option('r', "iRT filepath", Required = false, HelpText = "iRT file path")]
+        public String iRTFile { get; set; }
     }
 }
 
