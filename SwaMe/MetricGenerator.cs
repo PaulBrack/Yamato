@@ -6,9 +6,8 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division, string iRTpath = "none")
+        public void GenerateMetrics(Run run, int division, string iRTpath, string path)
         {
-            //iRTmetrics: first establish which reader to call, then call that reader:
             if (iRTpath != "none")
             {
                 LibraryParser.Library irtLibrary = new LibraryParser.Library();
@@ -23,13 +22,15 @@ namespace SwaMe
                     irtLibrary = sp.LoadLibrary(iRTpath);
                 }
 
-                for (int iterator = 0; iterator<irtLibrary.PeptideList.Count ; iterator++)
+                for (int iterator = 0; iterator < irtLibrary.PeptideList.Count; iterator++)
                 {
                     //Now search in the MS1 binary arrays for peptide m/z
 
                     //Amongst all the matches, search the next couple of ms2 scans for the correct m/z windows for matches to find out which ms1 matches are the correct ones.
                 }
             }
+
+
             //Acquire RTDuration:
             double RTDuration = run.BasePeaks[run.BasePeaks.Count() - 1].RetentionTime - run.BasePeaks[0].RetentionTime;
 
@@ -55,6 +56,7 @@ namespace SwaMe
             Rd.DivideByRT(run, division, RTDuration);
             FileMaker Um = new FileMaker { };
             Um.MakeUndividedMetricsFile(run, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), maxswath, CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density[Density.Count() / 2], InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
+            Um.MakeJSON(path, run, RTDuration,swathSizeDifference, run.Ms2Scans.Count(),maxswath, CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density[Density.Count() / 2], InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
         }
 
         private double CalcSwathSizeDiff(Run run)
@@ -68,3 +70,4 @@ namespace SwaMe
         }
     }
 }
+        
