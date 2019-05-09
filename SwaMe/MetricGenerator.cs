@@ -6,20 +6,20 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division, string iRTpath, string path)
+        public void GenerateMetrics(Run run, int division, string iRTpath, string inputFilePath)
         {
             if (iRTpath != "none")
             {
                 LibraryParser.Library irtLibrary = new LibraryParser.Library();
                 if (iRTpath.Contains("traml"))
                 {
-                    LibraryParser.TraMLReader lp = new LibraryParser.TraMLReader();
-                    irtLibrary = lp.LoadLibrary(iRTpath);
+                    LibraryParser.TraMLReader traMLReader = new LibraryParser.TraMLReader();
+                    irtLibrary = traMLReader.LoadLibrary(iRTpath);
                 }
                 else if (iRTpath.Contains("sky"))
                 {
-                    LibraryParser.SkyReader sp = new LibraryParser.SkyReader();
-                    irtLibrary = sp.LoadLibrary(iRTpath);
+                    LibraryParser.SkyReader skyReader = new LibraryParser.SkyReader();
+                    irtLibrary = skyReader.LoadLibrary(iRTpath);
                 }
 
                 for (int iterator = 0; iterator < irtLibrary.PeptideList.Count; iterator++)
@@ -35,28 +35,30 @@ namespace SwaMe
             double RTDuration = run.BasePeaks[run.BasePeaks.Count() - 1].RetentionTime - run.BasePeaks[0].RetentionTime;
 
             //Interpolate, Smooth, create chromatogram and generate chromatogram metrics
-            ChromatogramMetrics cm = new ChromatogramMetrics();
-            cm.CreateChromatogram(run);
+            ChromatogramMetrics chromatogramMetrics = new ChromatogramMetrics();
+            chromatogramMetrics.CreateChromatogram(run);
 
             //Calculating the largestswath
             double swathSizeDifference = CalcSwathSizeDiff(run);
 
             // This method will group the scans into swaths of the same number, return the number of swaths in a full cycle (maxswath) and call a FileMaker method to write out the metrics.
-            SwathGrouper Sd = new SwathGrouper { };
-            int maxswath = Sd.GroupBySwath(run);
+            SwathGrouper swathGrouper = new SwathGrouper { };
+            SwathGrouper.SwathMetrics swathMetrics = swathGrouper.GroupBySwath(run);
 
             //Retrieving cycletimesmetrics
             List<double> CycleTimes = CalcCycleTime(run);
-
+            CycleTimes.Sort();
             //Retrieving Density metrics
             var Density = run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
 
             //Create IQR so you can calculate IQR:            
-            RTGrouper Rd = new RTGrouper { };
-            Rd.DivideByRT(run, division, RTDuration);
-            FileMaker Um = new FileMaker { };
-            Um.MakeUndividedMetricsFile(run, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), maxswath, CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density[Density.Count() / 2], InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
-            Um.MakeJSON(path, run, RTDuration,swathSizeDifference, run.Ms2Scans.Count(),maxswath, CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density[Density.Count() / 2], InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
+            RTGrouper rtGrouper = new RTGrouper { };
+            RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
+            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
+            fileMaker.MakeUndividedMetricsFile();
+            fileMaker.MakeMetricsPerRTsegmentFile(rtMetrics);
+            fileMaker.MakeMetricsPerSwathFile(swathMetrics);
+            fileMaker.MakeJSON();
         }
 
         private double CalcSwathSizeDiff(Run run)
