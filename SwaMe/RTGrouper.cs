@@ -197,8 +197,8 @@ namespace SwaMe
                 MS2TICTotal.Add(MS2TICTotalTemp);
             }
 
-            RTMetrics rM = new RTMetrics(MS1TICTotal, MS2TICTotal, cycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, PeakSymmetry, PeakCapacity, PeakPrecision, MS1PeakPrecision);
-            return rM;
+            RTMetrics rtMetrics = new RTMetrics(MS1TICTotal, MS2TICTotal, cycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, PeakSymmetry, PeakCapacity, PeakPrecision, MS1PeakPrecision);
+            return rtMetrics;
         }
     }
 }

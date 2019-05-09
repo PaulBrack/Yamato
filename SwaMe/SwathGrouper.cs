@@ -97,8 +97,8 @@ namespace SwaMe
                 TicPercentage.Add((TICs[num] / totalTIC) *100);
             }
 
-            SwathMetrics sM = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, AveMzRange, TICs, swDensity50, swDensityIQR, TicPercentage);
-            return sM;
+            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, AveMzRange, TICs, swDensity50, swDensityIQR, TicPercentage);
+            return swathMetrics;
         }
 
     }
