@@ -1,3 +1,4 @@
+using LibraryParser;
 using MzmlParser;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +11,15 @@ namespace SwaMe
         {
             if (iRTpath != "none")
             {
-                LibraryParser.Library irtLibrary = new LibraryParser.Library();
+                Library irtLibrary = new Library();
                 if (iRTpath.Contains("traml"))
                 {
-                    LibraryParser.TraMLReader traMLReader = new LibraryParser.TraMLReader();
+                    TraMLReader traMLReader = new TraMLReader();
                     irtLibrary = traMLReader.LoadLibrary(iRTpath);
                 }
                 else if (iRTpath.Contains("sky"))
                 {
-                    LibraryParser.SkyReader skyReader = new LibraryParser.SkyReader();
+                    SkyReader skyReader = new SkyReader();
                     irtLibrary = skyReader.LoadLibrary(iRTpath);
                 }
 

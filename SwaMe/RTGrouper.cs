@@ -45,9 +45,9 @@ namespace SwaMe
             double RTsegment = RTDuration / division;
             double[] RTsegs = new double[division];
 
-            for (int uuu = 0; uuu < division; uuu++)
+            for (int i = 0; i < division; i++)
             {
-                RTsegs[uuu] = run.BasePeaks[0].RetentionTime + RTsegment * uuu;
+                RTsegs[i] = run.BasePeaks.First().RetentionTime + RTsegment * i;
             }
 
             //dividing basepeaks into segments
@@ -98,14 +98,14 @@ namespace SwaMe
             List<double> TICchange50List = new List<double>();
             List<double> TICchangeIQRList = new List<double>();
             var TempTIC = run.Ms2Scans.GroupBy(x => x.RTsegment).Select(d => d.OrderBy(x => x.ScanStartTime).Select(g => g.TotalIonCurrent).ToList());
-            for (int eee = 0; eee < TempTIC.Count(); eee++)
+            for (int i = 0; i < TempTIC.Count(); i++)
             {
-                var Temp = TempTIC.ElementAt(eee);
+                var Temp = TempTIC.ElementAt(i);
                 List<double> Templist = new List<double>();
-                for (int uuu = 1; uuu < Temp.Count(); uuu++)
+                for (int x = 1; x < Temp.Count(); x++)
                 {
 
-                    Templist.Add(Math.Abs(Temp.ElementAt(uuu) - Temp.ElementAt(uuu - 1)));
+                    Templist.Add(Math.Abs(Temp.ElementAt(x) - Temp.ElementAt(x - 1)));
                 }
                 Templist.Sort();
                 TICchange50List.Add(Templist.Average());
@@ -139,7 +139,6 @@ namespace SwaMe
                 List<double> PeakprecisionTemp = new List<double>();
                 foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
                 {
-
                     if (basepeak.RTsegment == segment)
                     {
                         PeakwidthsTemp.Add(basepeak.FWHM);
@@ -160,7 +159,6 @@ namespace SwaMe
                 {
                     if (scan.RTsegment == segment)
                     {
-
                         MS1PeakprecisionTemp.Add(scan.BasePeakIntensity / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / scan.BasePeakMz)));
                         firstScanStartTime = Math.Min(firstScanStartTime, scan.ScanStartTime);
                         lastScanStartTime = Math.Max(lastScanStartTime, scan.ScanStartTime);

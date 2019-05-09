@@ -26,16 +26,6 @@ namespace SwaMe
                         }
                     }
                 }
-                /*Console.WriteLine("The product of the two matrices is :");
-                for (i = 0; i < m; i++)
-                {
-                    for (j = 0; j < n; j++)
-                    {
-                        Console.Write(M[i, j] + "\t");
-                    }
-                    Console.WriteLine();
-                }*/
-
                 return outputMatrix;
             }
         }
