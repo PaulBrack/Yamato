@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SwaMe
 {
-    public class JSON_classes
+    public class JsonClasses
     {
         public class MzQC
         {
@@ -139,7 +139,7 @@ namespace SwaMe
                 this.unit = unit;
                 this.value = value;
             }
-            public QualityParameters(string cvRef, string accession, string name, Unit unit, double[] value)
+            public QualityParameters(string cvRef, string accession, string name, Unit unit, List<double> value)
             {
                 this.cvRef = cvRef;
                 this.accession = accession;

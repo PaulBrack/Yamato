@@ -6,7 +6,7 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division, string iRTpath, string path)
+        public void GenerateMetrics(Run run, int division, string iRTpath, string inputFilePath)
         {
             if (iRTpath != "none")
             {
@@ -35,28 +35,30 @@ namespace SwaMe
             double RTDuration = run.BasePeaks[run.BasePeaks.Count() - 1].RetentionTime - run.BasePeaks[0].RetentionTime;
 
             //Interpolate, Smooth, create chromatogram and generate chromatogram metrics
-            ChromatogramMetrics cm = new ChromatogramMetrics();
-            cm.CreateChromatogram(run);
+            ChromatogramMetrics cM = new ChromatogramMetrics();
+            cM.CreateChromatogram(run);
 
             //Calculating the largestswath
             double swathSizeDifference = CalcSwathSizeDiff(run);
 
             // This method will group the scans into swaths of the same number, return the number of swaths in a full cycle (maxswath) and call a FileMaker method to write out the metrics.
-            SwathGrouper Sd = new SwathGrouper { };
-            int maxswath = Sd.GroupBySwath(run);
+            SwathGrouper sD = new SwathGrouper { };
+            SwathGrouper.SwathMetrics sM = sD.GroupBySwath(run);
 
             //Retrieving cycletimesmetrics
             List<double> CycleTimes = CalcCycleTime(run);
-
+            CycleTimes.Sort();
             //Retrieving Density metrics
             var Density = run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
 
             //Create IQR so you can calculate IQR:            
-            RTGrouper Rd = new RTGrouper { };
-            Rd.DivideByRT(run, division, RTDuration);
-            FileMaker Um = new FileMaker { };
-            Um.MakeUndividedMetricsFile(run, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), maxswath, CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density[Density.Count() / 2], InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
-            Um.MakeJSON(path, run, RTDuration,swathSizeDifference, run.Ms2Scans.Count(),maxswath, CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density[Density.Count() / 2], InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
+            RTGrouper rD = new RTGrouper { };
+            RTGrouper.RTMetrics rM = rD.DivideByRT(run, division, RTDuration);
+            FileMaker fM = new FileMaker(division, inputFilePath, run, sM, rM, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
+            fM.MakeUndividedMetricsFile();
+            fM.MakeMetricsPerRTsegmentFile(rM);
+            fM.MakeMetricsPerSwathFile(sM);
+            fM.MakeJSON();
         }
 
         private double CalcSwathSizeDiff(Run run)

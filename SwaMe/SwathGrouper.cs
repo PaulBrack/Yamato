@@ -6,12 +6,36 @@ using System;
 
 namespace SwaMe
 {
-    class SwathGrouper
+    public class SwathGrouper
     {
         //This method groups all of the swaths of the same number together and generates the metrics that are reported per swath.
         //It generates a tsvfile with the "Perswath" metrics in.
         //It returns the number of swaths present in a full cycle.
-        public int GroupBySwath(MzmlParser.Run run)
+        public class SwathMetrics
+        {
+            public int maxswath;
+            public double totalTIC;
+            public List<int> numOfSwathPerGroup;
+            public List<double> AveMzRange;
+            public List<double> TICs;
+            public List<double> swDensity50;
+            public List<double> swDensityIQR;
+            public List<double> TicPercentage;
+
+            public SwathMetrics(int maxswath, double totalTIC, List<int> numOfSwathPerGroup, List<double> AveMzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
+            List<double> TicPercentage)
+            {
+                this.maxswath = maxswath;
+                this.totalTIC = totalTIC;
+                this.numOfSwathPerGroup = numOfSwathPerGroup;
+                this.AveMzRange = AveMzRange;
+                this.TICs = TICs;
+                this.swDensity50 = swDensity50;
+                this.swDensityIQR = swDensityIQR;
+                this.TicPercentage = TicPercentage;
+            }
+        }
+        public SwathMetrics GroupBySwath(MzmlParser.Run run)
         {
             int maxswath = 0;
             var result = run.Ms2Scans.GroupBy(s => s.Cycle).Select(g => new { Count = g.Count() });
@@ -40,6 +64,7 @@ namespace SwaMe
             List<double> swDensity50 = new List<double>();
             List<double> swDensityIQR = new List<double>();
             List<double> mzrange = new List<double>();
+            List<double> TicPercentage = new List<double>();
             for (int swathsOfThisNumber = 0; swathsOfThisNumber < maxswath; swathsOfThisNumber++)
             {
                 int track = 0;
@@ -60,14 +85,22 @@ namespace SwaMe
                 numOfSwathPerGroup.Add(track);
                 AveMzRange.Add(mzrange.Average());
                 TICs.Add(TICthisSwath);
+                TICthisSwath = 0;
                 swDensity.Sort();
                 swDensity50.Add(swDensity.Average());
                 swDensityIQR.Add(InterQuartileRangeCalculator.CalcIQR(swDensity));
+                swDensity.Clear();
             }
 
-            new FileMaker().MakeMetricsPerSwathFile(maxswath, run, numOfSwathPerGroup, AveMzRange, totalTIC, TICs, swDensity50, swDensityIQR);
+            for (int num = 0; num < maxswath; num++)
+            {
+                TicPercentage.Add((TICs[num] / totalTIC) *100);
+            }
 
-            return maxswath;
+            SwathMetrics sM = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, AveMzRange, TICs, swDensity50, swDensityIQR, TicPercentage);
+            return sM;
         }
+
     }
+   
 }

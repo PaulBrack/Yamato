@@ -17,23 +17,26 @@ namespace Yamato.Console
             {
                 UpdateLoggingLevels(options);
                 
-                string path = options.InputFile;
-                logger.Info("Loading file: {0}", path);
+                string inputFilePath = options.InputFile;
+                logger.Info("Loading file: {0}", inputFilePath);
 
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
                 int division = options.Division;
-                string iRTpath = options.iRTFile;
+                string iRTpath = "none";
+                if (options.iRTFile != null)
+                { iRTpath = options.iRTFile; }
+                
                 MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
                 if (options.ParseBinaryData == false)
                     mzmlParser.ParseBinaryData = false;
                 if (options.Threading == false)
                     mzmlParser.Threading = false;
 
-                MzmlParser.Run run = mzmlParser.LoadMzml(path);
+                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run, division,iRTpath, path);
+                new SwaMe.MetricGenerator().GenerateMetrics(run, division,iRTpath, inputFilePath);
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
             });
