@@ -35,8 +35,8 @@ namespace SwaMe
             double RTDuration = run.BasePeaks[run.BasePeaks.Count() - 1].RetentionTime - run.BasePeaks[0].RetentionTime;
 
             //Interpolate, Smooth, create chromatogram and generate chromatogram metrics
-            ChromatogramMetrics chromatogramMetrics = new ChromatogramMetrics();
-            chromatogramMetrics.CreateChromatogram(run);
+            ChromatogramMetricGenerator chromatogramMetrics = new ChromatogramMetricGenerator();
+            chromatogramMetrics.GenerateChromatogram(run);
 
             //Calculating the largestswath
             double swathSizeDifference = CalcSwathSizeDiff(run);

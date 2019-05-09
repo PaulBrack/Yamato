@@ -2,7 +2,6 @@
 
 namespace WaveletLibrary
 {
-
     public enum Direction
     {
         Forward,
@@ -20,8 +19,7 @@ namespace WaveletLibrary
         // </summary>
         protected void Split(Matrix data, int N)
         {
-
-            double[] tmp = new double[N/2];
+            double[] tmp = new double[N / 2];
 
             //while (start < end)
             //{
@@ -45,7 +43,7 @@ namespace WaveletLibrary
                     data.SetVectorElement(i >> 1, data.GetVectorElement(i));
             }
 
-            for (int i = 0; i < N/2; i++)
+            for (int i = 0; i < N / 2; i++)
             {
                 data.SetVectorElement((N >> 1) + i, tmp[i]);
             }
@@ -93,7 +91,7 @@ namespace WaveletLibrary
             if (((N >> level) << level) != N)
                 throw new ArgumentException("The vector size is not compatible with the lifting scheme.");
 
-            int n = N / (int) Math.Pow(2, level-1);
+            int n = N / (int)Math.Pow(2, level - 1);
             Split(data, n);
             Predict(data, n, Direction.Forward);
             Update(data, n, Direction.Forward);
@@ -115,7 +113,7 @@ namespace WaveletLibrary
             if (((N >> level) << level) != N)
                 throw new ArgumentException("The vector size is not compatible with the lifting scheme.");
 
-            int n = N / (int)Math.Pow(2, level-1);
+            int n = N / (int)Math.Pow(2, level - 1);
             Update(data, n, Direction.Inverse);
             Predict(data, n, Direction.Inverse);
             Merge(data, n);

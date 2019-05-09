@@ -26,7 +26,6 @@ namespace WaveletLibrary
                     throw new ArgumentException("Direction is not valid.");
                 }
             }
-
         }
 
         protected override void Update(Matrix data, int N, Direction direction)

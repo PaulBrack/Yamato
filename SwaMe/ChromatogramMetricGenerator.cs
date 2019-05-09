@@ -3,27 +3,23 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using MathNet.Numerics.Interpolation;
+using MzmlParser;
 
 namespace SwaMe
 {
-    class ChromatogramMetrics
+    class ChromatogramMetricGenerator
     {
-        public void CreateChromatogram(MzmlParser.Run run)
+        public void GenerateChromatogram(Run run)
         {
             //Interpolation and smoothing to acquire chromatogram metrics
-            foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
+            foreach (BasePeak basepeak in run.BasePeaks)
             {
-
-                double[] intensities = new double[basepeak.Spectrum.Count()];
-                double[] starttimes = new double[basepeak.Spectrum.Count()];
-                for (int iii = 0; iii < basepeak.Spectrum.Count(); iii++)
-                {
-                    intensities[iii] = basepeak.Spectrum[iii].Intensity;
-                    starttimes[iii] = basepeak.Spectrum[iii].RetentionTime;
-                }
+                double[] intensities = basepeak.Spectrum.Select(x => (double)x.Intensity).ToArray();
+                double[] starttimes = basepeak.Spectrum.Select(x => (double)x.RetentionTime).ToArray();
 
                 //if there are less than two datapoints we cannot calculate chromatogrammetrics:
-                if (starttimes.Count() < 2) { continue; }
+                if (starttimes.Count() < 2)
+                    continue;
 
                 //if there are not enough datapoints, interpolate:
                 if (starttimes.Count() < 100)
@@ -40,7 +36,6 @@ namespace SwaMe
                 }
 
                 WaveletLibrary.Matrix dataMatrix = new WaveletLibrary.Matrix(array3);
-
 
                 var transform = new WaveletLibrary.WaveletTransform(new WaveletLibrary.HaarLift(), 1);
                 dataMatrix = transform.DoForward(dataMatrix);
@@ -61,13 +56,10 @@ namespace SwaMe
                 basepeak.Peaksym = fwfpct / (2 * f);
                 basepeak.PeakCapacity = 1 + (peakTime / basepeak.FWHM);
             }
-
         }
 
-
-        public double CalculateFWHM(double[] starttimes, double[] intensities,double maxIntens,int mIIndex,double baseline)
+        public double CalculateFWHM(double[] starttimes, double[] intensities, double maxIntens, int mIIndex, double baseline)
         {
-            
             double halfMax = (maxIntens - baseline) / 2 + baseline;
             double halfRT1 = 0;
             double halfRT2 = 0;
@@ -88,7 +80,7 @@ namespace SwaMe
                     halfRT2 = starttimes[it];
                     break;
                 }
-                else if (it == mIIndex && starttimes[it] >= halfMax) { halfRT2 = starttimes[intensities.Length-1]; break; }
+                else if (it == mIIndex && starttimes[it] >= halfMax) { halfRT2 = starttimes[intensities.Length - 1]; break; }
             }
 
             return halfRT2 - halfRT1;
@@ -96,28 +88,27 @@ namespace SwaMe
 
         public double CalculateFpctHM(double[] starttimes, double[] intensities, double maxIntens, int mIIndex, double baseline)
         {
-            
             double fiveMax = (maxIntens - baseline) / 20 + baseline;
             double fiveRT1 = 0;
             double fiveRT2 = 0;
-            for (int it = mIIndex; it >0 ; it--)
+            for (int i = mIIndex; i > 0; i--)
             {
-                if (intensities[it] < fiveMax)
+                if (intensities[i] < fiveMax)
                 {
-                    fiveRT1 = starttimes[it];
+                    fiveRT1 = starttimes[i];
                     break;
                 }
-                else if (it == 0 && starttimes[it] >= fiveMax) { fiveRT2 = starttimes[0]; }
+                else if (i == 0 && starttimes[i] >= fiveMax) { fiveRT2 = starttimes[0]; }
             }
 
-            for (int it = mIIndex; it < intensities.Length ; it++)
+            for (int i = mIIndex; i < intensities.Length; i++)
             {
-                if (intensities[it] < fiveMax)
+                if (intensities[i] < fiveMax)
                 {
-                    fiveRT2 = starttimes[it];
+                    fiveRT2 = starttimes[i];
                     break;
                 }
-                else if (it == mIIndex && starttimes[it] >= fiveMax) { fiveRT2 = starttimes[intensities.Length-1]; }
+                else if (i == mIIndex && starttimes[i] >= fiveMax) { fiveRT2 = starttimes[intensities.Length - 1]; }
             }
 
             return fiveRT2 - fiveRT1;
@@ -137,9 +128,9 @@ namespace SwaMe
             double intervals = stimesinterval / numNeeded;
             intensityList = intensities.OfType<double>().ToList();
             starttimesList = starttimes.OfType<double>().ToList();
-            for (int uuu = 0; uuu < numNeeded; uuu++)
+            for (int i = 0; i < numNeeded; i++)
             {
-                double placetobe = starttimes[0] + (intervals * uuu);
+                double placetobe = starttimes[0] + (intervals * i);
 
                 //insert newIntensity into the correct spot in the array
                 for (int currentintensity = 0; currentintensity < 100; currentintensity++)

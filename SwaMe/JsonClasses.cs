@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SwaMe
 {
@@ -10,23 +9,18 @@ namespace SwaMe
             public string version = "0.0.11";
             public RunQuality runQuality { get; set; }
             public CV cv { get; set; }
-  
         }
 
         public class RunQuality
         {
             public MetaData metaData { get; set; }
             public QualityParameters[] qualityParameters { get; set; }
-
-            
-        }
-        
+        } 
 
         public class MetaData
         {
             public InputFiles inputFiles { get; set; }
             public AnalysisSoftware analysisSoftware = new AnalysisSoftware();
-
         }
        
         public class InputFiles
@@ -42,8 +36,6 @@ namespace SwaMe
             public string cvRef = "MS";
             public string accession = "MS:1000584";
             public string name = "mzML format";
-
-           
         }
         public class FileProperties
         {
@@ -51,8 +43,6 @@ namespace SwaMe
             public string accession { get; set; }
             public string name { get; set; }
             public string value { get; set; }
-
-    
         }
         public class AnalysisSoftware
         {
@@ -70,16 +60,13 @@ namespace SwaMe
             public string name { get; set; }
             public Unit unit { get; set; }
             public dynamic value { get; set; }
-
         }
-        
-        
+
         public class Unit
         {
             public string cvRef { get; set; }
             public string accession { get; set; }
             public string name { get; set; }
-    
         }
 
         public class CV
@@ -87,7 +74,6 @@ namespace SwaMe
             public NUV qc { get; set; }
             public NUV ms { get; set; }
             public NUV uo { get; set; }
-
         }
 
         public class NUV //Name,URI,Version
@@ -95,10 +81,6 @@ namespace SwaMe
             public string name { get; set; }
             public string URI { get; set; }
             public string version { get; set; }
-
-    
         }
-     
     }
-   
 }
