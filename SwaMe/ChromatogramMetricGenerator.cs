@@ -30,9 +30,9 @@ namespace SwaMe
                 }
 
                 double[,] array3 = new double[1, intensities.Length];
-                for (int aaa = 0; aaa < intensities.Length; aaa++)
+                for (int i = 0; i < intensities.Length; i++)
                 {
-                    array3[0, aaa] = intensities[aaa];
+                    array3[0, i] = intensities[i];
                 }
 
                 WaveletLibrary.Matrix dataMatrix = new WaveletLibrary.Matrix(array3);
@@ -41,9 +41,9 @@ namespace SwaMe
                 dataMatrix = transform.DoForward(dataMatrix);
 
                 double[] Smoothedms2bpc = new double[intensities.Length];
-                for (int aaa = 0; aaa < intensities.Length; aaa++)
+                for (int i = 0; i < intensities.Length; i++)
                 {
-                    Smoothedms2bpc[aaa] = dataMatrix.toArray[0, aaa];
+                    Smoothedms2bpc[i] = dataMatrix.toArray[0, i];
                 }
                 //Find the fwhm:
                 double maxIntens = Smoothedms2bpc.Max();
@@ -63,24 +63,24 @@ namespace SwaMe
             double halfMax = (maxIntens - baseline) / 2 + baseline;
             double halfRT1 = 0;
             double halfRT2 = 0;
-            for (int it = mIIndex; it > 0; it--)
+            for (int i = mIIndex; i > 0; i--)
             {
-                if (intensities[it] < halfMax)
+                if (intensities[i] < halfMax)
                 {
-                    halfRT1 = starttimes[it];
+                    halfRT1 = starttimes[i];
                     break;
                 }
-                else if (it == 0 && starttimes[it] >= halfMax) { halfRT2 = starttimes[0]; break; }
+                else if (i == 0 && starttimes[i] >= halfMax) { halfRT2 = starttimes[0]; break; }
             }
 
-            for (int it = mIIndex; it < intensities.Length; it++)
+            for (int i = mIIndex; i < intensities.Length; i++)
             {
-                if (intensities[it] < halfMax)
+                if (intensities[i] < halfMax)
                 {
-                    halfRT2 = starttimes[it];
+                    halfRT2 = starttimes[i];
                     break;
                 }
-                else if (it == mIIndex && starttimes[it] >= halfMax) { halfRT2 = starttimes[intensities.Length - 1]; break; }
+                else if (i == mIIndex && starttimes[i] >= halfMax) { halfRT2 = starttimes[intensities.Length - 1]; break; }
             }
 
             return halfRT2 - halfRT1;

@@ -47,7 +47,7 @@ namespace SwaMe
 
             for (int i = 0; i < division; i++)
             {
-                RTsegs[i] = run.BasePeaks.First().RetentionTime + RTsegment * i;
+                RTsegs[i] = run.BasePeaks[0].RetentionTime + RTsegment * i;
             }
 
             //dividing basepeaks into segments
@@ -102,10 +102,10 @@ namespace SwaMe
             {
                 var Temp = TempTIC.ElementAt(i);
                 List<double> Templist = new List<double>();
-                for (int x = 1; x < Temp.Count(); x++)
+                for (int j = 1; j < Temp.Count(); j++)
                 {
 
-                    Templist.Add(Math.Abs(Temp.ElementAt(x) - Temp.ElementAt(x - 1)));
+                    Templist.Add(Math.Abs(Temp.ElementAt(j) - Temp.ElementAt(j - 1)));
                 }
                 Templist.Sort();
                 TICchange50List.Add(Templist.Average());
@@ -139,6 +139,7 @@ namespace SwaMe
                 List<double> PeakprecisionTemp = new List<double>();
                 foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
                 {
+
                     if (basepeak.RTsegment == segment)
                     {
                         PeakwidthsTemp.Add(basepeak.FWHM);
@@ -159,6 +160,7 @@ namespace SwaMe
                 {
                     if (scan.RTsegment == segment)
                     {
+
                         MS1PeakprecisionTemp.Add(scan.BasePeakIntensity / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / scan.BasePeakMz)));
                         firstScanStartTime = Math.Min(firstScanStartTime, scan.ScanStartTime);
                         lastScanStartTime = Math.Max(lastScanStartTime, scan.ScanStartTime);

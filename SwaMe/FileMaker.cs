@@ -46,22 +46,22 @@ namespace SwaMe
             StreamWriter streamWriter = new StreamWriter("MetricsBySwath.tsv");
             streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AveMzRange \t TICpercentageOfSwath \t swDensityAverage \t swDensityIQR  \n");
 
-            for (int num = 0; num < swathMetrics.maxswath; num++)
+            for (int i = 0; i < swathMetrics.maxswath; i++)
             {
                 streamWriter.Write(run.SourceFileName);
                 streamWriter.Write("\t");
                 streamWriter.Write("Swathnumber");
-                streamWriter.Write(num + 1);
+                streamWriter.Write(i + 1);
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.numOfSwathPerGroup.ElementAt(num));
+                streamWriter.Write(swathMetrics.numOfSwathPerGroup.ElementAt(i));
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.AveMzRange.ElementAt(num));
+                streamWriter.Write(swathMetrics.AveMzRange.ElementAt(i));
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.TicPercentage.ElementAt(num));
+                streamWriter.Write(swathMetrics.TicPercentage.ElementAt(i));
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.swDensity50[num]);
+                streamWriter.Write(swathMetrics.swDensity50[i]);
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.swDensityIQR[num]);
+                streamWriter.Write(swathMetrics.swDensityIQR[i]);
                 streamWriter.Write("\n");
             }
             streamWriter.Close();
