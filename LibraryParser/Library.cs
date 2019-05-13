@@ -12,7 +12,7 @@ namespace LibraryParser
             this.TransitionList = new OrderedDictionary();
             this.ProteinDecoyList = new OrderedDictionary();
             this.RtList = new OrderedDictionary();
-            this.UniprotIdList = new OrderedDictionary();
+            this.UniprotIdList = new List<KeyValuePair<string, string>>();
         }
 
         public class Protein
@@ -77,7 +77,7 @@ namespace LibraryParser
             set;
         }
 
-        public OrderedDictionary UniprotIdList
+        public List<KeyValuePair<string, string>> UniprotIdList
         {
             get;
             set;
