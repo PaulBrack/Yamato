@@ -107,7 +107,7 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
-            if (run.SourceFileName.Contains("wiff"))
+            if (run.SourceFileName.ToUpper().EndsWith("WIFF"))
             {
                 scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
             }
@@ -123,7 +123,7 @@ namespace MzmlParser
                             {
                                 case "MS:1000511":
                                     scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                    if (run.SourceFileName.Contains("raw"))
+                                    if (run.SourceFileName.ToUpper().EndsWith("RAW"))
                                     {
                                         if (scan.Scan.MsLevel == 1)
                                         {
