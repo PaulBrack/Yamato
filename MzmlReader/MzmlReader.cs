@@ -24,7 +24,9 @@ namespace MzmlParser
         private const double BasePeakMinimumIntensity = 100;
         private const double massTolerance = 0.05;
         private const double rtTolerance = 2.5; //2.5 mins on either side
-
+        public int currentCycle = 0;
+        bool MS1 = false;
+        double previousTargetMz = 0;
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static CountdownEvent cde = new CountdownEvent(1);
@@ -105,68 +107,98 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
-            scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
-
-            bool cvParamsRead = false;
-            while (reader.Read() && !cvParamsRead)
+            if (run.SourceFileName.ToUpper().EndsWith("WIFF"))
             {
-                if (reader.IsStartElement())
-                {
-                    if (reader.LocalName == "cvParam")
-                    {
-                        switch (reader.GetAttribute("accession"))
-                        {
-                            case "MS:1000511":
-                                scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                break;
-                            case "MS:1000285":
-                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                            case "MS:1000016":
-                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                            case "MS:1000827":
-                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                            case "MS:1000829":
-                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                            case "MS:1000828":
-                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                        }
-                    }
-                    else if (reader.LocalName == "binaryDataArray")
-                    {
-                        GetBinaryData(reader, scan);
-                    }
-                    if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
-                    {
-                        if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
-                            scan.Scan.MsLevel = 1;
-                        else
-                            scan.Scan.MsLevel = 2;
-                    }
-                }
-                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
-                {
-                    if (ParseBinaryData)
-                    {
-                        if (Threading)
-                        {
-                            cde.AddCount();
-                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading));
-                        }
-                        else
-                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading);
-                    }
-                    else
-                    {
-                        AddScanToRun(scan.Scan, run);
-                    }
-                    cvParamsRead = true;
-                }
+                scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
             }
+
+                bool cvParamsRead = false;
+                while (reader.Read() && !cvParamsRead)
+                {
+                    if (reader.IsStartElement())
+                    {
+                        if (reader.LocalName == "cvParam")
+                        {
+                            switch (reader.GetAttribute("accession"))
+                            {
+                                case "MS:1000511":
+                                    scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
+                                    if (run.SourceFileName.ToUpper().EndsWith("RAW"))
+                                    {
+                                        if (scan.Scan.MsLevel == 1)
+                                        {
+                                            currentCycle++;
+                                            scan.Scan.Cycle = currentCycle;
+                                            MS1 = true;
+                                        }
+                                        //if there is ScanAndTempProperties ms1:
+                                        else if (MS1)
+                                        {
+                                            scan.Scan.Cycle = currentCycle;
+                                        }
+                                        //if there is no ms1:
+                                        else
+                                        {
+                                            if (previousTargetMz < scan.Scan.IsolationWindowTargetMz)
+                                            {
+                                                scan.Scan.Cycle = currentCycle;
+                                            }
+                                            else
+                                            {
+                                                currentCycle += currentCycle;
+                                                scan.Scan.Cycle = currentCycle;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case "MS:1000285":
+                                    scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                                case "MS:1000016":
+                                    scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                                case "MS:1000827":
+                                    scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                                case "MS:1000829":
+                                    scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                                case "MS:1000828":
+                                    scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                            }
+                        }
+                        else if (reader.LocalName == "binaryDataArray")
+                        {
+                            GetBinaryData(reader, scan);
+                        }
+                        if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
+                        {
+                            if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
+                                scan.Scan.MsLevel = 1;
+                            else
+                                scan.Scan.MsLevel = 2;
+                        }
+                    }
+                    else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
+                    {
+                        if (ParseBinaryData)
+                        {
+                            if (Threading)
+                            {
+                                cde.AddCount();
+                                ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading));
+                            }
+                            else
+                                ParseBase64Data(scan, run, ExtractBasePeaks, Threading);
+                        }
+                        else
+                        {
+                            AddScanToRun(scan.Scan, run);
+                        }
+                        cvParamsRead = true;
+                    }
+                }
         }
 
         private static void GetBinaryData(XmlReader reader, ScanAndTempProperties scan)
