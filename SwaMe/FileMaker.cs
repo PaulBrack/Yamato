@@ -46,7 +46,7 @@ namespace SwaMe
             StreamWriter streamWriter = new StreamWriter("MetricsBySwath.tsv");
             streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AveMzRange \t TICpercentageOfSwath \t swDensityAverage \t swDensityIQR  \n");
 
-            for (int i = 0; i < swathMetrics.maxswath; i++)
+            for (int i = 0; i < (swathMetrics.numOfSwathPerGroup.Count()-1); i++)
             {
                 streamWriter.Write(run.SourceFileName);
                 streamWriter.Write("\t");
@@ -112,9 +112,11 @@ namespace SwaMe
         public void MakeUndividedMetricsFile()
         {
             StreamWriter streamWriter = new StreamWriter("undividedMetrics.tsv");
-            streamWriter.Write("Filename \t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t CycleTimes50 \t CycleTimesIQR \t MS2Density50 \t MS2DensityIQR \t MS1Count");
+            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t CycleTimes50 \t CycleTimesIQR \t MS2Density50 \t MS2DensityIQR \t MS1Count");
             streamWriter.Write("\n");
             streamWriter.Write(run.SourceFileName);
+            streamWriter.Write("\t");
+            streamWriter.Write(run.MissingScans);
             streamWriter.Write("\t");
             streamWriter.Write(RTDuration);
             streamWriter.Write("\t");
