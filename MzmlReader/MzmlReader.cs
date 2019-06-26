@@ -272,8 +272,9 @@ namespace MzmlParser
             float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
             if (intensities.Count() == 0)
             {
-                System.Array.Resize(ref intensities, 5);
-                System.Array.Resize(ref mzs, 5);
+                intensities = FillZeroArray(intensities);
+                mzs = FillZeroArray(mzs);
+                logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}", scan.Scan.MsLevel , scan.Scan.Cycle);
                 run.MissingScans++;
             }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
@@ -362,6 +363,13 @@ namespace MzmlParser
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
             }
         }
+
+        private static float[] FillZeroArray(float[] array)
+        {
+            System.Array.Resize(ref array, 5);
+            return array;
+        }
+
 
         private void FindMs2IsolationWindows(Run run)
         {
