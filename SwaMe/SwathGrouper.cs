@@ -1,4 +1,4 @@
-﻿
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,7 +42,7 @@ namespace SwaMe
             foreach (var e in result)
             {
                 if (e.Count > maxswath)
-                    maxswath = e.Count;
+                    maxswath = e.Count-1;
             }
 
             //Create list of target isolationwindows to serve as swathnumber
@@ -65,14 +65,15 @@ namespace SwaMe
             List<double> swDensityIQR = new List<double>();
             List<double> mzrange = new List<double>();
             List<double> TicPercentage = new List<double>();
-            for (int swathsOfThisNumber = 0; swathsOfThisNumber < maxswath; swathsOfThisNumber++)
+//Loop through all the swaths of the same number and add to
+            for (int swathNumber = 0; swathNumber < swathBoundaries.Count(); swathNumber++)
             {
                 int track = 0;
 
                 double TICthisSwath = 0;
 
                 var result333 = run.Ms2Scans.OrderBy(s => s.ScanStartTime)
-                    .Where(x => x.MsLevel == 2 && x.IsolationWindowTargetMz == swathBoundaries[swathsOfThisNumber]);
+                    .Where(x => x.MsLevel == 2 && x.IsolationWindowTargetMz == swathBoundaries[swathNumber]);
                 foreach (var scan in result333)
                 {
 
@@ -92,7 +93,7 @@ namespace SwaMe
                 swDensity.Clear();
             }
 
-            for (int num = 0; num < maxswath; num++)
+            for (int num = 0; num < swathBoundaries.Count(); num++)
             {
                 TicPercentage.Add((TICs[num] / totalTIC) *100);
             }
