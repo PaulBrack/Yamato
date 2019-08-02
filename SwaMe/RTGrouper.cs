@@ -187,14 +187,14 @@ namespace SwaMe
 
                 cycleTime.Add((lastCycle - firstCycle) / (lastScanStartTime - firstScanStartTime));
                 Peakwidths.Add(PeakwidthsTemp.Average());
-                PeakSymmetry.Add(PeaksymTemp.Average());
-                PeakCapacity.Add(PeakCapacityTemp.Average());
-                PeakPrecision.Add(PeakprecisionTemp.Average());
-                MS1PeakPrecision.Add(MS1PeakprecisionTemp.Average());
+                PeakSymmetry.Add(Math.Ceiling(PeaksymTemp.Average()));
+                PeakCapacity.Add(Math.Ceiling(PeakCapacityTemp.Average()));
+                PeakPrecision.Add(Math.Ceiling(PeakprecisionTemp.Average()));
+                MS1PeakPrecision.Add(Math.Ceiling(MS1PeakprecisionTemp.Average()));
                 MS1Density.Add(Convert.ToInt32(Math.Round(MS1DensityTemp.Average(),0)));
                 MS2Density.Add(Convert.ToInt32(Math.Round(MS2DensityTemp.Average(), 0)));
-                MS1TICTotal.Add(MS1TICTotalTemp);
-                MS2TICTotal.Add(MS2TICTotalTemp);
+                MS1TICTotal.Add(Math.Ceiling(MS1TICTotalTemp));
+                MS2TICTotal.Add(Math.Ceiling(MS2TICTotalTemp));
             }
 
             RTMetrics rtMetrics = new RTMetrics(MS1TICTotal, MS2TICTotal, cycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, PeakSymmetry, PeakCapacity, PeakPrecision, MS1PeakPrecision);
