@@ -59,7 +59,7 @@ namespace SwaMe
             fileMaker.MakeUndividedMetricsFile();
             fileMaker.MakeMetricsPerRTsegmentFile(rtMetrics);
             fileMaker.MakeMetricsPerSwathFile(swathMetrics);
-            fileMaker.MakeJSON();
+            fileMaker.CreateAndSaveMzqc();
         }
 
         private double CalcSwathSizeDiff(Run run)

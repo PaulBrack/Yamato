@@ -1,9 +1,7 @@
-﻿using Json.Net;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿
 using System.IO;
 using System.Linq;
-
+using MzqcGenerator;
 
 namespace SwaMe
 {
@@ -138,7 +136,7 @@ namespace SwaMe
             streamWriter.Close();
         }
 
-        public void MakeJSON()
+        public void CreateAndSaveMzqc()
         {
             //Declare units:
             JsonClasses.Unit Count = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0000189", name = "count" };
@@ -193,12 +191,25 @@ namespace SwaMe
             string output = JsonConvert.SerializeObject(metrics);
             using (StreamWriter file = File.CreateText(@"metrics.json"))
             {
+                file.Write("mzQC:");
+                Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
+                serializer.NullValueHandling = NullValueHandling.Ignore;
+                serializer.Serialize(file, metrics);
+            }
+        }
+    }
+}
+
+
+            //Then print:
+            string output = JsonConvert.SerializeObject(metrics);
+            using (StreamWriter file = File.CreateText(@"metrics.json"))
+            {
                 file.Write("{ \"mzQC\":");
                 Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
                 serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.Serialize(file, metrics);
                 file.Write("}");
             }
-        }
-    }
-}
+            //Then save:
+            new MzqcGenerator.MzqcWriter().WriteMzqc(@"metrics.json", metrics);
