@@ -8,7 +8,7 @@ namespace SwaMe
         {
             public string version = "0.0.11";
             public RunQuality runQuality { get; set; }
-            public CV cv { get; set; }
+            public CV CV { get; set; }
         }
 
         public class RunQuality
@@ -71,9 +71,9 @@ namespace SwaMe
 
         public class CV
         {
-            public NUV qc { get; set; }
-            public NUV ms { get; set; }
-            public NUV uo { get; set; }
+            public NUV QC { get; set; }
+            public NUV MS { get; set; }
+            public NUV UO { get; set; }
         }
 
         public class NUV //Name,URI,Version

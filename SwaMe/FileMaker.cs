@@ -44,9 +44,9 @@ namespace SwaMe
         {
             //tsv
             StreamWriter streamWriter = new StreamWriter("MetricsBySwath.tsv");
-            streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AveMzRange \t TICpercentageOfSwath \t swDensityAverage \t swDensityIQR  \n");
+            streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AveMzRange \t TICRatioOfSwath \t swDensityAverage \t swDensityIQR  \n");
 
-            for (int i = 0; i < swathMetrics.maxswath; i++)
+            for (int i = 0; i < (swathMetrics.numOfSwathPerGroup.Count()-1); i++)
             {
                 streamWriter.Write(run.SourceFileName);
                 streamWriter.Write("\t");
@@ -57,7 +57,7 @@ namespace SwaMe
                 streamWriter.Write("\t");
                 streamWriter.Write(swathMetrics.AveMzRange.ElementAt(i));
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.TicPercentage.ElementAt(i));
+                streamWriter.Write(swathMetrics.TICRatio.ElementAt(i));
                 streamWriter.Write("\t");
                 streamWriter.Write(swathMetrics.swDensity50[i]);
                 streamWriter.Write("\t");
@@ -112,9 +112,11 @@ namespace SwaMe
         public void MakeUndividedMetricsFile()
         {
             StreamWriter streamWriter = new StreamWriter("undividedMetrics.tsv");
-            streamWriter.Write("Filename \t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t CycleTimes50 \t CycleTimesIQR \t MS2Density50 \t MS2DensityIQR \t MS1Count");
+            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t CycleTimes50 \t CycleTimesIQR \t MS2Density50 \t MS2DensityIQR \t MS1Count");
             streamWriter.Write("\n");
             streamWriter.Write(run.SourceFileName);
+            streamWriter.Write("\t");
+            streamWriter.Write(run.MissingScans);
             streamWriter.Write("\t");
             streamWriter.Write(RTDuration);
             streamWriter.Write("\t");
@@ -141,10 +143,10 @@ namespace SwaMe
             //Declare units:
             JsonClasses.Unit Count = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0000189", name = "count" };
             JsonClasses.Unit Second = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0000010", name = "second" };
-            JsonClasses.Unit mZ = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:XXXXXXX", name = "m/z" };// I know this one doesn't exist, put it here as a placeholder until I figure out what to do with it.
+            JsonClasses.Unit mZ = new JsonClasses.Unit() { cvRef = "MS", accession = "MS:1000040", name = "m/z" };
             JsonClasses.Unit Hertz = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0000106", name = "Hertz" };
-            JsonClasses.Unit MzPercentage = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:XXXXXXXX", name = "m/z percentage" };//Also doesn't exist, need to re-evaluate...
-            JsonClasses.Unit Intensity = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:XXXXXXX", name = "Counts per second" };//Also doesn't exist in the UO obo...
+            JsonClasses.Unit Ratio = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0010006", name = "ratio" };//Also doesn't exist, need to re-evaluate...
+            JsonClasses.Unit Intensity = new JsonClasses.Unit() { cvRef = "MS", accession = "MS:1000042", name = "Peak Intensity" };
 
             //Start with the long part: adding all the metrics
             JsonClasses.QualityParameters[] qualityParameters = new JsonClasses.QualityParameters[25];
@@ -159,7 +161,7 @@ namespace SwaMe
             qualityParameters[8] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:4000059", name = "Quameter metric: MS1-Count", unit = Count, value = MS1Count };
             qualityParameters[9] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: scansPerSwathGroup", unit = Count, value = swathMetrics.numOfSwathPerGroup };
             qualityParameters[10] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AveMzRange", unit = mZ, value = swathMetrics.AveMzRange };
-            qualityParameters[11] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: TICpercentageOfSwath", unit = MzPercentage, value = swathMetrics.TicPercentage };
+            qualityParameters[11] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: TICRatioOfSwath", unit = Ratio, value = swathMetrics.TICRatio };
             qualityParameters[12] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: swDensity50", unit = Count, value = swathMetrics.swDensity50 };
             qualityParameters[13] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: swDensityIQR", unit = Count, value = swathMetrics.swDensityIQR };
             qualityParameters[14] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: Peakwidths", unit = Second, value = rtMetrics.Peakwidths };
@@ -176,24 +178,26 @@ namespace SwaMe
             qualityParameters[24] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS1TICTotal", unit = Count, value = rtMetrics.MS1TICTotal };
 
             //Now for the other stuff
-            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles() { location = inputFilePath, name = run.SourceFileName };
+            JsonClasses.FileFormat fileFormat = new JsonClasses.FileFormat() { };
+            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles() { location = "file://"+inputFilePath, name = run.SourceFileName, fileFormat = fileFormat };
             JsonClasses.MetaData metaData = new JsonClasses.MetaData() { inputFiles = inputFile };
             JsonClasses.RunQuality runQuality = new JsonClasses.RunQuality() { metaData = metaData, qualityParameters = qualityParameters };
-            JsonClasses.NUV qualityControl = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Quality Control Ontology", URI = "https://github.com/HUPO-PSI/qcML-development/blob/master/cv/v0_0_11/qc-cv.obo", version = "0.1.0" };
-            JsonClasses.NUV massSpectrometry = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Mass Spectrometry Ontology", URI = "https://github.com/HUPO-PSI/psi-ms-CV/blob/master/psi-ms.obo", version = "4.1.7" };
-            JsonClasses.NUV UnitOntology = new JsonClasses.NUV() { name = "Unit Ontology", URI = "https://github.com/bio-ontology-research-group/unit-ontology/blob/master/unit.obo", version = "09:04:2014 13:37" };
-            JsonClasses.CV cV = new JsonClasses.CV() { qc = qualityControl, ms = massSpectrometry, uo = UnitOntology };
-            JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, cv = cV };
+            JsonClasses.NUV qualityControl = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Quality Control Ontology", URI = "https://raw.githubusercontent.com/HUPO-PSI/mzQC/master/cv/v0_0_11/qc-cv.obo", version = "0.1.0" };
+            JsonClasses.NUV massSpectrometry = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Mass Spectrometry Ontology", URI = "https://raw.githubusercontent.com/HUPO-PSI/psi-ms-CV/master/psi-ms.obo", version = "4.1.7" };
+            JsonClasses.NUV UnitOntology = new JsonClasses.NUV() { name = "Unit Ontology", URI = "https://raw.githubusercontent.com/bio-ontology-research-group/unit-ontology/master/unit.obo", version = "09:04:2014 13:37" };
+            JsonClasses.CV cV = new JsonClasses.CV() { QC = qualityControl, MS = massSpectrometry, UO = UnitOntology };
+            JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, CV = cV };
 
 
             //Then print:
             string output = JsonConvert.SerializeObject(metrics);
             using (StreamWriter file = File.CreateText(@"metrics.json"))
             {
-                file.Write("mzQC:");
+                file.Write("{ \"mzQC\":");
                 Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
                 serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.Serialize(file, metrics);
+                file.Write("}");
             }
         }
     }

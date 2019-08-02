@@ -22,6 +22,7 @@ namespace MzmlParser
         public List<BasePeak> BasePeaks { get;set; }
         public Chromatograms Chromatograms { get; set; }
         public List<(double, double)> IsolationWindows { get; set; }
+        public int MissingScans { get; set; }
     }
 
     public class Chromatograms

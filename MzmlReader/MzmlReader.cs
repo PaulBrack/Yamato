@@ -24,7 +24,9 @@ namespace MzmlParser
         private const double BasePeakMinimumIntensity = 100;
         private const double massTolerance = 0.05;
         private const double rtTolerance = 2.5; //2.5 mins on either side
-
+        public int currentCycle = 0;
+        bool MS1 = false;
+        double previousTargetMz = 0;
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static CountdownEvent cde = new CountdownEvent(1);
@@ -35,7 +37,7 @@ namespace MzmlParser
         {
             Run run = new Run();
             logger.Info("Loading file: {0}", path);
-
+            run.MissingScans = 0;
             using (XmlReader reader = XmlReader.Create(path))
             {
                 while (reader.Read())
@@ -105,68 +107,98 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
-            scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
-
-            bool cvParamsRead = false;
-            while (reader.Read() && !cvParamsRead)
+            if (run.SourceFileName.ToUpper().EndsWith("WIFF")|| run.SourceFileName.ToUpper().EndsWith("SCAN"))
             {
-                if (reader.IsStartElement())
-                {
-                    if (reader.LocalName == "cvParam")
-                    {
-                        switch (reader.GetAttribute("accession"))
-                        {
-                            case "MS:1000511":
-                                scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                break;
-                            case "MS:1000285":
-                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                            case "MS:1000016":
-                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                            case "MS:1000827":
-                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                            case "MS:1000829":
-                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                            case "MS:1000828":
-                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
-                        }
-                    }
-                    else if (reader.LocalName == "binaryDataArray")
-                    {
-                        GetBinaryData(reader, scan);
-                    }
-                    if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
-                    {
-                        if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
-                            scan.Scan.MsLevel = 1;
-                        else
-                            scan.Scan.MsLevel = 2;
-                    }
-                }
-                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
-                {
-                    if (ParseBinaryData)
-                    {
-                        if (Threading)
-                        {
-                            cde.AddCount();
-                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading));
-                        }
-                        else
-                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading);
-                    }
-                    else
-                    {
-                        AddScanToRun(scan.Scan, run);
-                    }
-                    cvParamsRead = true;
-                }
+                scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
             }
+
+                bool cvParamsRead = false;
+                while (reader.Read() && !cvParamsRead)
+                {
+                    if (reader.IsStartElement())
+                    {
+                        if (reader.LocalName == "cvParam")
+                        {
+                            switch (reader.GetAttribute("accession"))
+                            {
+                                case "MS:1000511":
+                                    scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
+                                    if (run.SourceFileName.ToUpper().EndsWith("RAW"))
+                                    {
+                                        if (scan.Scan.MsLevel == 1)
+                                        {
+                                            currentCycle++;
+                                            scan.Scan.Cycle = currentCycle;
+                                            MS1 = true;
+                                        }
+                                        //if there is ScanAndTempProperties ms1:
+                                        else if (MS1)
+                                        {
+                                            scan.Scan.Cycle = currentCycle;
+                                        }
+                                        //if there is no ms1:
+                                        else
+                                        {
+                                            if (previousTargetMz < scan.Scan.IsolationWindowTargetMz)
+                                            {
+                                                scan.Scan.Cycle = currentCycle;
+                                            }
+                                            else
+                                            {
+                                                currentCycle += currentCycle;
+                                                scan.Scan.Cycle = currentCycle;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case "MS:1000285":
+                                    scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                                case "MS:1000016":
+                                    scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                                case "MS:1000827":
+                                    scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                                case "MS:1000829":
+                                    scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                                case "MS:1000828":
+                                    scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                    break;
+                            }
+                        }
+                        else if (reader.LocalName == "binaryDataArray")
+                        {
+                            GetBinaryData(reader, scan);
+                        }
+                        if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
+                        {
+                            if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
+                                scan.Scan.MsLevel = 1;
+                            else
+                                scan.Scan.MsLevel = 2;
+                        }
+                    }
+                    else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
+                    {
+                        if (ParseBinaryData)
+                        {
+                            if (Threading)
+                            {
+                                cde.AddCount();
+                                ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading));
+                            }
+                            else
+                                ParseBase64Data(scan, run, ExtractBasePeaks, Threading);
+                        }
+                        else
+                        {
+                            AddScanToRun(scan.Scan, run);
+                        }
+                        cvParamsRead = true;
+                    }
+                }
         }
 
         private static void GetBinaryData(XmlReader reader, ScanAndTempProperties scan)
@@ -236,46 +268,55 @@ namespace MzmlParser
         private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading)
         {
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
+            
             float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
+            if (intensities.Count() == 0)
+            {
+                intensities = FillZeroArray(intensities);
+                mzs = FillZeroArray(mzs);
+                logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}", scan.Scan.MsLevel , scan.Scan.Cycle);
+                run.MissingScans++;
+            }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
 
-            //Want to potentially chuck 30GB of scan data into RAM? This is how you do it...
-            //scan.Scan.Spectrum = spectrum;
-            scan.Scan.Density = spectrum.Count();
-            scan.Scan.BasePeakIntensity = intensities.Max();
-            scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
-            AddScanToRun(scan.Scan, run);
+                //Want to potentially chuck 30GB of scan data into RAM? This is how you do it...
+                //scan.Scan.Spectrum = spectrum;
+             scan.Scan.Density = spectrum.Count();
+             scan.Scan.BasePeakIntensity = intensities.Max();
+             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, (int)scan.Scan.BasePeakIntensity)];
+             AddScanToRun(scan.Scan, run);
 
-            if (extractBasePeaks && scan.Scan.MsLevel == 2)
-            {
-                lock (Lock)
+             if (extractBasePeaks && scan.Scan.MsLevel == 2)
                 {
-                    //Create a new basepeak if no matching one exists
-                    if (!run.BasePeaks.Exists(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance) && scan.Scan.BasePeakIntensity >= BasePeakMinimumIntensity)
+                    lock (Lock)
                     {
-                        spectrum.Select(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance);
-                        BasePeak basePeak = new BasePeak()
+                        //Create a new basepeak if no matching one exists
+                        if (!run.BasePeaks.Exists(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance) && scan.Scan.BasePeakIntensity >= BasePeakMinimumIntensity)
                         {
-                            Mz = scan.Scan.BasePeakMz,
-                            RetentionTime = scan.Scan.ScanStartTime,
-                            Intensity = scan.Scan.BasePeakIntensity,
-                            Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList()
-                        };
-                        run.BasePeaks.Add(basePeak);
-                    }
-                    //Check to see if we have a basepeak we can add points to
-                    else
-                    {
-                        foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
+                            spectrum.Select(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance);
+                            BasePeak basePeak = new BasePeak()
+                            {
+                                Mz = scan.Scan.BasePeakMz,
+                                RetentionTime = scan.Scan.ScanStartTime,
+                                Intensity = scan.Scan.BasePeakIntensity,
+                                Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList()
+                            };
+                            run.BasePeaks.Add(basePeak);
+                        }
+                        //Check to see if we have a basepeak we can add points to
+                        else
                         {
-                            bp.Spectrum.Add(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).First());
+                            foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
+                            {
+                                bp.Spectrum.Add(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).First());
+                            }
                         }
                     }
                 }
-            }
 
-            if (threading)
-                cde.Signal();
+              if (threading)
+                  cde.Signal();
+              
         }
 
         private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed, int bits)
@@ -322,6 +363,13 @@ namespace MzmlParser
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
             }
         }
+
+        private static float[] FillZeroArray(float[] array)
+        {
+            System.Array.Resize(ref array, 5);
+            return array;
+        }
+
 
         private void FindMs2IsolationWindows(Run run)
         {
