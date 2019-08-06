@@ -2,6 +2,7 @@ using CommandLine;
 using System;
 using System.Diagnostics;
 using NLog;
+using System.Linq;
 
 namespace Yamato.Console
 {
@@ -23,7 +24,9 @@ namespace Yamato.Console
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                int division = options.Division;
+                int division;
+                if (Enumerable.Range(1, 100).Contains(options.Division))
+                {division = options.Division; } else {division = 1; }
                 string iRTpath = "none";
                 if (options.iRTFile != null)
                 { iRTpath = options.iRTFile; }

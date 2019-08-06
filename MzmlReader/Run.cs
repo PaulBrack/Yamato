@@ -17,6 +17,7 @@ namespace MzmlParser
         public String SourceFileName { get; set; }
         public String SourceFilePath { get; set; }
         public String SourceFileChecksum { get; set; }
+        public String CompletionTime { get; set; }
         public List<Scan> Ms1Scans { get; set; }
         public ConcurrentBag<Scan> Ms2Scans { get; set; }
         public List<BasePeak> BasePeaks { get;set; }

@@ -83,8 +83,14 @@ namespace MzmlParser
                             case "MS:1000562":
                                 run.SourceFileType = reader.GetAttribute("name");
                                 break;
+                            case "MS:1000563"://Thermo
+                                run.SourceFileType = reader.GetAttribute("name");
+                                break;
                             case "MS:1000569":
                                 run.SourceFileChecksum = reader.GetAttribute("value");
+                                break;
+                            case "MS:1000747"://Optional for the conversion process, but included in mzQC
+                                run.CompletionTime = reader.GetAttribute("value");
                                 break;
                         }
                     }

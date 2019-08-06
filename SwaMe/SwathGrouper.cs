@@ -1,6 +1,5 @@
 
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System;
 
@@ -20,10 +19,10 @@ namespace SwaMe
             public List<double> TICs;
             public List<double> swDensity50;
             public List<double> swDensityIQR;
-            public List<double> TicPercentage;
+            public List<double> TICRatio;
 
             public SwathMetrics(int maxswath, double totalTIC, List<int> numOfSwathPerGroup, List<double> AveMzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
-            List<double> TicPercentage)
+            List<double> TICRatio)
             {
                 this.maxswath = maxswath;
                 this.totalTIC = totalTIC;
@@ -32,7 +31,7 @@ namespace SwaMe
                 this.TICs = TICs;
                 this.swDensity50 = swDensity50;
                 this.swDensityIQR = swDensityIQR;
-                this.TicPercentage = TicPercentage;
+                this.TICRatio = TICRatio;
             }
         }
         public SwathMetrics GroupBySwath(MzmlParser.Run run)
@@ -64,7 +63,7 @@ namespace SwaMe
             List<double> swDensity50 = new List<double>();
             List<double> swDensityIQR = new List<double>();
             List<double> mzrange = new List<double>();
-            List<double> TicPercentage = new List<double>();
+            List<double> TICRatio = new List<double>();
 //Loop through all the swaths of the same number and add to
             for (int swathNumber = 0; swathNumber < swathBoundaries.Count(); swathNumber++)
             {
@@ -88,17 +87,17 @@ namespace SwaMe
                 TICs.Add(TICthisSwath);
                 TICthisSwath = 0;
                 swDensity.Sort();
-                swDensity50.Add(swDensity.Average());
-                swDensityIQR.Add(InterQuartileRangeCalculator.CalcIQR(swDensity));
+                swDensity50.Add(Math.Truncate(Math.Ceiling(swDensity.Average())));
+                swDensityIQR.Add(Math.Truncate(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity))));
                 swDensity.Clear();
             }
 
             for (int num = 0; num < swathBoundaries.Count(); num++)
             {
-                TicPercentage.Add((TICs[num] / totalTIC) *100);
+                TICRatio.Add((TICs[num] / totalTIC));
             }
 
-            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, AveMzRange, TICs, swDensity50, swDensityIQR, TicPercentage);
+            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, AveMzRange, TICs, swDensity50, swDensityIQR, TICRatio);
             return swathMetrics;
         }
 
