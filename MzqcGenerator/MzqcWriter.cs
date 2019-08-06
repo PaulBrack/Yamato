@@ -9,11 +9,14 @@ namespace MzqcGenerator
         {
             using (StreamWriter file = File.CreateText(path))
             {
-                file.Write("mzQC:");
-                Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
+                file.Write("{ mzQC:");
+                JsonSerializer serializer = new JsonSerializer();
                 serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.Serialize(file, metrics);
+                file.Write("}");
             }
         }
+
     }
+
 }

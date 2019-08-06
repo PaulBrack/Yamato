@@ -87,8 +87,8 @@ namespace SwaMe
                 TICs.Add(TICthisSwath);
                 TICthisSwath = 0;
                 swDensity.Sort();
-                swDensity50.Add(Math.Ceiling(swDensity.Average()));
-                swDensityIQR.Add(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity)));
+                swDensity50.Add(Math.Truncate(Math.Ceiling(swDensity.Average())));
+                swDensityIQR.Add(Math.Truncate(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity))));
                 swDensity.Clear();
             }
 
