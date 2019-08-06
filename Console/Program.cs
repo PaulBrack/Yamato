@@ -39,7 +39,7 @@ namespace Yamato.Console
 
                 MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run, division,iRTpath, inputFilePath);
+                new SwaMe.MetricGenerator().GenerateMetrics(run, division, iRTpath, inputFilePath);
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
             });
