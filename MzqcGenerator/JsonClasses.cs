@@ -54,7 +54,7 @@ namespace MzqcGenerator
         }
         public class RunQuality
         {
-            public MetaData metaData { get; set; }
+            public MetaData metadata { get; set; }
             public QualityParameters[] qualityParameters { get; set; }
         }
 
@@ -67,16 +67,16 @@ namespace MzqcGenerator
 
         public class CV
         {
-            public NUV qc { get; set; }
-            public NUV ms { get; set; }
-            public NUV uo { get; set; }
+            public NUV QC { get; set; }
+            public NUV MS { get; set; }
+            public NUV UO { get; set; }
         }
 
        
         public class MzQC
         {
             public string version = "0.0.11";
-            public List<RunQuality> runQualities { get; set; }
+            public List<RunQuality> runQuality { get; set; }
             public CV cv { get; set; }
         }
     }

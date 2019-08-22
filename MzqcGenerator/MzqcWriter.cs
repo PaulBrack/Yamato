@@ -9,7 +9,7 @@ namespace MzqcGenerator
         {
             using (StreamWriter file = File.CreateText(path))
             {
-                file.Write("{ mzQC:");
+                file.Write("{ \"mzQC\":");
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.Serialize(file, metrics);
