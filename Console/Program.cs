@@ -27,6 +27,12 @@ namespace Yamato.Console
                 int division;
                 if (Enumerable.Range(1, 100).Contains(options.Division))
                 {division = options.Division; } else {division = 1; }
+
+                double massTolerance;
+                if (options.Tolerance>0 && options.Tolerance<1)
+                { massTolerance = options.Tolerance; }
+                else { massTolerance = 0.05; }
+
                 string iRTpath = "none";
                 if (options.iRTFile != null)
                 { iRTpath = options.iRTFile; }
@@ -37,9 +43,9 @@ namespace Yamato.Console
                 if (options.Threading == false)
                     mzmlParser.Threading = false;
 
-                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath);
+                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, iRTpath, massTolerance);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run, division, iRTpath, inputFilePath);
+                new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath,massTolerance);
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
             });
@@ -65,11 +71,8 @@ namespace Yamato.Console
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
         public int Division { get; set; }
 
-        [Option('u', "upperoffset", Required = false, HelpText = "m/z tolerance upper offset. The closest m/z value to the m/z of the basepeak that is still within the upper and lower offest from the basepeak m/z are part of the same chromatogram.")]
-        public float UpperOffset { get; set; }
-
-        [Option('l', "loweroffset", Required = false, HelpText = "m/z tolerance lower offset. The closest m/z value to the m/z of the basepeak that is still within the upper and lower offest from the basepeak m/z are part of the same chromatogram.")]
-        public float LowerOffset { get; set; }
+        [Option('m', "masstolerance", Required = false, HelpText = "m/z tolerance. The closest m/z value to the m/z of the basepeak that is still within this value from the basepeak m/z are part of the same chromatogram.")]
+        public float Tolerance { get; set; }
 
         [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]
         public bool? ParseBinaryData { get; set; }

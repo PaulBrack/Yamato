@@ -1,4 +1,3 @@
-using LibraryParser;
 using MzmlParser;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,30 +6,9 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division, string iRTpath, string inputFilePath)
+        public void GenerateMetrics(Run run, int division,  string inputFilePath, double massTolerance)
         {
-            if (iRTpath != "none")
-            {
-                Library irtLibrary = new Library();
-                if (iRTpath.Contains("traml"))
-                {
-                    TraMLReader traMLReader = new TraMLReader();
-                    irtLibrary = traMLReader.LoadLibrary(iRTpath);
-                }
-                else if (iRTpath.Contains("sky"))
-                {
-                    SkyReader skyReader = new SkyReader();
-                    irtLibrary = skyReader.LoadLibrary(iRTpath);
-                }
-
-                for (int iterator = 0; iterator < irtLibrary.PeptideList.Count; iterator++)
-                {
-                    //Now search in the MS1 binary arrays for peptide m/z
-
-                    //Amongst all the matches, search the next couple of ms2 scans for the correct m/z windows for matches to find out which ms1 matches are the correct ones.
-                }
-            }
-
+           
 
             //Acquire RTDuration:
             double RTDuration = run.BasePeaks[run.BasePeaks.Count() - 1].RetentionTime - run.BasePeaks[0].RetentionTime;
@@ -38,6 +16,10 @@ namespace SwaMe
             //Interpolate, Smooth, create chromatogram and generate chromatogram metrics
             ChromatogramMetricGenerator chromatogramMetrics = new ChromatogramMetricGenerator();
             chromatogramMetrics.GenerateChromatogram(run);
+
+            if (run.IRTPeaks != null) {
+            chromatogramMetrics.GenerateiRTChromatogram(run,massTolerance);
+            }
 
             //Calculating the largestswath
             double swathSizeDifference = CalcSwathSizeDiff(run);
@@ -57,6 +39,7 @@ namespace SwaMe
             RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
             FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
             fileMaker.MakeUndividedMetricsFile();
+            fileMaker.MakeiRTmetricsFile(run);
             fileMaker.MakeMetricsPerRTsegmentFile(rtMetrics);
             fileMaker.MakeMetricsPerSwathFile(swathMetrics);
             fileMaker.CreateAndSaveMzqc();

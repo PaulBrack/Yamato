@@ -20,10 +20,13 @@ namespace MzmlParser
         public String CompletionTime { get; set; }
         public List<Scan> Ms1Scans { get; set; }
         public ConcurrentBag<Scan> Ms2Scans { get; set; }
-        public List<BasePeak> BasePeaks { get;set; }
+        public List<BasePeak> BasePeaks { get; set; }
         public Chromatograms Chromatograms { get; set; }
         public List<(double, double)> IsolationWindows { get; set; }
         public int MissingScans { get; set; }
+        public String FilePropertiesAccession;
+        public String iRTpath;
+        public List<IRTPeak> IRTPeaks { get; set; }
     }
 
     public class Chromatograms

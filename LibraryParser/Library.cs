@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace LibraryParser
@@ -31,6 +31,7 @@ namespace LibraryParser
             public int ChargeState;
             public double RetentionTime;
             public double CollisionEnergy;
+            public List<Transition> AssociatedTransitions;
             public List<string> AssociatedTransitionIds;
         }
 

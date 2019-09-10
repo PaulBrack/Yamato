@@ -87,7 +87,7 @@ namespace LibraryParser
                                 peptide.GroupLabel = reader.GetAttribute("value");
                                 break;
                             case "MS:1000896":
-                                peptide.RetentionTime = Convert.ToInt32(reader.GetAttribute("value"));
+                                peptide.RetentionTime = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                         }
                     }
@@ -138,9 +138,9 @@ namespace LibraryParser
                         {
                             case "MS:1000827":
                                 if (ionType == Enums.IonType.Precursor)
-                                    transition.PrecursorMz = Convert.ToDouble(reader.GetAttribute("value"));
+                                    transition.PrecursorMz = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 else if (ionType == Enums.IonType.Product)
-                                    transition.ProductMz = Convert.ToDouble(reader.GetAttribute("value"));
+                                    transition.ProductMz = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000041":
                                 transition.ProductIonChargeState = Convert.ToInt32(reader.GetAttribute("value"));
@@ -155,7 +155,7 @@ namespace LibraryParser
                                 transition.IonType = reader.GetAttribute("value");
                                 break;
                             case "MS:1001226":
-                                transition.ProductIonIntensity = Convert.ToDouble(reader.GetAttribute("value"));
+                                transition.ProductIonIntensity = double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                         }
                     }
