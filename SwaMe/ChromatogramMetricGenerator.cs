@@ -60,8 +60,6 @@ namespace SwaMe
 
         public void GenerateiRTChromatogram(Run run, double massTolerance)
         {
-            //Interpolation and smoothing to acquire chromatogram metrics
-            
             int Count = 0;
             foreach (IRTPeak irtpeak in run.IRTPeaks)
             {
@@ -96,9 +94,7 @@ namespace SwaMe
                         //if there are less than two datapoints we cannot calculate chromatogrammetrics:
                         if (starttimes.Count() < 2)
                             continue;
-
-
-
+                        
                         double[,] array3 = new double[1, intensities.Length];
                         for (int i = 0; i < intensities.Length; i++)
                         {
@@ -124,24 +120,19 @@ namespace SwaMe
                         List<int> peakIndexes = new List<int>();
                         List<int> peakJoint = new List<int>();
 
-                        
-                            int mIIndex = Array.IndexOf(Smoothed, Smoothed.Max());
-                            double height = Smoothed.Max();
-                            double width = starttimes.Max() - starttimes.Min();
-                            sp.peakArea = height * width / 2;
-                            sp.RT = starttimes[mIIndex];
-                            double baseline = Smoothed.Where(i => i > 0).DefaultIfEmpty(int.MinValue).Min();
-
-
+                        int mIIndex = Array.IndexOf(Smoothed, Smoothed.Max());
+                        double height = Smoothed.Max();
+                        double width = starttimes.Max() - starttimes.Min();
+                        sp.peakArea = height * width / 2;
+                        sp.RT = starttimes[mIIndex];
+                        double baseline = Smoothed.Where(i => i > 0).DefaultIfEmpty(int.MinValue).Min();
                         Ri = irtpeak.AssociatedTransitions[yyy].ProductIonIntensity;
-                            Ti = transSmoothInt[yyy][length/2];
-                            tiriPair = tiriPair + (Ti * Ri);
-                            tsquared = tsquared + (Ti * Ti);
-                            rsquared = rsquared + (Ri * Ri);
-                            tisum = tisum + Ti;
+                        Ti = transSmoothInt[yyy][length/2];
+                        tiriPair = tiriPair + (Ti * Ri);
+                        tsquared = tsquared + (Ti * Ti);
+                        rsquared = rsquared + (Ri * Ri);
+                        tisum = tisum + Ti;
 
-
-                        //calc fwhm - we can get the average for each of the transitions:
                         tempFWHM = tempFWHM + CalculateFWHM(starttimes, Smoothed, Smoothed.Max(), mIIndex, baseline);
                         double tempFWfpt = CalculateFpctHM(starttimes, Smoothed, Smoothed.Max(), mIIndex, baseline);
                         double f = Math.Abs(irtpeak.RetentionTime - tempFWfpt);
@@ -154,41 +145,25 @@ namespace SwaMe
                     double totalRT = run.Ms1Scans.Last().ScanStartTime - run.Ms1Scans.First().ScanStartTime;
                     double segment = totalRT / run.IRTPeaks.Count();
                     double RTscore = 0;
-                    if (Count>0 && Count< run.IRTPeaks.Count()-1 && run.IRTPeaks[Count+1].RetentionTime > sp.RT && run.IRTPeaks[Count - 1].RetentionTime < sp.RT)
-                     RTscore = 1;
-                    /*if (Count == 1)
-                        RTscore = 1 / Math.Abs(sp.RT - 13.1078);
-                     //double RTscore = Math.Abs(1/(sp.RT - (totalRT / 10 * Count))*10);*/
-                   if (Count==0 && sp.RT!=0)
-                        RTscore =10 * 1/Math.Pow(Math.Abs(sp.RT - 0.227),2);
-                    double score = 0.2 * sp.DotProduct + 0.05 *1/rank*pPeak.Alltransitions[0].Count() + 0.5 * RTscore;
+                    if (Count>0 && Count< run.IRTPeaks.Count()-1 && run.IRTPeaks[Count+1].RetentionTime > sp.RT && run.IRTPeaks[Count - 1].RetentionTime < sp.RT)//if this is not the peaks for the first iRT peptide, we give the peak an RTscore based on whether it is sequential to the last iRT peptide or not
+                        RTscore = 1;
+                    if (Count==0 && sp.RT!=0)//if this is the first irtpeptide, we want to score its RT based on its proximity to the beginning of the run
+                        RTscore =10 * 1/Math.Pow(Math.Abs(sp.RT - 0.227),2);//The power and times ten calculation was added to penalize a peptide greatly for occurring later in the RT. Due to our not wanting to hardcode any peptide standard RTs, we would like to keep the order that the peptides are presented. Therefore, the first peptide should rather occur too early than too late.
+                    double score = 0.2 * sp.DotProduct + 0.05 *1/rank*pPeak.Alltransitions[0].Count() + 0.5 * RTscore;//The rank is a rank of the intensity as the peaks were sorted by intensity, the rank is simply the order it occurred in
                     if (highestdp < score)
                     {
                         highestdp = score;
                         irtpeak.RetentionTime = sp.RT;
-                        irtpeak.FWHM = tempFWHM / irtpeak.AssociatedTransitions.Count();
+                        irtpeak.FWHM = tempFWHM / irtpeak.AssociatedTransitions.Count();//average fwhm
                         irtpeak.Peaksym = tempPeakSym / irtpeak.AssociatedTransitions.Count();
                     }
-                    
                     rank++;
                 }
-
                 Count++;
-
-
-
-                
-                
-                
-
             }
 
         }
-
-           
-    
-
-
+                 
         public double CalculateFWHM(double[] starttimes, double[] intensities, double maxIntens, int mIIndex, double baseline)
         {
             double halfMax = (maxIntens - baseline) / 2 + baseline;

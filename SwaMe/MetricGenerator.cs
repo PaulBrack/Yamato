@@ -9,7 +9,6 @@ namespace SwaMe
         public void GenerateMetrics(Run run, int division,  string inputFilePath, double massTolerance)
         {
            
-
             //Acquire RTDuration:
             double RTDuration = run.BasePeaks[run.BasePeaks.Count() - 1].RetentionTime - run.BasePeaks[0].RetentionTime;
 
@@ -17,8 +16,9 @@ namespace SwaMe
             ChromatogramMetricGenerator chromatogramMetrics = new ChromatogramMetricGenerator();
             chromatogramMetrics.GenerateChromatogram(run);
 
-            if (run.IRTPeaks != null) {
-            chromatogramMetrics.GenerateiRTChromatogram(run,massTolerance);
+            if (run.IRTPeaks != null)
+            {
+                chromatogramMetrics.GenerateiRTChromatogram(run, massTolerance);
             }
 
             //Calculating the largestswath
