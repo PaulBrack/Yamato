@@ -46,6 +46,7 @@ namespace MzmlParser
             Run run = new Run();
             logger.Info("Loading file: {0}", path);
             run.iRTpath = iRTpath;
+            run.IRTPeaks = new List<IRTPeak>();
             if (run.iRTpath != null)
             {
                 lock (Lock)
