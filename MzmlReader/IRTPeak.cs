@@ -32,5 +32,7 @@ namespace MzmlParser
         public double DotProduct;
         public double RT;
         public double peakArea;
+        public double FWHMAllTransitions;
+        public double PSAllTransitions;
     }
 }

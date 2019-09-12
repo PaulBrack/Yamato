@@ -54,7 +54,7 @@ namespace MzmlParser
                     Library irtLibrary = new Library();
                     if (run.iRTpath.ToLower().Contains("traml"))
                     {
-                        TraMLReader traMLReader = new TraMLReader();
+                       TraMLReader traMLReader = new TraMLReader();
                         irtLibrary = traMLReader.LoadLibrary(run.iRTpath);
                         {
                             run.IRTPeaks = new List<IRTPeak>();
