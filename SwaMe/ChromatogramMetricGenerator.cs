@@ -257,6 +257,7 @@ namespace SwaMe
                 RTscore = 1;
             if (Count == 0 && sp.RT != 0)//if this is the first irtpeptide, we want to score its RT based on its proximity to the beginning of the run
                 RTscore = 10 * (1 / Math.Pow(sp.RT - 0.227, 2));//The power and times ten calculation was added to penalize a peptide greatly for occurring later in the RT. Due to our not wanting to hardcode any peptide standard RTs, we would like to keep the order that the peptides are presented. Therefore, the first peptide should rather occur too early than too late.
+
             return RTscore;
         }
         public Dotproduct CalcDotProductParameters(int yyy, int length, IRTPeak irtpeak, Dotproduct dp, List<double[]> transSmoothInt)
@@ -267,6 +268,7 @@ namespace SwaMe
             dp.Tsquared += Ti * Ti;
             dp.Rsquared += Ri * Ri;
             dp.Tisum += Ti;
+
             return dp;
         }
     }
