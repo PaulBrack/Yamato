@@ -2,7 +2,6 @@ using CommandLine;
 using System;
 using System.Diagnostics;
 using NLog;
-using System.Linq;
 
 namespace Yamato.Console
 {
@@ -25,17 +24,14 @@ namespace Yamato.Console
                 sw.Start();
 
                 int division;
-                if (Enumerable.Range(1, 100).Contains(options.Division))
-                {division = options.Division; } else {division = 1; }
+                division = options.Division;
 
                 double massTolerance;
-                if (options.Tolerance>0 && options.Tolerance<1)
-                { massTolerance = options.Tolerance; }
-                else { massTolerance = 0.05; }
+                massTolerance = options.Tolerance;
 
                 string iRTpath = "none";
-                if (options.iRTFile != null)
-                { iRTpath = options.iRTFile; }
+                if (options.IRTFile != null)
+                { iRTpath = options.IRTFile; }
                 
                 MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
                 if (options.ParseBinaryData == false)
@@ -69,19 +65,19 @@ namespace Yamato.Console
         public String InputFile { get; set; }
 
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
-        public int Division { get; set; }
+        public int Division { get; set; } = 1;
 
         [Option('m', "masstolerance", Required = false, HelpText = "m/z tolerance. The closest m/z value to the m/z of the basepeak that is still within this value from the basepeak m/z are part of the same chromatogram.")]
-        public float Tolerance { get; set; }
+        public float Tolerance { get; set; } = 0.05F;
 
         [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]
-        public bool? ParseBinaryData { get; set; }
+        public bool? ParseBinaryData { get; set; } = true;
 
         [Option('t', "threading", Required = false, HelpText = "whether threading is used")]
-        public bool? Threading { get; set; }
+        public bool? Threading { get; set; } = true;
 
         [Option('r', "iRT filepath", Required = false, HelpText = "iRT file path")]
-        public String iRTFile { get; set; }
+        public String IRTFile { get; set; } = null;
     }
 }
 
