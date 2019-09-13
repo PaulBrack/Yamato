@@ -27,7 +27,7 @@ namespace Yamato.Console
                 division = options.Division;
 
                 double massTolerance;
-                massTolerance = options.Tolerance;
+                massTolerance = options.MassTolerance;
 
                 string iRTpath = "none";
                 if (options.IRTFile != null)
@@ -67,8 +67,8 @@ namespace Yamato.Console
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
         public int Division { get; set; } = 1;
 
-        [Option('m', "masstolerance", Required = false, HelpText = "m/z tolerance. The closest m/z value to the m/z of the basepeak that is still within this value from the basepeak m/z are part of the same chromatogram.")]
-        public float Tolerance { get; set; } = 0.05F;
+        [Option('m', "masstolerance", Required = false, HelpText = "m/z tolerance. The closest m/z value to the m/z of the basepeak that is still within this value from the basepeak m/z are part of the same chromatogram. Similarly with iRT peptide searching, this is the tolerance that will allow two values to be considered the same peak.")]
+        public float MassTolerance { get; set; } = 0.05F;
 
         [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]
         public bool? ParseBinaryData { get; set; } = true;

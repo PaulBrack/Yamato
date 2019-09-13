@@ -6,9 +6,7 @@ using System.Globalization;
 using System.Threading;
 using Ionic.Zlib;
 using LibraryParser;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace MzmlParser
@@ -31,20 +29,17 @@ namespace MzmlParser
         const double irtTolerance = 0.5;
         public int currentCycle = 0;
         bool MS1 = false;
-        double previousTargetMz = 0;
+        public double previousTargetMz = 0;
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static CountdownEvent cde = new CountdownEvent(1);
         private static readonly Object Lock = new Object();
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
-
-
-
-
+        
         public Run LoadMzml(string path, string iRTpath, double massTolerance)
         {
             Run run = new Run();
-            logger.Info("Loading file: {0}", path);
+            
             run.iRTpath = iRTpath;
             run.IRTPeaks = new List<IRTPeak>();
             if (run.iRTpath != null)
@@ -124,9 +119,9 @@ namespace MzmlParser
 
             try
             {
-                using (Stream stream = new FileStream("MyFilename.txt", FileMode.Open))
+                using (Stream stream = new FileStream(path, FileMode.Open))
                 {
-                    logger.Info("");
+                    logger.Info("Loading file: {0}", path);
                 }
             }
             catch (IOException)
