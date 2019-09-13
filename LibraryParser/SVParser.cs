@@ -29,8 +29,11 @@ namespace LibraryParser
             logger.Info("Loading file: {0}", path);
             string sep = "";
             Library library = new Library();
-
-            var allLines = File.ReadLines(path).Select(a => a.Split("//n"));
+            IEnumerable <string[]> allLines;
+            if (File.ReadLines(path).Contains("//r//n"))
+                allLines = File.ReadLines(path).Select(a => a.Split("//r//n"));
+            else
+                allLines = File.ReadLines(path).Select(a => a.Split("//n"));
             string heading = allLines.ElementAt(0)[0];
             string[] line = { };
             int sequenceIndex = 100;
@@ -142,15 +145,17 @@ namespace LibraryParser
             }
             else transition.ProductMz = mzLastPeptide;
             transition.ProductIonIntensity = double.Parse(line[intensityIndex].Replace(",", "."), CultureInfo.InvariantCulture);
-            if (library.TransitionList.Contains(transition.Id))
+            string keystring = transition.Id +"-"+ transition.PrecursorMz;
+            if (library.TransitionList.Contains(keystring))
             {
-                double.Parse(transition.Id.Replace(",", "."), CultureInfo.InvariantCulture);
-                transition.Id += 0.000001;
-                Convert.ToString(transition.Id);
+                logger.Info("Two of the same peptide - transition combinations were detected. The second entry was not added as a valid transition.Please check your file for duplication.");
             }
-            library.TransitionList.Add(transition.Id, transition);
-            var correspondingPeptide = (Library.Peptide)(library.PeptideList[key: Convert.ToString(precursorMz).Replace(",", ".")]);
-            correspondingPeptide.AssociatedTransitions.Add(transition);
+            else
+            {
+                library.TransitionList.Add(keystring, transition);
+                var correspondingPeptide = (Library.Peptide)(library.PeptideList[key: Convert.ToString(precursorMz).Replace(",", ".")]);
+                correspondingPeptide.AssociatedTransitions.Add(transition);
+            }
         }
     }
 }
