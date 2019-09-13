@@ -29,9 +29,13 @@ namespace Yamato.Console
                 double massTolerance;
                 massTolerance = options.MassTolerance;
 
+                bool irt = false;
                 string iRTpath = "none";
                 if (options.IRTFile != null)
-                { iRTpath = options.IRTFile; }
+                {
+                    iRTpath = options.IRTFile;
+                    irt = true;
+                }
                 
                 MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
                 if (options.ParseBinaryData == false)
@@ -39,7 +43,13 @@ namespace Yamato.Console
                 if (options.Threading == false)
                     mzmlParser.Threading = false;
 
-                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, iRTpath, massTolerance);
+                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance,irt);
+                if (irt == true)
+                {
+                    IRTSearcher.IRTPeptideMatch irtSearcher = new IRTSearcher.IRTPeptideMatch();
+                    run = irtSearcher.ParseLibrary(run, iRTpath,massTolerance);
+                }
+                
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                 new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath,massTolerance);
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
