@@ -2,7 +2,6 @@ using CommandLine;
 using System;
 using System.Diagnostics;
 using NLog;
-using System.Linq;
 
 namespace Yamato.Console
 {
@@ -25,11 +24,14 @@ namespace Yamato.Console
                 sw.Start();
 
                 int division;
-                if (Enumerable.Range(1, 100).Contains(options.Division))
-                {division = options.Division; } else {division = 1; }
+                division = options.Division;
+
+                double massTolerance;
+                massTolerance = options.MassTolerance;
+
                 string iRTpath = "none";
-                if (options.iRTFile != null)
-                { iRTpath = options.iRTFile; }
+                if (options.IRTFile != null)
+                { iRTpath = options.IRTFile; }
                 
                 MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
                 if (options.ParseBinaryData == false)
@@ -37,9 +39,9 @@ namespace Yamato.Console
                 if (options.Threading == false)
                     mzmlParser.Threading = false;
 
-                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath);
+                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, iRTpath, massTolerance);
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run, division, iRTpath, inputFilePath);
+                new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath,massTolerance);
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
             });
@@ -63,22 +65,19 @@ namespace Yamato.Console
         public String InputFile { get; set; }
 
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
-        public int Division { get; set; }
+        public int Division { get; set; } = 1;
 
-        [Option('u', "upperoffset", Required = false, HelpText = "m/z tolerance upper offset. The closest m/z value to the m/z of the basepeak that is still within the upper and lower offest from the basepeak m/z are part of the same chromatogram.")]
-        public float UpperOffset { get; set; }
-
-        [Option('l', "loweroffset", Required = false, HelpText = "m/z tolerance lower offset. The closest m/z value to the m/z of the basepeak that is still within the upper and lower offest from the basepeak m/z are part of the same chromatogram.")]
-        public float LowerOffset { get; set; }
+        [Option('m', "masstolerance", Required = false, HelpText = "m/z tolerance. The closest m/z value to the m/z of the basepeak that is still within this value from the basepeak m/z are part of the same chromatogram. Similarly with iRT peptide searching, this is the tolerance that will allow two values to be considered the same peak.")]
+        public float MassTolerance { get; set; } = 0.05F;
 
         [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]
-        public bool? ParseBinaryData { get; set; }
+        public bool? ParseBinaryData { get; set; } = true;
 
         [Option('t', "threading", Required = false, HelpText = "whether threading is used")]
-        public bool? Threading { get; set; }
+        public bool? Threading { get; set; } = true;
 
         [Option('r', "iRT filepath", Required = false, HelpText = "iRT file path")]
-        public String iRTFile { get; set; }
+        public String IRTFile { get; set; } = null;
     }
 }
 

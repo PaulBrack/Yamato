@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MzmlParser;
 using MzqcGenerator;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace SwaMe
 {
@@ -136,6 +135,30 @@ namespace SwaMe
             streamWriter.Write(MS2DensityIQR);
             streamWriter.Write("\t");
             streamWriter.Write(MS1Count);
+            streamWriter.Close();
+        }
+
+        public void MakeiRTmetricsFile(Run run)
+        {
+
+            StreamWriter streamWriter = new StreamWriter("iRTMetrics.tsv");
+            streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t PeakSymmetry");
+
+            foreach (IRTPeak peak in run.IRTPeaks)
+            {
+                //write streamWriter
+                streamWriter.Write("\n");
+                streamWriter.Write(run.SourceFileName);
+                streamWriter.Write("\t");
+                streamWriter.Write(peak.Mz.ToString());
+                streamWriter.Write(" \t ");
+                streamWriter.Write(peak.RetentionTime.ToString());
+                streamWriter.Write(" \t ");
+                streamWriter.Write(peak.FWHM.ToString());
+                streamWriter.Write(" \t ");
+                streamWriter.Write(peak.Peaksym.ToString());
+                streamWriter.Write(" \t ");
+            }
             streamWriter.Close();
         }
 

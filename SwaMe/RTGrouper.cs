@@ -186,12 +186,28 @@ namespace SwaMe
                 }
 
                 cycleTime.Add((lastCycle - firstCycle) / (lastScanStartTime - firstScanStartTime));
-                Peakwidths.Add(PeakwidthsTemp.Average());
-                PeakSymmetry.Add(Math.Truncate(Math.Ceiling(PeaksymTemp.Average())));
-                PeakCapacity.Add(Math.Truncate(Math.Ceiling(PeakCapacityTemp.Average())));
-                PeakPrecision.Add(Math.Truncate(Math.Ceiling(PeakprecisionTemp.Average())));
-                MS1PeakPrecision.Add(Math.Truncate(Math.Ceiling(MS1PeakprecisionTemp.Average())));
-                MS1Density.Add(Convert.ToInt32(Math.Round(MS1DensityTemp.Average(),0)));
+                if (PeakwidthsTemp.Count > 0)
+                {
+                    Peakwidths.Add(PeakwidthsTemp.Average());
+                    PeakSymmetry.Add(Math.Truncate(Math.Ceiling(PeaksymTemp.Average())));
+                    PeakCapacity.Add(Math.Truncate(Math.Ceiling(PeakCapacityTemp.Average())));
+                    PeakPrecision.Add(Math.Truncate(Math.Ceiling(PeakprecisionTemp.Average())));
+                }
+                else {
+                    Peakwidths.Add(0);
+                    PeakSymmetry.Add(0);
+                    PeakCapacity.Add(0);
+                    PeakPrecision.Add(0);
+                }
+                if (MS1PeakprecisionTemp.Count > 0)
+                {
+                    MS1PeakPrecision.Add(Math.Truncate(Math.Ceiling(MS1PeakprecisionTemp.Average())));
+                    MS1Density.Add(Convert.ToInt32(Math.Round(MS1DensityTemp.Average(), 0)));
+                }
+                else {
+                    MS1PeakPrecision.Add(0);
+                    MS1Density.Add(0);
+                }
                 MS2Density.Add(Convert.ToInt32(Math.Round(MS2DensityTemp.Average(), 0)));
                 MS1TICTotal.Add(Math.Truncate(Math.Ceiling(MS1TICTotalTemp)));
                 MS2TICTotal.Add(Math.Truncate(Math.Ceiling(MS2TICTotalTemp)));
