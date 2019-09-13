@@ -86,7 +86,7 @@ namespace MzmlParser
 
                         }
                     }
-                    else if (run.iRTpath.Contains("csv") || run.iRTpath.Contains("tsv"))
+                    else if (run.iRTpath.Contains("csv") || run.iRTpath.Contains("tsv") || run.iRTpath.Contains("txt"))
                     {
                         SVReader svReader = new SVReader();
                         irtLibrary = svReader.LoadLibrary(run.iRTpath);
@@ -99,7 +99,7 @@ namespace MzmlParser
                             peak.TransitionRTs = new List<double>();
                             peak.PossPeaks = new List<PossiblePeak>();
                             var temp = irtLibrary.PeptideList[iii];
-                            peak.Mz = Convert.ToDouble(((Library.Peptide)temp).Id);
+                            peak.Mz = double.Parse(((Library.Peptide)temp).Id.Replace(",", "."), CultureInfo.InvariantCulture);
                             for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
                             {
                                 if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
@@ -121,7 +121,7 @@ namespace MzmlParser
             {
                 using (Stream stream = new FileStream(path, FileMode.Open))
                 {
-                    logger.Info("Loading file: {0}", path);
+                    logger.Info("Starting analysis on file: {0}. Please be patient.", path);
                 }
             }
             catch (IOException)

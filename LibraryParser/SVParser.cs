@@ -22,57 +22,75 @@ namespace LibraryParser
     public class SVReader : LibraryReader
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        private double lastPeptideRead = 0;
+        private double mzLastPeptide = 0;
 
         public Library LoadLibrary(string path)
         {
             logger.Info("Loading file: {0}", path);
-
+            string sep = "";
             Library library = new Library();
-            if (path.Contains("csv"))
-            {
-                var Lines = File.ReadLines(path).Select(a => a.Split("//n"));
-                string sep = "";
-                //figure out which column is which and also which separater is used:
-                string heading = Lines.ElementAt(0)[0];
-                string[] line = { };
-                int sequenceIndex = 0;
-                int pepMzIndex = 0;
-                int transMzIndex = 0;
-                int intensityIndex = 0;
 
-                if (heading.Contains(";"))
-                {
-                    sep = "semi-colon";
-                    line = heading.Split(";");
-                }
-                else if (heading.Contains(","))
-                {
-                    sep = "comma";
-                    line = heading.Split(",");
-                }
-                for (int position = 0; position < line.Count(); position++)
-                {
-                    if (line[position].ToLower().Contains("peptidesequence") || line[position].ToLower().Contains("nominal sequence"))
+            var allLines = File.ReadLines(path).Select(a => a.Split("//n"));
+            string heading = allLines.ElementAt(0)[0];
+            string[] line = { };
+            int sequenceIndex = 100;
+            int pepMzIndex = 100;
+            int transMzIndex = 100;
+            int intensityIndex = 100;
+
+            //figure out  which separater is used:
+            if (heading.Contains(";"))
+            {
+                sep = "semi-colon";
+                line = heading.Split(";");
+            }
+            else if (heading.Contains(","))
+            {
+                sep = "comma";
+                line = heading.Split(",");
+            }
+            else if (heading.Contains("\t")|| heading.Contains(" "))
+            {
+                sep = "tab";
+                line = heading.Split("\t");
+            }
+            else
+            {
+                logger.Info("Seperated value file provided for iRT peptides, however the separater could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
+                Environment.Exit(0);
+            }
+            
+
+            
+            for (int position = 0; position < line.Count(); position++)
+               {
+               if (line[position].ToLower().Contains("peptidesequence") || line[position].ToLower().Contains("nominal sequence"))
                     {
                         sequenceIndex = position;
                     }
-                    else if (line[position].ToLower().Contains("precursormz") || line[position].ToLower().Contains("q1 monoisotopic"))
+               else if (line[position].ToLower().Contains("precursormz") || line[position].ToLower().Contains("q1 monoisotopic"))
                     {
                         pepMzIndex = position;
                     }
-                    else if (line[position].ToLower().Contains("productmz") || line[position].ToLower().Contains("q3"))
+               else if (line[position].ToLower().Contains("productmz") || line[position].ToLower().Contains("q3"))
                     {
                         transMzIndex = position;
                     }
-                    else if (line[position].ToLower().Contains("relative intensity") || line[position].ToLower().Contains("libraryintensity"))
+               else if (line[position].ToLower().Contains("relative intensity") || line[position].ToLower().Contains("libraryintensity"))
                     {
                         intensityIndex = position;
                     }
-                }
-                for (int iii = 1; iii < Lines.Count(); iii++)
+               }
+            if (sequenceIndex == 100 || pepMzIndex == 100 || transMzIndex == 100 || intensityIndex == 100)
+            {
+                logger.Info("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
+                logger.Info("Exiting program");
+                Environment.Exit(0);
+            }
+
+            for (int iii = 1; iii < allLines.Count(); iii++)
                 {
-                    string temp = Lines.ElementAt(iii)[0];
+                    string temp = allLines.ElementAt(iii)[0];
                     
                     if (sep== "semi-colon")
                     {
@@ -82,69 +100,25 @@ namespace LibraryParser
                     {
                         line = temp.Split(",");
                     }
-                    double precursorMz = Convert.ToDouble(line[pepMzIndex]);
-                    if (lastPeptideRead != precursorMz)
+                    else if (sep == "tab")
                     {
-                        lastPeptideRead = precursorMz;
+                        line = temp.Split("\t");
+                    }
+
+                    double precursorMz = double.Parse(line[pepMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
+
+                if (mzLastPeptide != precursorMz)
+                    {
+                        mzLastPeptide = precursorMz;
                         AddPeptide(library, line, sequenceIndex, pepMzIndex);
-                        AddTransition(library, line, lastPeptideRead, transMzIndex, intensityIndex, pepMzIndex);
+                        AddTransition(library, line, mzLastPeptide, transMzIndex, intensityIndex, precursorMz);
                     }
                     else
                     {
-                        AddTransition(library, line, lastPeptideRead, transMzIndex, intensityIndex, pepMzIndex);
+                        AddTransition(library, line, mzLastPeptide, transMzIndex, intensityIndex, precursorMz);
                     }
-                }
             }
-            else 
-            {
-                var Lines = File.ReadLines(path).Select(a => a.Split("//n"));
-                //figure out which column is which:
-                string heading = Lines.ElementAt(0)[0];
-                string[] line = { };
-                int sequenceIndex = 0;
-                int pepMzIndex = 0;
-                int transMzIndex = 0;
-                int intensityIndex = 0;
-                line = heading.Split("\t");
-
-                for (int position = 0; position < line.Count(); position++)
-                {
-                    if (line[position].ToLower().Contains("peptidesequence") && !line[position].ToLower().Contains("sequence id"))
-                    {
-                        sequenceIndex = position;
-                    }
-                    else if ( line[position].ToLower().Contains("q1 monoisotopic") || line[position].ToLower().Contains("precursormz"))
-                    {
-                        pepMzIndex = position;
-                    }
-                    else if ( line[position].ToLower().Contains("q3") || line[position].ToLower().Contains("productmz"))
-                    {
-                        transMzIndex = position;
-                    }
-                    else if (line[position].ToLower().Contains("intensity") || line[position].ToLower().Contains("libraryintensity"))
-                    {
-                        intensityIndex = position;
-                    }
-                }
-                //Now we use the indexes
-                for (int iii = 1; iii < Lines.Count(); iii++)
-                {
-                    line = Lines.ElementAt(iii)[0].Split("\t");
-                    
-                    double precursorMz = double.Parse(line[pepMzIndex].Replace(",","."), CultureInfo.InvariantCulture);
-                    if (lastPeptideRead != precursorMz)
-                    {
-                        lastPeptideRead = precursorMz;
-                        AddPeptide(library, line, sequenceIndex, pepMzIndex);
-                        AddTransition(library, line, lastPeptideRead, transMzIndex, intensityIndex, precursorMz);
-                    }
-                    else
-                    {
-                        AddTransition(library, line, lastPeptideRead, transMzIndex, intensityIndex, precursorMz);
-                    }
-                }
-            }
-
+            
             return library;
         }
 
@@ -157,7 +131,7 @@ namespace LibraryParser
             library.PeptideList.Add(peptide.Id, peptide);
         }
 
-        private void AddTransition(Library library, string[] line, double lastPeptideRead, int transMzIndex, int intensityIndex, double precursorMz)
+        private void AddTransition(Library library, string[] line, double mzLastPeptide, int transMzIndex, int intensityIndex, double precursorMz)
         {
             var transition = new Library.Transition();
             transition.Id = line[transMzIndex].Replace(",", ".");
@@ -166,7 +140,7 @@ namespace LibraryParser
             {
                 transition.ProductMz = double.Parse(line[transMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
             }
-            else transition.ProductMz = lastPeptideRead;
+            else transition.ProductMz = mzLastPeptide;
             transition.ProductIonIntensity = double.Parse(line[intensityIndex].Replace(",", "."), CultureInfo.InvariantCulture);
             if (library.TransitionList.Contains(transition.Id))
             {
@@ -175,7 +149,7 @@ namespace LibraryParser
                 Convert.ToString(transition.Id);
             }
             library.TransitionList.Add(transition.Id, transition);
-            var correspondingPeptide = (Library.Peptide)(library.PeptideList[key: Convert.ToString(precursorMz)]);
+            var correspondingPeptide = (Library.Peptide)(library.PeptideList[key: Convert.ToString(precursorMz).Replace(",", ".")]);
             correspondingPeptide.AssociatedTransitions.Add(transition);
         }
     }
