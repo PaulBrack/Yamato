@@ -31,7 +31,7 @@ namespace Yamato.Console
 
                 bool irt = false;
                 string iRTpath = "none";
-                if (options.IRTFile != null)
+                if (String.IsNullOrEmpty(options.IRTFile))
                 {
                     iRTpath = options.IRTFile;
                     irt = true;

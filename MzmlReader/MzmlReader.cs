@@ -47,9 +47,9 @@ namespace MzmlParser
                     logger.Info("Starting analysis on file: {0}. Please be patient.", path);
                 }
             }
-            catch (IOException)
+            catch (IOException ex)
             {
-                logger.Info("This file is in use. Please close the application using it and try again.");
+                logger.Error(ex,"This file {0} is in use. Please close the application using it and try again.",path);
             }
             using (XmlReader reader = XmlReader.Create(path))
             {
@@ -130,75 +130,75 @@ namespace MzmlParser
             }
 
                 bool cvParamsRead = false;
-                while (reader.Read() && !cvParamsRead)
+            while (reader.Read() && !cvParamsRead)
+            {
+                if (reader.IsStartElement())
                 {
-                    if (reader.IsStartElement())
+                    if (reader.LocalName == "cvParam")
                     {
-                        if (reader.LocalName == "cvParam")
+                        switch (reader.GetAttribute("accession"))
                         {
-                            switch (reader.GetAttribute("accession"))
-                            {
-                                case "MS:1000511":
-                                    scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                    if (run.SourceFileName.ToUpper().EndsWith("RAW"))
+                            case "MS:1000511":
+                                scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
+                                if (run.SourceFileName.ToUpper().EndsWith("RAW"))
+                                {
+                                    if (scan.Scan.MsLevel == 1)
                                     {
-                                        if (scan.Scan.MsLevel == 1)
+                                        currentCycle++;
+                                        scan.Scan.Cycle = currentCycle;
+                                        MS1 = true;
+                                    }
+                                    //if there is ScanAndTempProperties ms1:
+                                    else if (MS1)
+                                    {
+                                        scan.Scan.Cycle = currentCycle;
+                                    }
+                                    //if there is no ms1:
+                                    else
+                                    {
+                                        if (previousTargetMz < scan.Scan.IsolationWindowTargetMz)
                                         {
-                                            currentCycle++;
-                                            scan.Scan.Cycle = currentCycle;
-                                            MS1 = true;
-                                        }
-                                        //if there is ScanAndTempProperties ms1:
-                                        else if (MS1)
-                                        {
                                             scan.Scan.Cycle = currentCycle;
                                         }
-                                        //if there is no ms1:
                                         else
                                         {
-                                            if (previousTargetMz < scan.Scan.IsolationWindowTargetMz)
-                                            {
-                                                scan.Scan.Cycle = currentCycle;
-                                            }
-                                            else
-                                            {
-                                                currentCycle += currentCycle;
-                                                scan.Scan.Cycle = currentCycle;
-                                            }
+                                            currentCycle += currentCycle;
+                                            scan.Scan.Cycle = currentCycle;
                                         }
                                     }
-                                    break;
-                                case "MS:1000285":
-                                    scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                                case "MS:1000016":
-                                    scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                                case "MS:1000827":
-                                    scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                                case "MS:1000829":
-                                    scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                                case "MS:1000828":
-                                    scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                            }
-                        }
-                        else if (reader.LocalName == "binaryDataArray")
-                        {
-                            GetBinaryData(reader, scan);
-                        }
-                        if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
-                        {
-                            if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
-                                scan.Scan.MsLevel = 1;
-                            else
-                                scan.Scan.MsLevel = 2;
+                                }
+                                break;
+                            case "MS:1000285":
+                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+                            case "MS:1000016":
+                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+                            case "MS:1000827":
+                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+                            case "MS:1000829":
+                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+                            case "MS:1000828":
+                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
                         }
                     }
-                    else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
+                    else if (reader.LocalName == "binaryDataArray")
                     {
+                        GetBinaryData(reader, scan);
+                    }
+                    if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
+                    {
+                        if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
+                            scan.Scan.MsLevel = 1;
+                        else
+                            scan.Scan.MsLevel = 2;
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
+                {
                     if (ParseBinaryData)
                     {
                         if (Threading)
@@ -212,14 +212,14 @@ namespace MzmlParser
                         }
 
                     }
-                    
-                        else
-                        {
-                            AddScanToRun(scan.Scan, run);
-                        }
-                        cvParamsRead = true;
+                    else
+                    {
+                        AddScanToRun(scan.Scan, run);
                     }
+                    cvParamsRead = true;
+
                 }
+            }
         }
 
         private static void GetBinaryData(XmlReader reader, ScanAndTempProperties scan)
@@ -296,7 +296,7 @@ namespace MzmlParser
             {
                 intensities = FillZeroArray(intensities);
                 mzs = FillZeroArray(mzs);
-                logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}", scan.Scan.MsLevel, scan.Scan.Cycle);
+                logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}. The empty scans have been filled with zero values.", scan.Scan.MsLevel, scan.Scan.Cycle);
                 run.MissingScans++;
             }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
@@ -346,9 +346,6 @@ namespace MzmlParser
             }
         }
 
-
-        
-
         private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed, int bits)
         {
             float[] floats = new float[0];
@@ -363,7 +360,6 @@ namespace MzmlParser
                 floats = GetFloatsFromDoubles(bytes);
             else
                 throw new ArgumentOutOfRangeException("bits", "Numbers must be 32 or 64 bits");
-
             return floats;
         }
 
