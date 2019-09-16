@@ -19,11 +19,8 @@ namespace LibraryParser
 
         public void LogResults(Library library, Logger logger)
         {
-            logger.Debug("{0} proteins loaded", library.ProteinList.Count);
             logger.Debug("{0} unique uniprot IDs", library.UniprotIdList.Count);
-            logger.Debug("{0} decoy proteins loaded", library.ProteinDecoyList.Count);
             logger.Debug("{0} peptides loaded", library.PeptideList.Count);
-            logger.Debug("{0} IRT peptides loaded", library.RtList.Count);
             logger.Debug("{0} transitions loaded", library.TransitionList.Count);
             System.IO.File.WriteAllLines("proteins.txt", library.UniprotIdList.Select(x => x.Value).Distinct());
         }

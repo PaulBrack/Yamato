@@ -42,8 +42,10 @@ namespace Yamato.Console
                 if (options.Threading == false)
                     mzmlParser.Threading = false;
 
-                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance,irt);
-                if (irt == true)
+                double[] targetMzs = { 500, 800 };
+
+                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, targetMzs);
+                if (irt)
                 {
                     IRTSearcher.IRTPeptideMatch ip = new IRTSearcher.IRTPeptideMatch();
                     run = ip.ParseLibrary(run, iRTpath, massTolerance);

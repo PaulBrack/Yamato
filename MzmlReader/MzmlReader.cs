@@ -34,8 +34,8 @@ namespace MzmlParser
         private static CountdownEvent cde = new CountdownEvent(1);
         private static readonly Object Lock = new Object();
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
-        
-        public Run LoadMzml(string path,double massTolerance, bool irt)
+
+        public Run LoadMzml(string path, double massTolerance, bool storeScansInMemory, double[] targetMzs)
         {
             Run run = new Run();
             run.MissingScans = 0;
@@ -49,7 +49,7 @@ namespace MzmlParser
             }
             catch (IOException ex)
             {
-                logger.Error(ex,"This file {0} is in use. Please close the application using it and try again.",path);
+                logger.Error(ex, "This file {0} is in use. Please close the application using it and try again.", path);
             }
             using (XmlReader reader = XmlReader.Create(path))
             {
@@ -63,7 +63,7 @@ namespace MzmlParser
                                 ReadSourceFileMetaData(reader, run);
                                 break;
                             case "spectrum":
-                                ReadSpectrum(reader, run, massTolerance, irt);
+                                ReadSpectrum(reader, run, massTolerance, storeScansInMemory, targetMzs);
                                 break;
                             case "referenceableParamGroup":
                                 if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
@@ -80,7 +80,7 @@ namespace MzmlParser
             FindMs2IsolationWindows(run);
             return run;
         }
-    
+
 
         public void ReadSourceFileMetaData(XmlReader reader, Run run)
         {
@@ -113,7 +113,7 @@ namespace MzmlParser
             }
         }
 
-        public void ReadSpectrum(XmlReader reader, Run run, double massTolerance, bool irt)
+        public void ReadSpectrum(XmlReader reader, Run run, double massTolerance, bool storeScansInMemory, double[] targetMzs)
         {
             ScanAndTempProperties scan = new ScanAndTempProperties();
 
@@ -124,12 +124,12 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
-            if (run.SourceFileName.ToUpper().EndsWith("WIFF")|| run.SourceFileName.ToUpper().EndsWith("SCAN"))
+            if (run.SourceFileName.ToUpper().EndsWith("WIFF") || run.SourceFileName.ToUpper().EndsWith("SCAN"))
             {
                 scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
             }
 
-                bool cvParamsRead = false;
+            bool cvParamsRead = false;
             while (reader.Read() && !cvParamsRead)
             {
                 if (reader.IsStartElement())
@@ -204,11 +204,11 @@ namespace MzmlParser
                         if (Threading)
                         {
                             cde.AddCount();
-                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, irt));
+                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, storeScansInMemory, targetMzs));
                         }
                         else
                         {
-                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, irt);
+                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, storeScansInMemory, targetMzs);
                         }
 
                     }
@@ -286,10 +286,12 @@ namespace MzmlParser
             }
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, double massTolerance, bool irt)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, double massTolerance, bool storeScansInMemory, double[] targetMzs)
         {
 
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
+
+
 
             float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
             if (intensities.Count() == 0)
@@ -301,16 +303,16 @@ namespace MzmlParser
             }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
 
-            //Want to potentially chuck 30GB of scan data into RAM? This is how you do it...
-            //okay adding the 
-            if (irt == true)
-            { scan.Scan.Spectrum = spectrum; }
+            if (storeScansInMemory && scan.Scan.MsLevel == 1 | (targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowLowerBoundary))))
+            {
+                scan.Scan.Spectrum = spectrum;
+            }
 
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];
             AddScanToRun(scan.Scan, run);
-            
+
             //Extract info for Basepeak chromatograms
             if (extractBasePeaks && scan.Scan.MsLevel == 2)
             {
@@ -339,7 +341,7 @@ namespace MzmlParser
                     }
                 }
             }
-            
+
             if (threading)
             {
                 cde.Signal();
@@ -356,7 +358,7 @@ namespace MzmlParser
 
             if (bits == 32)
                 floats = GetFloats(bytes);
-            else if(bits == 64)
+            else if (bits == 64)
                 floats = GetFloatsFromDoubles(bytes);
             else
                 throw new ArgumentOutOfRangeException("bits", "Numbers must be 32 or 64 bits");
@@ -381,11 +383,15 @@ namespace MzmlParser
 
         private static void AddScanToRun(Scan scan, Run run)
         {
+            scan.IsolationWindowLowerBoundary = scan.IsolationWindowTargetMz - scan.IsolationWindowLowerOffset;
+            scan.IsolationWindowUpperBoundary = scan.IsolationWindowTargetMz + scan.IsolationWindowUpperOffset;
+
             if (scan.MsLevel == 1)
                 run.Ms1Scans.Add(scan);
             else if (scan.MsLevel == 2)
                 run.Ms2Scans.Add(scan);
-            else {
+            else
+            {
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
             }
         }

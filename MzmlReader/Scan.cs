@@ -13,6 +13,8 @@ namespace MzmlParser
         public double IsolationWindowTargetMz { get; set; }
         public double IsolationWindowUpperOffset { get; set; }
         public double IsolationWindowLowerOffset { get; set; }
+        public double IsolationWindowUpperBoundary { get; set; }
+        public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
         public int Density { get; set; }
         public List<SpectrumPoint> Spectrum { get; set; }

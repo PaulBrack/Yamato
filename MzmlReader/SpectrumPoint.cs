@@ -1,7 +1,7 @@
 ﻿namespace MzmlParser
 {
     /// <summary>
-    /// A point in the 2-dimensional LC-MS space of retention time and m/z, recording intensity.
+    /// A point in the 2-dimensional LC-MS space of retention time and m/z, recording intensity at this coordinate.
     /// </summary>
     /// <remarks>
     /// Arguably, this should be a struct, for ease of memory management and pointer dereferencing within the VM.
