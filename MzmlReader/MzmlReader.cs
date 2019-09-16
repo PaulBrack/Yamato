@@ -26,7 +26,6 @@ namespace MzmlParser
 
         private const double BasePeakMinimumIntensity = 100;
         private const double rtTolerance = 2.5; //2.5 mins on either side
-        const double irtTolerance = 0.5;
         public int currentCycle = 0;
         bool MS1 = false;
         public double previousTargetMz = 0;
@@ -36,85 +35,9 @@ namespace MzmlParser
         private static readonly Object Lock = new Object();
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
         
-        public Run LoadMzml(string path, string iRTpath, double massTolerance)
+        public Run LoadMzml(string path,double massTolerance, bool irt)
         {
             Run run = new Run();
-            
-            run.iRTpath = iRTpath;
-            run.IRTPeaks = new List<IRTPeak>();
-            if (run.iRTpath != null)
-            {
-                lock (Lock)
-                {
-                    Library irtLibrary = new Library();
-                    if (run.iRTpath.ToLower().Contains("traml"))
-                    {
-                       TraMLReader traMLReader = new TraMLReader();
-                        irtLibrary = traMLReader.LoadLibrary(run.iRTpath);
-                        {
-                            run.IRTPeaks = new List<IRTPeak>();
-                            for (int iii = 0; iii < irtLibrary.PeptideList.Count; iii++)
-                            {
-                                IRTPeak peak = new IRTPeak();
-                                peak.AssociatedTransitions = new List<Library.Transition>();
-                                peak.Spectrum = new List<SpectrumPoint>();
-                                peak.TransitionRTs = new List<double>();
-                                peak.PossPeaks = new List<PossiblePeak>();
-
-                                var temp = irtLibrary.PeptideList[iii];
-                                peak.ExpectedRetentionTime = ((Library.Peptide)temp).RetentionTime;
-                                string Sequence = ((Library.Peptide)temp).Sequence;
-                                peak.Mz = (Sequence.Count(x => x == 'A') * 71.04 + Sequence.Count(x => x == 'H') * 137.06 + Sequence.Count(x => x == 'R') * 156.10 +
-                                    Sequence.Count(x => x == 'K') * 128.09 + Sequence.Count(x => x == 'I') * 113.08 + Sequence.Count(x => x == 'F') * 147.07 +
-                                    Sequence.Count(x => x == 'L') * 113.08 + Sequence.Count(x => x == 'W') * 186.08 + Sequence.Count(x => x == 'M') * 131.04 +
-                                    Sequence.Count(x => x == 'P') * 97.05 + Sequence.Count(x => x == 'C') * 103.01 + Sequence.Count(x => x == 'N') * 114.04 +
-                                    Sequence.Count(x => x == 'V') * 99.07 + Sequence.Count(x => x == 'G') * 57.02 + Sequence.Count(x => x == 'S') * 87.03 +
-                                    Sequence.Count(x => x == 'Q') * 128.06 + Sequence.Count(x => x == 'Y') * 163.06 + Sequence.Count(x => x == 'D') * 115.03 +
-                                    Sequence.Count(x => x == 'E') * 129.04 + Sequence.Count(x => x == 'T') * 101.05 + 18.02 + 2.017) / ((Library.Peptide)temp).ChargeState;
-
-                                for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
-                                {
-                                    if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
-                                    {
-                                        peak.AssociatedTransitions.Add((Library.Transition)irtLibrary.TransitionList[transition]);
-                                    }
-                                }
-
-                                run.IRTPeaks.Add(peak);
-                                run.IRTPeaks = run.IRTPeaks.OrderBy(x => x.ExpectedRetentionTime).ToList();
-                            }
-
-                        }
-                    }
-                    else if (run.iRTpath.Contains("csv") || run.iRTpath.Contains("tsv") || run.iRTpath.Contains("txt"))
-                    {
-                        SVReader svReader = new SVReader();
-                        irtLibrary = svReader.LoadLibrary(run.iRTpath);
-                        run.IRTPeaks = new List<IRTPeak>();
-                        for (int iii = 0; iii < irtLibrary.PeptideList.Count; iii++)
-                        {
-                            IRTPeak peak = new IRTPeak();
-                            peak.Spectrum = new List<SpectrumPoint>();
-                            peak.AssociatedTransitions = new List<Library.Transition>();
-                            peak.TransitionRTs = new List<double>();
-                            peak.PossPeaks = new List<PossiblePeak>();
-                            var temp = irtLibrary.PeptideList[iii];
-                            peak.Mz = double.Parse(((Library.Peptide)temp).Id.Replace(",", "."), CultureInfo.InvariantCulture);
-                            for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
-                            {
-                                if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
-                                {
-                                    peak.AssociatedTransitions.Add((Library.Transition)irtLibrary.TransitionList[transition]);
-                                }
-                            }
-                            peak.AssociatedTransitions = ((Library.Peptide)temp).AssociatedTransitions;
-                            run.IRTPeaks.Add(peak);
-                        }
-                    }
-
-
-                }
-            }
             run.MissingScans = 0;
 
             try
@@ -124,9 +47,9 @@ namespace MzmlParser
                     logger.Info("Starting analysis on file: {0}. Please be patient.", path);
                 }
             }
-            catch (IOException)
+            catch (IOException ex)
             {
-                logger.Info("This file is in use. Please close the application using it and try again.");
+                logger.Error(ex,"This file {0} is in use. Please close the application using it and try again.",path);
             }
             using (XmlReader reader = XmlReader.Create(path))
             {
@@ -137,10 +60,10 @@ namespace MzmlParser
                         switch (reader.LocalName)
                         {
                             case "sourceFile":
-                                ReadSourceFileMetaData(reader, run, iRTpath);
+                                ReadSourceFileMetaData(reader, run);
                                 break;
                             case "spectrum":
-                                ReadSpectrum(reader, run, massTolerance);
+                                ReadSpectrum(reader, run, massTolerance, irt);
                                 break;
                             case "referenceableParamGroup":
                                 if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
@@ -159,12 +82,11 @@ namespace MzmlParser
         }
     
 
-        public void ReadSourceFileMetaData(XmlReader reader, Run run, string iRTpath)
+        public void ReadSourceFileMetaData(XmlReader reader, Run run)
         {
             bool cvParamsRead = false;
             run.SourceFileName = reader.GetAttribute("name");
             run.SourceFilePath = reader.GetAttribute("location");
-            run.iRTpath = iRTpath;
 
             while (reader.Read() && !cvParamsRead)
             {
@@ -191,7 +113,7 @@ namespace MzmlParser
             }
         }
 
-        public void ReadSpectrum(XmlReader reader, Run run, double massTolerance)
+        public void ReadSpectrum(XmlReader reader, Run run, double massTolerance, bool irt)
         {
             ScanAndTempProperties scan = new ScanAndTempProperties();
 
@@ -208,107 +130,96 @@ namespace MzmlParser
             }
 
                 bool cvParamsRead = false;
-                while (reader.Read() && !cvParamsRead)
+            while (reader.Read() && !cvParamsRead)
+            {
+                if (reader.IsStartElement())
                 {
-                    if (reader.IsStartElement())
+                    if (reader.LocalName == "cvParam")
                     {
-                        if (reader.LocalName == "cvParam")
+                        switch (reader.GetAttribute("accession"))
                         {
-                            switch (reader.GetAttribute("accession"))
-                            {
-                                case "MS:1000511":
-                                    scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                    if (run.SourceFileName.ToUpper().EndsWith("RAW"))
+                            case "MS:1000511":
+                                scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
+                                if (run.SourceFileName.ToUpper().EndsWith("RAW"))
+                                {
+                                    if (scan.Scan.MsLevel == 1)
                                     {
-                                        if (scan.Scan.MsLevel == 1)
+                                        currentCycle++;
+                                        scan.Scan.Cycle = currentCycle;
+                                        MS1 = true;
+                                    }
+                                    //if there is ScanAndTempProperties ms1:
+                                    else if (MS1)
+                                    {
+                                        scan.Scan.Cycle = currentCycle;
+                                    }
+                                    //if there is no ms1:
+                                    else
+                                    {
+                                        if (previousTargetMz < scan.Scan.IsolationWindowTargetMz)
                                         {
-                                            currentCycle++;
-                                            scan.Scan.Cycle = currentCycle;
-                                            MS1 = true;
-                                        }
-                                        //if there is ScanAndTempProperties ms1:
-                                        else if (MS1)
-                                        {
                                             scan.Scan.Cycle = currentCycle;
                                         }
-                                        //if there is no ms1:
                                         else
                                         {
-                                            if (previousTargetMz < scan.Scan.IsolationWindowTargetMz)
-                                            {
-                                                scan.Scan.Cycle = currentCycle;
-                                            }
-                                            else
-                                            {
-                                                currentCycle += currentCycle;
-                                                scan.Scan.Cycle = currentCycle;
-                                            }
+                                            currentCycle += currentCycle;
+                                            scan.Scan.Cycle = currentCycle;
                                         }
                                     }
-                                    break;
-                                case "MS:1000285":
-                                    scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                                case "MS:1000016":
-                                    scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                                case "MS:1000827":
-                                    scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                                case "MS:1000829":
-                                    scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                                case "MS:1000828":
-                                    scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                    break;
-                            }
-                        }
-                        else if (reader.LocalName == "binaryDataArray")
-                        {
-                            GetBinaryData(reader, scan);
-                        }
-                        if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
-                        {
-                            if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
-                                scan.Scan.MsLevel = 1;
-                            else
-                                scan.Scan.MsLevel = 2;
+                                }
+                                break;
+                            case "MS:1000285":
+                                scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+                            case "MS:1000016":
+                                scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+                            case "MS:1000827":
+                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+                            case "MS:1000829":
+                                scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+                            case "MS:1000828":
+                                scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
                         }
                     }
-                    else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
+                    else if (reader.LocalName == "binaryDataArray")
                     {
+                        GetBinaryData(reader, scan);
+                    }
+                    if (scan.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
+                    {
+                        if (reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId)
+                            scan.Scan.MsLevel = 1;
+                        else
+                            scan.Scan.MsLevel = 2;
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
+                {
                     if (ParseBinaryData)
                     {
                         if (Threading)
                         {
                             cde.AddCount();
-                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance));
-                            if (run.iRTpath != null)
-                            {
-                                cde.AddCount();
-                                ThreadPool.QueueUserWorkItem(state => Base64iRTSearch(scan, run, Threading, massTolerance));
-                               
-                            }
+                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, irt));
                         }
                         else
                         {
-                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance);
-                            if (run.iRTpath != "none")
-                            {
-                                Base64iRTSearch(scan, run, Threading, massTolerance);
-                            }
+                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, irt);
                         }
 
                     }
-                    
-                        
-                        else
-                        {
-                            AddScanToRun(scan.Scan, run);
-                        }
-                        cvParamsRead = true;
+                    else
+                    {
+                        AddScanToRun(scan.Scan, run);
                     }
+                    cvParamsRead = true;
+
                 }
+            }
         }
 
         private static void GetBinaryData(XmlReader reader, ScanAndTempProperties scan)
@@ -375,7 +286,7 @@ namespace MzmlParser
             }
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, double massTolerance)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, double massTolerance, bool irt)
         {
 
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
@@ -385,21 +296,21 @@ namespace MzmlParser
             {
                 intensities = FillZeroArray(intensities);
                 mzs = FillZeroArray(mzs);
-                logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}", scan.Scan.MsLevel, scan.Scan.Cycle);
+                logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}. The empty scans have been filled with zero values.", scan.Scan.MsLevel, scan.Scan.Cycle);
                 run.MissingScans++;
             }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
 
             //Want to potentially chuck 30GB of scan data into RAM? This is how you do it...
-
-            //scan.Scan.Spectrum = spectrum;
+            //okay adding the 
+            if (irt == true)
+            { scan.Scan.Spectrum = spectrum; }
 
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];
             AddScanToRun(scan.Scan, run);
-
-
+            
             //Extract info for Basepeak chromatograms
             if (extractBasePeaks && scan.Scan.MsLevel == 2)
             {
@@ -421,170 +332,17 @@ namespace MzmlParser
                     //Check to see if we have a basepeak we can add points to
                     else
                     {
-                        foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= irtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
+                        foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
                         {
                             bp.Spectrum.Add(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).First());
                         }
                     }
                 }
             }
-
-            //Extract info for iRT chromatograms
-            if (run.iRTpath != null && scan.Scan.MsLevel == 1)
-            {
-                lock (Lock)
-                {
-                    foreach (IRTPeak ip in run.IRTPeaks)
-                    {
-                        List<SpectrumPoint> temp = spectrum.Where(x => Math.Abs(ip.Mz - x.Mz) <= irtTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList();
-                        if (temp.Count > 0)
-                        {
-                            if (ip.PossPeaks.Count() > 0)
-                            {
-                                bool found = false;
-                                for (int ttt = 0; ttt < ip.PossPeaks.Count() - 1; ttt++)
-                                {
-
-                                    if (Math.Abs(ip.PossPeaks[ttt].BasePeak.RetentionTime - temp[0].RetentionTime) < irtTolerance)// if there is already a possPeak that it can fit into then add
-                                    {
-                                        found = true;
-
-                                        if (ip.PossPeaks[ttt].BasePeak.Intensity < temp[0].Intensity)
-                                        {
-                                            //This peak is more intense and should be the basepeak of this peak
-                                            ip.PossPeaks[ttt].BasePeak = temp[0];
-                                        }
-                                    }
-
-                                }
-
-                                if (!found)
-                                { 
-                                    PossiblePeak possPeak = new PossiblePeak();
-                                    possPeak.Alltransitions = new List<List<SpectrumPoint>>();
-                                    foreach (var at in ip.AssociatedTransitions)
-                                    {
-                                        List<SpectrumPoint> tempList = new List<SpectrumPoint>();
-                                        possPeak.Alltransitions.Add(tempList);
-                                    }
-                                    possPeak.BasePeak = temp[0];
-                                    ip.PossPeaks.Add(possPeak);
-                                }
-                            }
-                            else {
-
-                                PossiblePeak possPeak = new PossiblePeak();
-                                possPeak.Alltransitions = new List<List<SpectrumPoint>>();
-                                foreach (var at in ip.AssociatedTransitions)
-                                {
-                                    List<SpectrumPoint> tempList = new List<SpectrumPoint>();
-                                    possPeak.Alltransitions.Add(tempList);
-                                }
-                                possPeak.BasePeak = temp[0];
-                                ip.PossPeaks.Add(possPeak);
-                            }
-                           
-
-                            
-                        }
-
-                    }
-
-                }
-
-            }
-
-            //lets try to find all the spectra where at least two transitions occur and add their RT's to a list.We can then later compare this list to the iRTPeak.spectrum.RT's
-            if (run.IRTPeaks != null && scan.Scan.MsLevel == 2)
-            {
-
-                lock (Lock)
-                {
-                    foreach (IRTPeak peak in run.IRTPeaks)
-                    {
-                        
-                            if (peak.PossPeaks.Count() > 0)
-                            {
-                                 peak.PossPeaks = peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
-                                for (int iii = 0; iii < peak.PossPeaks.Count() - 1; iii++)
-                                {
-
-                                    if (Math.Abs(scan.Scan.ScanStartTime - peak.PossPeaks[iii].BasePeak.RetentionTime) < irtTolerance)
-                                    {
-                                    //find if transitions are present
-                                    
-                                        int TransitionsMatched = 0;
-                                        for (int iterator = 0; iterator < peak.AssociatedTransitions.Count(); iterator++)
-                                        {
-                                            int temp = spectrum.Count(x => Math.Abs(x.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance);
-                                            if (temp > 0)
-                                            {
-                                                TransitionsMatched++;
-                                            }
-
-                                        }
-
-                                        if (TransitionsMatched == peak.AssociatedTransitions.Count())
-                                        {
-                                            //Add the spectrumpoints of transitions to the transitionSpectrum of that possible peak
-                                            for (int iterator = 0; iterator < TransitionsMatched; iterator++)
-                                            {
-                                                peak.PossPeaks[iii].Alltransitions[iterator].Add(spectrum.Where(x => Math.Abs(x.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance).First());
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        
-                    }
-                }
-            }
-
+            
             if (threading)
             {
                 cde.Signal();
-            }
-        }
-
-
-        private static void Base64iRTSearch(ScanAndTempProperties scan, Run run, bool threading, double massTolerance)
-        {
-           
-            float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
-
-            float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
-            if (intensities.Count() == 0)
-            {
-                intensities = FillZeroArray(intensities);
-                mzs = FillZeroArray(mzs);
-            }
-            var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
-
-           
-
-                //Now we loop through to add to the chromatogram
-                if (run.IRTPeaks != null && scan.Scan.MsLevel == 1 && run.IRTPeaks.Count()>0)
-            {
-                    lock (Lock)
-                    {
-                    
-                        foreach (IRTPeak ip in run.IRTPeaks)
-                        {
-                            if (Math.Abs(ip.RetentionTime - scan.Scan.ScanStartTime) <= irtTolerance)
-                            {
-                               List<SpectrumPoint> temp = spectrum.Where(x=> Math.Abs(ip.Mz - x.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList();
-                                if(temp.Count>0)ip.Spectrum.Add(temp[0]);
-                            }
-                        }
-
-
-
-                    }
-            }
-            if (threading)
-            {
-                cde.Signal();
-
             }
         }
 
@@ -602,7 +360,6 @@ namespace MzmlParser
                 floats = GetFloatsFromDoubles(bytes);
             else
                 throw new ArgumentOutOfRangeException("bits", "Numbers must be 32 or 64 bits");
-
             return floats;
         }
 

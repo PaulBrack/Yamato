@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using LibraryParser;
+using MzmlParser;
 
 namespace MzmlParser
 {
-   public class IRTPeak
+    public class IRTPeak
     {
         public double Mz { get; set; }
         public double Intensity { get; set; }

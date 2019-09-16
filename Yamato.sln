@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28922.388
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.705
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzmlParser", "MzmlReader\MzmlParser.csproj", "{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}"
 EndProject
@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMe", "SwaMe\SwaMe.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryParser", "LibraryParser\LibraryParser.csproj", "{DC33B002-23B9-4BE9-9D19-C663DF4D51A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MzqcGenerator", "MzqcGenerator\MzqcGenerator.csproj", "{60EF5F87-175C-4BD9-AD1C-04E57A71232F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzqcGenerator", "MzqcGenerator\MzqcGenerator.csproj", "{60EF5F87-175C-4BD9-AD1C-04E57A71232F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRTSearcher", "IRTSearch\IRTSearcher.csproj", "{85419632-0C73-4AFB-93B7-F2556E422879}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{60EF5F87-175C-4BD9-AD1C-04E57A71232F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60EF5F87-175C-4BD9-AD1C-04E57A71232F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60EF5F87-175C-4BD9-AD1C-04E57A71232F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85419632-0C73-4AFB-93B7-F2556E422879}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85419632-0C73-4AFB-93B7-F2556E422879}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85419632-0C73-4AFB-93B7-F2556E422879}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85419632-0C73-4AFB-93B7-F2556E422879}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
