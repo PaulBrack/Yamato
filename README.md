@@ -12,7 +12,7 @@ A C# library to deserialise transisition libraries, including Thermo, Skyline an
 
 ## SwaMe
 A Quameter-based SWATH metrics library  
-Author: **Marina Pauw**  
+Author: **Marina Kriek**  
 pauwmarina@sun.ac.za
 
 ## Prognosticator
