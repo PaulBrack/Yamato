@@ -29,11 +29,10 @@ namespace Yamato.Console
                 double massTolerance;
                 massTolerance = options.MassTolerance;
 
-                bool irt = false;
                 string iRTpath = "none";
-                if (String.IsNullOrEmpty(options.IRTFile))
-                {
-                    iRTpath = options.IRTFile;
+                bool irt = false;
+                if (!String.IsNullOrEmpty(options.IRTFile))
+                { iRTpath = options.IRTFile;
                     irt = true;
                 }
                 
@@ -46,8 +45,8 @@ namespace Yamato.Console
                 MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance,irt);
                 if (irt == true)
                 {
-                    IRTSearcher.IRTPeptideMatch irtSearcher = new IRTSearcher.IRTPeptideMatch();
-                    run = irtSearcher.ParseLibrary(run, iRTpath,massTolerance);
+                    IRTSearcher.IRTPeptideMatch ip = new IRTSearcher.IRTPeptideMatch();
+                    run = ip.ParseLibrary(run, iRTpath, massTolerance);
                 }
                 
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);

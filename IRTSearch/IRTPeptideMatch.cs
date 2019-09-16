@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using MzmlParser;
 using NLog;
 using LibraryParser;
@@ -26,9 +24,9 @@ namespace IRTSearcher
                     logger.Info("Starting the incorporation of iRT file: {0}. Please be patient.", iRTpath);
                 }
             }
-            catch (IOException)
+            catch (IOException ex)
             {
-                logger.Info("The iRT file is in use. Please close the application using it and try again.");
+                logger.Error(ex, "The iRT file {0} is in use. Please close the application using it and try again.", iRTpath);
             }
             run.iRTpath = iRTpath;
             run.IRTPeaks = new List<IRTPeak>();
@@ -177,17 +175,14 @@ namespace IRTSearcher
             //lets try to find all the spectra where at least two transitions occur and add their RT's to a list.We can then later compare this list to the iRTPeak.spectrum.RT's
             foreach (Scan scan in run.Ms2Scans)
             {
+                 foreach (IRTPeak peak in run.IRTPeaks)
+                 {
 
-              //  lock (Lock)
-             //   {
-                    foreach (IRTPeak peak in run.IRTPeaks)
-                    {
-
-                        if (peak.PossPeaks.Count() > 0)
-                        {
-                            peak.PossPeaks = peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
-                            for (int iii = 0; iii < peak.PossPeaks.Count() - 1; iii++)
-                            {
+                     if (peak.PossPeaks.Count() > 0)
+                     {
+                         peak.PossPeaks = peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
+                         for (int iii = 0; iii < peak.PossPeaks.Count() - 1; iii++)
+                         {
 
                                 if (Math.Abs(scan.ScanStartTime - peak.PossPeaks[iii].BasePeak.RetentionTime) < irtTolerance)
                                 {
@@ -213,10 +208,10 @@ namespace IRTSearcher
                                         }
                                     }
                                 }
-                            }
-                        }
-                    }
-               // }
+                         }
+                     }
+                 }
+               
             }
         }
 
@@ -224,19 +219,14 @@ namespace IRTSearcher
         {
             foreach (Scan scan in run.Ms1Scans)
             {
-               // lock (Lock)
-               // {
-
-                    foreach (IRTPeak ip in run.IRTPeaks)
+                foreach (IRTPeak ip in run.IRTPeaks)
+                {
+                    if (Math.Abs(ip.RetentionTime - scan.ScanStartTime) <= irtTolerance)
                     {
-                        if (Math.Abs(ip.RetentionTime - scan.ScanStartTime) <= irtTolerance)
-                        {
-                            List<SpectrumPoint> temp = scan.Spectrum.Where(x => Math.Abs(ip.Mz - x.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList();
-                            if (temp.Count > 0) ip.Spectrum.Add(temp[0]);
-                        }
+                         List<SpectrumPoint> temp = scan.Spectrum.Where(x => Math.Abs(ip.Mz - x.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList();
+                         if (temp.Count > 0) ip.Spectrum.Add(temp[0]);
                     }
-
-               // }
+                }
             }
 
         }
