@@ -32,9 +32,9 @@ namespace IRTSearcher
                         for (int i = 0; i < irtLibrary.PeptideList.Count; i++)
                         {
                             IRTPeak peak = new IRTPeak();
-                            Library.Peptide temp = (Library.Peptide)irtLibrary.PeptideList[i];
-                            peak.ExpectedRetentionTime = temp.RetentionTime;
-                            peak.Mz = GetTheoreticalMz(temp.Sequence, temp.ChargeState);
+                            Library.Peptide irtLibPeptide = (Library.Peptide)irtLibrary.PeptideList[i];
+                            peak.ExpectedRetentionTime = irtLibPeptide.RetentionTime;
+                            peak.Mz = GetTheoreticalMz(irtLibPeptide.Sequence, irtLibPeptide.ChargeState);
 
                             for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
                             {
@@ -54,15 +54,11 @@ namespace IRTSearcher
                     SVReader svReader = new SVReader();
                     irtLibrary = svReader.LoadLibrary(run.iRTpath);
                     run.IRTPeaks = new List<IRTPeak>();
-                    for (int iii = 0; iii < irtLibrary.PeptideList.Count; iii++)
+                    for (int i = 0; i < irtLibrary.PeptideList.Count; i++)
                     {
                         IRTPeak peak = new IRTPeak();
-                        peak.Spectrum = new List<SpectrumPoint>();
-                        peak.AssociatedTransitions = new List<Library.Transition>();
-                        peak.TransitionRTs = new List<double>();
-                        peak.PossPeaks = new List<PossiblePeak>();
-                        var temp = irtLibrary.PeptideList[iii];
-                        peak.Mz = double.Parse(((Library.Peptide)temp).Id.Replace(",", "."), CultureInfo.InvariantCulture);
+                        Library.Peptide irtLibPeptide = (Library.Peptide)irtLibrary.PeptideList[i];
+                        peak.Mz = double.Parse(irtLibPeptide.Id.Replace(",", "."), CultureInfo.InvariantCulture);
                         for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
                         {
                             if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
@@ -70,7 +66,7 @@ namespace IRTSearcher
                                 peak.AssociatedTransitions.Add((Library.Transition)irtLibrary.TransitionList[transition]);
                             }
                         }
-                        peak.AssociatedTransitions = ((Library.Peptide)temp).AssociatedTransitions;
+                        peak.AssociatedTransitions = irtLibPeptide.AssociatedTransitions;
                         run.IRTPeaks.Add(peak);
                     }
                 }
