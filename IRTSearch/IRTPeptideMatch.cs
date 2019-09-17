@@ -37,16 +37,11 @@ namespace IRTSearcher
                             peak.TransitionRTs = new List<double>();
                             peak.PossPeaks = new List<PossiblePeak>();
 
-                            var temp = irtLibrary.PeptideList[iii];
-                            peak.ExpectedRetentionTime = ((Library.Peptide)temp).RetentionTime;
-                            string Sequence = ((Library.Peptide)temp).Sequence;
-                            peak.Mz = (Sequence.Count(x => x == 'A') * 71.04 + Sequence.Count(x => x == 'H') * 137.06 + Sequence.Count(x => x == 'R') * 156.10 +
-                                Sequence.Count(x => x == 'K') * 128.09 + Sequence.Count(x => x == 'I') * 113.08 + Sequence.Count(x => x == 'F') * 147.07 +
-                                Sequence.Count(x => x == 'L') * 113.08 + Sequence.Count(x => x == 'W') * 186.08 + Sequence.Count(x => x == 'M') * 131.04 +
-                                Sequence.Count(x => x == 'P') * 97.05 + Sequence.Count(x => x == 'C') * 103.01 + Sequence.Count(x => x == 'N') * 114.04 +
-                                Sequence.Count(x => x == 'V') * 99.07 + Sequence.Count(x => x == 'G') * 57.02 + Sequence.Count(x => x == 'S') * 87.03 +
-                                Sequence.Count(x => x == 'Q') * 128.06 + Sequence.Count(x => x == 'Y') * 163.06 + Sequence.Count(x => x == 'D') * 115.03 +
-                                Sequence.Count(x => x == 'E') * 129.04 + Sequence.Count(x => x == 'T') * 101.05 + 18.02 + 2.017) / ((Library.Peptide)temp).ChargeState;
+                            Library.Peptide temp = (Library.Peptide)irtLibrary.PeptideList[iii];
+                            peak.ExpectedRetentionTime = (temp).RetentionTime;
+                            string Sequence = (temp).Sequence;
+                            var chargeState = (temp).ChargeState;
+                            peak.Mz = GetTheoreticalMz((temp).Sequence, chargeState);
 
                             for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
                             {
@@ -91,6 +86,17 @@ namespace IRTSearcher
             ReadSpectrum(run, massTolerance);
             irtSearch(run, massTolerance);
             return run;
+        }
+
+        private static double GetTheoreticalMz(string Sequence, int chargeState)
+        {
+            return (Sequence.Count(x => x == 'A') * 71.04 + Sequence.Count(x => x == 'H') * 137.06 + Sequence.Count(x => x == 'R') * 156.10 +
+                Sequence.Count(x => x == 'K') * 128.09 + Sequence.Count(x => x == 'I') * 113.08 + Sequence.Count(x => x == 'F') * 147.07 +
+                Sequence.Count(x => x == 'L') * 113.08 + Sequence.Count(x => x == 'W') * 186.08 + Sequence.Count(x => x == 'M') * 131.04 +
+                Sequence.Count(x => x == 'P') * 97.05 + Sequence.Count(x => x == 'C') * 103.01 + Sequence.Count(x => x == 'N') * 114.04 +
+                Sequence.Count(x => x == 'V') * 99.07 + Sequence.Count(x => x == 'G') * 57.02 + Sequence.Count(x => x == 'S') * 87.03 +
+                Sequence.Count(x => x == 'Q') * 128.06 + Sequence.Count(x => x == 'Y') * 163.06 + Sequence.Count(x => x == 'D') * 115.03 +
+                Sequence.Count(x => x == 'E') * 129.04 + Sequence.Count(x => x == 'T') * 101.05 + 18.02 + 2.017) / chargeState;
         }
 
         private static void CheckIrtPathAccessible(string iRTpath)
@@ -169,7 +175,7 @@ namespace IRTSearcher
             //lets try to find all the spectra where at least two transitions occur and add their RT's to a list.We can then later compare this list to the iRTPeak.spectrum.RT's
             foreach (Scan scan in run.Ms2Scans)
             {
-                if (scan.Spectrum !=null)
+                if (scan.Spectrum != null)
                 {
                     foreach (IRTPeak peak in run.IRTPeaks)
                     {
