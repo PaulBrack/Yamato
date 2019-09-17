@@ -6,6 +6,7 @@ using LibraryParser;
 using System.IO;
 using System.Linq;
 using System.Globalization;
+using System.Threading;
 
 namespace IRTSearcher
 {
@@ -15,50 +16,29 @@ namespace IRTSearcher
         private static readonly Object Lock = new Object();
         const double irtTolerance = 0.5;
 
+
+        private static CountdownEvent cde = new CountdownEvent(1);
+
+
         public Run ParseLibrary(Run run, string iRTpath, double massTolerance)
         {
             CheckIrtPathAccessible(iRTpath);
             run.iRTpath = iRTpath;
             run.IRTPeaks = new List<IRTPeak>();
-            lock (Lock)
+            Library irtLibrary = new Library();
+            if (run.iRTpath.EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
             {
-                Library irtLibrary = new Library();
-                if (run.iRTpath.EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
+                TraMLReader traMLReader = new TraMLReader();
+                irtLibrary = traMLReader.LoadLibrary(run.iRTpath);
                 {
-                    TraMLReader traMLReader = new TraMLReader();
-                    irtLibrary = traMLReader.LoadLibrary(run.iRTpath);
-                    {
-                        run.IRTPeaks = new List<IRTPeak>();
-                        for (int i = 0; i < irtLibrary.PeptideList.Count; i++)
-                        {
-                            IRTPeak peak = new IRTPeak();
-                            Library.Peptide irtLibPeptide = (Library.Peptide)irtLibrary.PeptideList[i];
-                            peak.ExpectedRetentionTime = irtLibPeptide.RetentionTime;
-                            peak.Mz = GetTheoreticalMz(irtLibPeptide.Sequence, irtLibPeptide.ChargeState);
-
-                            for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
-                            {
-                                if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
-                                {
-                                    peak.AssociatedTransitions.Add((Library.Transition)irtLibrary.TransitionList[transition]);
-                                }
-                            }
-
-                            run.IRTPeaks.Add(peak);
-                            run.IRTPeaks = run.IRTPeaks.OrderBy(x => x.ExpectedRetentionTime).ToList();
-                        }
-                    }
-                }
-                else if (run.iRTpath.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase) || run.iRTpath.EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || run.iRTpath.EndsWith("txt", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    SVReader svReader = new SVReader();
-                    irtLibrary = svReader.LoadLibrary(run.iRTpath);
                     run.IRTPeaks = new List<IRTPeak>();
                     for (int i = 0; i < irtLibrary.PeptideList.Count; i++)
                     {
                         IRTPeak peak = new IRTPeak();
                         Library.Peptide irtLibPeptide = (Library.Peptide)irtLibrary.PeptideList[i];
-                        peak.Mz = double.Parse(irtLibPeptide.Id.Replace(",", "."), CultureInfo.InvariantCulture);
+                        peak.ExpectedRetentionTime = irtLibPeptide.RetentionTime;
+                        peak.Mz = GetTheoreticalMz(irtLibPeptide.Sequence, irtLibPeptide.ChargeState);
+
                         for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
                         {
                             if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
@@ -66,10 +46,36 @@ namespace IRTSearcher
                                 peak.AssociatedTransitions.Add((Library.Transition)irtLibrary.TransitionList[transition]);
                             }
                         }
-                        peak.AssociatedTransitions = irtLibPeptide.AssociatedTransitions;
+
                         run.IRTPeaks.Add(peak);
+                        run.IRTPeaks = run.IRTPeaks.OrderBy(x => x.ExpectedRetentionTime).ToList();
                     }
                 }
+            }
+            else if (run.iRTpath.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase) || run.iRTpath.EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || run.iRTpath.EndsWith("txt", StringComparison.InvariantCultureIgnoreCase))
+            {
+                SVReader svReader = new SVReader();
+                irtLibrary = svReader.LoadLibrary(run.iRTpath);
+                run.IRTPeaks = new List<IRTPeak>();
+                for (int i = 0; i < irtLibrary.PeptideList.Count; i++)
+                {
+                    IRTPeak peak = new IRTPeak();
+                    Library.Peptide irtLibPeptide = (Library.Peptide)irtLibrary.PeptideList[i];
+                    peak.Mz = double.Parse(irtLibPeptide.Id.Replace(",", "."), CultureInfo.InvariantCulture);
+                    for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
+                    {
+                        if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
+                        {
+                            peak.AssociatedTransitions.Add((Library.Transition)irtLibrary.TransitionList[transition]);
+                        }
+                    }
+                    peak.AssociatedTransitions = irtLibPeptide.AssociatedTransitions;
+                    run.IRTPeaks.Add(peak);
+                }
+            }
+            foreach (IRTPeak peak in run.IRTPeaks.Where(x => x.PossPeaks.Count() > 0))
+            {
+                peak.PossPeaks = peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
             }
 
             ReadSpectrum(run, massTolerance);
@@ -117,21 +123,19 @@ namespace IRTSearcher
                         if (ip.PossPeaks.Count() > 0)
                         {
                             bool found = false;
-                            for (int ttt = 0; ttt < ip.PossPeaks.Count() - 1; ttt++)
+                            for (int i = 0; i < ip.PossPeaks.Count() - 1; i++)
                             {
-
-                                if (Math.Abs(ip.PossPeaks[ttt].BasePeak.RetentionTime - temp[0].RetentionTime) < irtTolerance)// if there is already a possPeak that it can fit into then add
+                                if (Math.Abs(ip.PossPeaks[i].BasePeak.RetentionTime - temp[0].RetentionTime) < irtTolerance)// if there is already a possPeak that it can fit into then add
                                 {
                                     found = true;
 
-                                    if (ip.PossPeaks[ttt].BasePeak.Intensity < temp[0].Intensity)
+                                    if (ip.PossPeaks[i].BasePeak.Intensity < temp[0].Intensity)
                                     {
                                         //This peak is more intense and should be the basepeak of this peak
-                                        ip.PossPeaks[ttt].BasePeak = temp[0];
+                                        ip.PossPeaks[i].BasePeak = temp[0];
                                     }
                                 }
                             }
-
                             if (!found)
                             {
                                 PossiblePeak possPeak = new PossiblePeak();
@@ -162,48 +166,33 @@ namespace IRTSearcher
                 }
             }
             //lets try to find all the spectra where at least two transitions occur and add their RT's to a list.We can then later compare this list to the iRTPeak.spectrum.RT's
-            foreach (Scan scan in run.Ms2Scans)
+            foreach (IRTPeak peak in run.IRTPeaks.Where(x => x.PossPeaks.Count() > 0))
             {
-                if (scan.Spectrum != null)
+
+                cde.AddCount();
+                ThreadPool.QueueUserWorkItem(state => FindMatchingTransitions(run, massTolerance, peak));
+                FindMatchingTransitions(run, massTolerance, peak);
+            }
+            cde.Signal();
+            cde.Wait();
+
+        }
+
+        private static void FindMatchingTransitions(Run run, double massTolerance, IRTPeak peak)
+        {
+
+            foreach (PossiblePeak pp in peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList())
+            {
+                var matchingscans = run.Ms2Scans.Where(x => x.Spectrum != null && x.IsolationWindowLowerBoundary <= (pp.BasePeak.Mz - massTolerance) & x.IsolationWindowUpperBoundary >= (pp.BasePeak.Mz + massTolerance));
+
+                foreach (Scan scan in matchingscans)
                 {
-                    foreach (IRTPeak peak in run.IRTPeaks)
-                    {
 
-                        if (peak.PossPeaks.Count() > 0)
-                        {
-                            peak.PossPeaks = peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
-                            for (int iii = 0; iii < peak.PossPeaks.Count() - 1; iii++)
-                            {
 
-                                if (Math.Abs(scan.ScanStartTime - peak.PossPeaks[iii].BasePeak.RetentionTime) < irtTolerance)
-                                {
-                                    //find if transitions are present
 
-                                    int TransitionsMatched = 0;
-                                    for (int iterator = 0; iterator < peak.AssociatedTransitions.Count(); iterator++)
-                                    {
-                                        int temp = scan.Spectrum.Count(x => Math.Abs(x.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance);
-                                        if (temp > 0)
-                                        {
-                                            TransitionsMatched++;
-                                        }
-
-                                    }
-
-                                    if (TransitionsMatched == peak.AssociatedTransitions.Count())
-                                    {
-                                        //Add the spectrumpoints of transitions to the transitionSpectrum of that possible peak
-                                        for (int iterator = 0; iterator < TransitionsMatched; iterator++)
-                                        {
-                                            peak.PossPeaks[iii].Alltransitions[iterator].Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance).First());
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
             }
+            cde.Signal();
         }
 
         private static void irtSearch(Run run, double massTolerance)
@@ -212,13 +201,14 @@ namespace IRTSearcher
             {
                 foreach (IRTPeak ip in run.IRTPeaks)
                 {
-                    if (Math.Abs(ip.RetentionTime - scan.ScanStartTime) <= irtTolerance)
+                    if (Math.Abs(ip.RetentionTime - scan.ScanStartTime) <= massTolerance)
                     {
                         List<SpectrumPoint> temp = scan.Spectrum.Where(x => Math.Abs(ip.Mz - x.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList();
                         if (temp.Count > 0) ip.Spectrum.Add(temp[0]);
                     }
                 }
             }
+
         }
     }
 }
