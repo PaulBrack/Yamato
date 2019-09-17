@@ -17,13 +17,20 @@ namespace MzmlParser
         public SpectrumPoint BasePeak;
         public List<PossiblePeak> PossPeaks;
         public double DotProduct;
+
+        public IRTPeak()
+        {
+            AssociatedTransitions = new List<Library.Transition>();
+            Spectrum = new List<SpectrumPoint>();
+            TransitionRTs = new List<double>();
+            PossPeaks = new List<PossiblePeak>();
+        }
     }
 
     public class PossiblePeak
     {
         public double DotProduct;
         public SpectrumPoint BasePeak;
-
         public List<List<SpectrumPoint>> Alltransitions;
     }
 
