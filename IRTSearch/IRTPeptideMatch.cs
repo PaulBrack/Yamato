@@ -102,7 +102,7 @@ namespace IRTSearcher
             irtSearch(run, massTolerance);
             return run;
         }
-
+        
         public static void ReadSpectrum(Run run, double massTolerance)
         {
             foreach (Scan scan in run.Ms1Scans)
@@ -163,36 +163,39 @@ namespace IRTSearcher
             //lets try to find all the spectra where at least two transitions occur and add their RT's to a list.We can then later compare this list to the iRTPeak.spectrum.RT's
             foreach (Scan scan in run.Ms2Scans)
             {
-                foreach (IRTPeak peak in run.IRTPeaks)
+                if (scan.Spectrum !=null)
                 {
-
-                    if (peak.PossPeaks.Count() > 0)
+                    foreach (IRTPeak peak in run.IRTPeaks)
                     {
-                        peak.PossPeaks = peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
-                        for (int iii = 0; iii < peak.PossPeaks.Count() - 1; iii++)
+
+                        if (peak.PossPeaks.Count() > 0)
                         {
-
-                            if (Math.Abs(scan.ScanStartTime - peak.PossPeaks[iii].BasePeak.RetentionTime) < irtTolerance)
+                            peak.PossPeaks = peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
+                            for (int iii = 0; iii < peak.PossPeaks.Count() - 1; iii++)
                             {
-                                //find if transitions are present
 
-                                int TransitionsMatched = 0;
-                                for (int iterator = 0; iterator < peak.AssociatedTransitions.Count(); iterator++)
+                                if (Math.Abs(scan.ScanStartTime - peak.PossPeaks[iii].BasePeak.RetentionTime) < irtTolerance)
                                 {
-                                    int temp = scan.Spectrum.Count(x => Math.Abs(x.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance);
-                                    if (temp > 0)
+                                    //find if transitions are present
+
+                                    int TransitionsMatched = 0;
+                                    for (int iterator = 0; iterator < peak.AssociatedTransitions.Count(); iterator++)
                                     {
-                                        TransitionsMatched++;
+                                        int temp = scan.Spectrum.Count(x => Math.Abs(x.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance);
+                                        if (temp > 0)
+                                        {
+                                            TransitionsMatched++;
+                                        }
+
                                     }
 
-                                }
-
-                                if (TransitionsMatched == peak.AssociatedTransitions.Count())
-                                {
-                                    //Add the spectrumpoints of transitions to the transitionSpectrum of that possible peak
-                                    for (int iterator = 0; iterator < TransitionsMatched; iterator++)
+                                    if (TransitionsMatched == peak.AssociatedTransitions.Count())
                                     {
-                                        peak.PossPeaks[iii].Alltransitions[iterator].Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance).First());
+                                        //Add the spectrumpoints of transitions to the transitionSpectrum of that possible peak
+                                        for (int iterator = 0; iterator < TransitionsMatched; iterator++)
+                                        {
+                                            peak.PossPeaks[iii].Alltransitions[iterator].Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance).First());
+                                        }
                                     }
                                 }
                             }
