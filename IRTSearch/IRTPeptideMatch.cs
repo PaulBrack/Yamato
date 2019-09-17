@@ -29,19 +29,12 @@ namespace IRTSearcher
                     irtLibrary = traMLReader.LoadLibrary(run.iRTpath);
                     {
                         run.IRTPeaks = new List<IRTPeak>();
-                        for (int iii = 0; iii < irtLibrary.PeptideList.Count; iii++)
+                        for (int i = 0; i < irtLibrary.PeptideList.Count; i++)
                         {
                             IRTPeak peak = new IRTPeak();
-                            peak.AssociatedTransitions = new List<Library.Transition>();
-                            peak.Spectrum = new List<SpectrumPoint>();
-                            peak.TransitionRTs = new List<double>();
-                            peak.PossPeaks = new List<PossiblePeak>();
-
-                            Library.Peptide temp = (Library.Peptide)irtLibrary.PeptideList[iii];
-                            peak.ExpectedRetentionTime = (temp).RetentionTime;
-                            string Sequence = (temp).Sequence;
-                            var chargeState = (temp).ChargeState;
-                            peak.Mz = GetTheoreticalMz((temp).Sequence, chargeState);
+                            Library.Peptide temp = (Library.Peptide)irtLibrary.PeptideList[i];
+                            peak.ExpectedRetentionTime = temp.RetentionTime;
+                            peak.Mz = GetTheoreticalMz(temp.Sequence, temp.ChargeState);
 
                             for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
                             {
