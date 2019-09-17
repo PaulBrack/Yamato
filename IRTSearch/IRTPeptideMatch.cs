@@ -17,18 +17,7 @@ namespace IRTSearcher
 
         public Run ParseLibrary(Run run, string iRTpath, double massTolerance)
         {
-            try
-            {
-                using (Stream stream = new FileStream(iRTpath, FileMode.Open))
-                {
-                    logger.Info("Starting the incorporation of iRT file: {0}. Please be patient.", iRTpath);
-                }
-            }
-            catch (IOException ex)
-            {
-                logger.Error(ex, "The iRT file {0} was not able to be read - this can happen because it is in use by another program. Please close the application using it and try again.", iRTpath);
-                throw ex;
-            }
+            CheckIrtPathAccessible(iRTpath);
             run.iRTpath = iRTpath;
             run.IRTPeaks = new List<IRTPeak>();
             lock (Lock)
@@ -103,7 +92,23 @@ namespace IRTSearcher
             irtSearch(run, massTolerance);
             return run;
         }
-        
+
+        private static void CheckIrtPathAccessible(string iRTpath)
+        {
+            try
+            {
+                using (Stream stream = new FileStream(iRTpath, FileMode.Open))
+                {
+                    logger.Info("Starting the incorporation of iRT file: {0}. Please be patient.", iRTpath);
+                }
+            }
+            catch (IOException ex)
+            {
+                logger.Error(ex, "The iRT file {0} was not able to be read - this can happen because it is in use by another program. Please close the application using it and try again.", iRTpath);
+                throw ex;
+            }
+        }
+
         public static void ReadSpectrum(Run run, double massTolerance)
         {
             foreach (Scan scan in run.Ms1Scans)
