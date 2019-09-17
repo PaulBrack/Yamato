@@ -23,7 +23,7 @@ namespace IRTSearcher
             lock (Lock)
             {
                 Library irtLibrary = new Library();
-                if (run.iRTpath.ToLower().Contains("traml"))
+                if (run.iRTpath.EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
                 {
                     TraMLReader traMLReader = new TraMLReader();
                     irtLibrary = traMLReader.LoadLibrary(run.iRTpath);
@@ -61,7 +61,7 @@ namespace IRTSearcher
                         }
                     }
                 }
-                else if (run.iRTpath.Contains("csv") || run.iRTpath.Contains("tsv") || run.iRTpath.Contains("txt"))
+                else if (run.iRTpath.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase) || run.iRTpath.EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || run.iRTpath.EndsWith("txt", StringComparison.InvariantCultureIgnoreCase))
                 {
                     SVReader svReader = new SVReader();
                     irtLibrary = svReader.LoadLibrary(run.iRTpath);
