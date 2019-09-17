@@ -164,7 +164,7 @@ namespace LibraryParser
                 {
                     if (reader.LocalName == "Precursor" || reader.LocalName == "Product")
                         ionType = null;
-                    if(reader.LocalName == "Transition")
+                    if (reader.LocalName == "Transition")
                         cvParamsRead = true;
                 }
             }
@@ -173,5 +173,45 @@ namespace LibraryParser
             var correspondingPeptide = (Library.Peptide)(library.PeptideList[transition.PeptideId]);
             correspondingPeptide.AssociatedTransitionIds.Add(transition.Id);
         }
+
+        public List<double> CollectTransitions(string path)
+        {
+            List<double> Alltransitions = new List<double>();
+            Library library = new Library();
+            using (XmlReader reader = XmlReader.Create(path))
+            {
+                while (reader.Read())
+                {
+                    if (reader.IsStartElement())
+                    {
+                        if (reader.LocalName == "Transition")
+                        {
+                            Enums.IonType? ionType = null;
+                            while (reader.Read())
+                            {
+                                if (reader.IsStartElement())
+                                {
+                                    if (reader.LocalName == "Product")
+                                        ionType = Enums.IonType.Product;
+
+                                    if (reader.LocalName == "cvParam")
+                                    {
+                                        if (reader.GetAttribute("accession") == "MS:1000827")
+                                        {
+                                            if (ionType == Enums.IonType.Product)
+                                                Alltransitions.Add(double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture));
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return Alltransitions;
+        }
     }
 }
+            
+ 

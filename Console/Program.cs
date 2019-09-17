@@ -2,6 +2,9 @@ using CommandLine;
 using System;
 using System.Diagnostics;
 using NLog;
+using LibraryParser;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Yamato.Console
 {
@@ -24,25 +27,57 @@ namespace Yamato.Console
                 sw.Start();
 
                 int division;
-                division = options.Division;
-
+                if (options.Division <100)
+                {
+                    if (options.Division > 0)
+                    {
+                        division = options.Division;
+                    }
+                    else
+                    {
+                        division = 1;
+                        logger.Info("Your entry for division is not within the range 1-100. A division of 1 was therefore used.");
+                    }
+                }
+                else
+                {
+                    division = 100;
+                    logger.Info("Your entry for division is not within the range 1-100. A division of 100 was therefore used.");
+                }
+                
                 double massTolerance;
                 massTolerance = options.MassTolerance;
+                List<double> targetMzs = new List<double>();
 
                 string iRTpath = "none";
                 bool irt = false;
                 if (!String.IsNullOrEmpty(options.IRTFile))
-                { iRTpath = options.IRTFile;
+                { iRTpath = options.IRTFile.ToLower();
                     irt = true;
+                    if (iRTpath.Contains("traml"))
+                    {
+                        TraMLReader tr = new TraMLReader();
+                        targetMzs = tr.CollectTransitions(iRTpath);
+                    }
+                    else if (iRTpath.Contains("csv") || iRTpath.Contains("tsv") || iRTpath.Contains("txt"))
+                    {
+                        SVReader sr = new SVReader();
+                        targetMzs = sr.CollectTransitions(iRTpath);
+                    }
+                    if (targetMzs.Count() < 1)
+                    {
+                        logger.Error("iRTfile was provided, but transitions could not be determined.");
+                    }
                 }
                 
+
                 MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
                 if (options.ParseBinaryData == false)
                     mzmlParser.ParseBinaryData = false;
                 if (options.Threading == false)
                     mzmlParser.Threading = false;
 
-                double[] targetMzs = { 500, 800 };
+                
 
                 MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, targetMzs);
                 if (irt)

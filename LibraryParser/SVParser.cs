@@ -157,5 +157,77 @@ namespace LibraryParser
                 correspondingPeptide.AssociatedTransitions.Add(transition);
             }
         }
+
+        public List<double> CollectTransitions(string path)
+        {
+            List<double> Alltransitions = new List<double>();
+            string sep = "";
+            IEnumerable<string[]> allLines;
+            if (File.ReadLines(path).Contains("//r//n"))
+                allLines = File.ReadLines(path).Select(a => a.Split("//r//n"));
+            else
+                allLines = File.ReadLines(path).Select(a => a.Split("//n"));
+            string heading = allLines.ElementAt(0)[0];
+            string[] line = { };
+            int transMzIndex = 100;
+
+            //figure out  which separater is used:
+            if (heading.Contains(";"))
+            {
+                sep = "semi-colon";
+                line = heading.Split(";");
+            }
+            else if (heading.Contains(","))
+            {
+                sep = "comma";
+                line = heading.Split(",");
+            }
+            else if (heading.Contains("\t") || heading.Contains(" "))
+            {
+                sep = "tab";
+                line = heading.Split("\t");
+            }
+            else
+            {
+                logger.Info("Seperated value file provided for iRT peptides, however the separater could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
+                Environment.Exit(0);
+            }
+
+            for (int position = 0; position < line.Count(); position++)
+            {
+                if (line[position].ToLower().Contains("productmz") || line[position].ToLower().Contains("q3"))
+                {
+                    transMzIndex = position;
+                }
+            }
+            if (transMzIndex == 100)
+            {
+                logger.Info("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
+                logger.Info("Exiting program");
+                Environment.Exit(0);
+            }
+
+            for (int iii = 1; iii < allLines.Count(); iii++)
+            {
+                string temp = allLines.ElementAt(iii)[0];
+
+                if (sep == "semi-colon")
+                {
+                    line = temp.Split(";");
+                }
+                else if (sep == "comma")
+                {
+                    line = temp.Split(",");
+                }
+                else if (sep == "tab")
+                {
+                    line = temp.Split("\t");
+                }
+
+                double transitionMz = double.Parse(line[transMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
+                Alltransitions.Add(transitionMz);
+            }
+            return Alltransitions;
+        }
     }
 }
