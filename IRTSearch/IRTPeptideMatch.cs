@@ -26,7 +26,8 @@ namespace IRTSearcher
             }
             catch (IOException ex)
             {
-                logger.Error(ex, "The iRT file {0} is in use. Please close the application using it and try again.", iRTpath);
+                logger.Error(ex, "The iRT file {0} was not able to be read - this can happen because it is in use by another program. Please close the application using it and try again.", iRTpath);
+                throw ex;
             }
             run.iRTpath = iRTpath;
             run.IRTPeaks = new List<IRTPeak>();
