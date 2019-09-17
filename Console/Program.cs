@@ -27,8 +27,24 @@ namespace Yamato.Console
                 sw.Start();
 
                 int division;
-                division = options.Division;
-
+                if (options.Division <100)
+                {
+                    if (options.Division > 0)
+                    {
+                        division = options.Division;
+                    }
+                    else
+                    {
+                        division = 1;
+                        logger.Info("Your entry for division is not within the range 1-100. A division of 1 was therefore used.");
+                    }
+                }
+                else
+                {
+                    division = 100;
+                    logger.Info("Your entry for division is not within the range 1-100. A division of 100 was therefore used.");
+                }
+                
                 double massTolerance;
                 massTolerance = options.MassTolerance;
                 List<double> targetMzs = new List<double>();
