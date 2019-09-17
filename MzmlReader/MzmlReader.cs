@@ -5,9 +5,8 @@ using System.Linq;
 using System.Globalization;
 using System.Threading;
 using Ionic.Zlib;
-using LibraryParser;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 
 namespace MzmlParser
 {
@@ -35,7 +34,7 @@ namespace MzmlParser
         private static readonly Object Lock = new Object();
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
 
-        public Run LoadMzml(string path, double massTolerance, bool storeScansInMemory, double[] targetMzs)
+        public Run LoadMzml(string path, double massTolerance, bool storeScansInMemory, List<double> targetMzs)
         {
             Run run = new Run();
             run.MissingScans = 0;
@@ -113,7 +112,7 @@ namespace MzmlParser
             }
         }
 
-        public void ReadSpectrum(XmlReader reader, Run run, double massTolerance, bool storeScansInMemory, double[] targetMzs)
+        public void ReadSpectrum(XmlReader reader, Run run, double massTolerance, bool storeScansInMemory, List<double> targetMzs)
         {
             ScanAndTempProperties scan = new ScanAndTempProperties();
 
@@ -210,7 +209,6 @@ namespace MzmlParser
                         {
                             ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, storeScansInMemory, targetMzs);
                         }
-
                     }
                     else
                     {
@@ -286,7 +284,7 @@ namespace MzmlParser
             }
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, double massTolerance, bool storeScansInMemory, double[] targetMzs)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, double massTolerance, bool storeScansInMemory, List<double> targetMzs)
         {
 
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
@@ -302,12 +300,12 @@ namespace MzmlParser
                 run.MissingScans++;
             }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
-
-            if (storeScansInMemory && scan.Scan.MsLevel == 1 | (targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowLowerBoundary))))
-            {
-                scan.Scan.Spectrum = spectrum;
-            }
-
+            scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
+            scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
+            if (storeScansInMemory && scan.Scan.MsLevel == 1 | scan.Scan.IsolationWindowTargetMz == 0|(targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowUpperBoundary))))
+                {
+                    scan.Scan.Spectrum = spectrum;
+                }
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];
