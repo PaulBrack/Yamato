@@ -7,6 +7,7 @@ using System.Threading;
 using Ionic.Zlib;
 using System.IO;
 using System.Collections.Generic;
+using CenterSpace.NMath.Core;
 
 namespace MzmlParser
 {
@@ -304,8 +305,24 @@ namespace MzmlParser
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
             if (storeScansInMemory && scan.Scan.MsLevel == 1 | scan.Scan.IsolationWindowTargetMz == 0|(targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowUpperBoundary))))
                 {
-                    scan.Scan.Spectrum = spectrum;
+                    //scan.Scan.Spectrum = spectrum;
                 }
+
+
+            if (spectrum.Sum(x => x.Intensity) > 2000000)
+            {
+                logger.Info("Length of u intensities {0}", intensities.Length);
+                logger.Info("Max of u intensities {0}", intensities.Max());
+
+                
+                DoubleVector dvIntensities = new DoubleVector(Array.ConvertAll(intensities, x => (double)x));
+                
+                PeakFinderSavitzkyGolay pf = new PeakFinderSavitzkyGolay(dvIntensities, 10, 5);
+                pf.LocatePeaks();
+                logger.Info("Length of f intensities {0}", pf.NumberPeaks);
+                logger.Info("Max of f intensities {0}", pf.GetAllPeaks().Max(x => x.X));
+                logger.Info("Max of f intensities {0}", pf.GetAllPeaks().Max(x => x.Y));
+            }
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];

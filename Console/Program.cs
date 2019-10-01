@@ -5,17 +5,29 @@ using NLog;
 using LibraryParser;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Yamato.Console
 {
+
+    
     class Program
     {
         
         private static Logger logger = LogManager.GetCurrentClassLogger();
-     
+
+
+
+        //Logger.Info(cpf.HelloWorld());
 
         static void Main(string[] args)
         {
+           // crawdadyamatowrapper.paul.CrawdadPeakFinder cpf = new crawdadyamatowrapper.paul.CrawdadPeakFinder().
+            string s = new crawdadyamatowrapper.paul.CrawdadPeakFinder().HelloWorld();
+            logger.Info(s);
+
+
+
             Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
                 UpdateLoggingLevels(options);
