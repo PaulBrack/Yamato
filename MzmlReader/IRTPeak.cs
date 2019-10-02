@@ -32,6 +32,7 @@ namespace MzmlParser
         public double DotProduct;
         public SpectrumPoint BasePeak;
         public List<List<SpectrumPoint>> Alltransitions;
+        public int MatchingTransitions = 0;
     }
 
     public class SmoothedPeak

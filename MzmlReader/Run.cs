@@ -27,6 +27,8 @@ namespace MzmlParser
         public String FilePropertiesAccession;
         public String iRTpath;
         public List<IRTPeak> IRTPeaks { get; set; }
+        public double RunLowerBoundary { get; set; }
+        public double RunUpperBoundary { get; set; }
     }
 
     public class Chromatograms
