@@ -303,10 +303,10 @@ namespace MzmlParser
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
-            if (storeScansInMemory && scan.Scan.MsLevel == 1 | scan.Scan.IsolationWindowTargetMz == 0|(targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowUpperBoundary))))
-                {
-                    //scan.Scan.Spectrum = spectrum;
-                }
+            if (storeScansInMemory && scan.Scan.MsLevel == 1 | scan.Scan.IsolationWindowTargetMz == 0 | (targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowUpperBoundary))))
+            {   
+             scan.Scan.Spectrum = spectrum;
+            }
 
 
             if (spectrum.Sum(x => x.Intensity) > 2000000)

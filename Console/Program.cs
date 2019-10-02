@@ -18,13 +18,9 @@ namespace Yamato.Console
 
 
 
-        //Logger.Info(cpf.HelloWorld());
-
         static void Main(string[] args)
         {
-           // crawdadyamatowrapper.paul.CrawdadPeakFinder cpf = new crawdadyamatowrapper.paul.CrawdadPeakFinder().
-            string s = new crawdadyamatowrapper.paul.CrawdadPeakFinder().HelloWorld();
-            logger.Info(s);
+           
 
 
 

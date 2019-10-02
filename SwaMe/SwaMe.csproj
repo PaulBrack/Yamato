@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
@@ -6,14 +6,21 @@
 
   <ItemGroup>
     <PackageReference Include="Json.Net" Version="1.0.16" />
-    <PackageReference Include="MathNet.Numerics" Version="4.7.0" />
+    <PackageReference Include="MathNet.Numerics" Version="4.8.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CWT\CWT.csproj" />
     <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
     <ProjectReference Include="..\MzmlReader\MzmlParser.csproj" />
     <ProjectReference Include="..\MzqcGenerator\MzqcGenerator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Crawdad">
+      <HintPath>Crawdad.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

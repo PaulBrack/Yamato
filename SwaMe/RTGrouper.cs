@@ -189,9 +189,9 @@ namespace SwaMe
                 if (PeakwidthsTemp.Count > 0)
                 {
                     Peakwidths.Add(PeakwidthsTemp.Average());
-                    PeakSymmetry.Add(Math.Truncate(Math.Ceiling(PeaksymTemp.Average())));
-                    PeakCapacity.Add(Math.Truncate(Math.Ceiling(PeakCapacityTemp.Average())));
-                    PeakPrecision.Add(Math.Truncate(Math.Ceiling(PeakprecisionTemp.Average())));
+                    PeakSymmetry.Add(PeaksymTemp.Average());
+                    PeakCapacity.Add(PeakCapacityTemp.Average());
+                    PeakPrecision.Add(PeakprecisionTemp.Average());
                 }
                 else {
                     Peakwidths.Add(0);
@@ -201,7 +201,7 @@ namespace SwaMe
                 }
                 if (MS1PeakprecisionTemp.Count > 0)
                 {
-                    MS1PeakPrecision.Add(Math.Truncate(Math.Ceiling(MS1PeakprecisionTemp.Average())));
+                    MS1PeakPrecision.Add(MS1PeakprecisionTemp.Average());
                     MS1Density.Add(Convert.ToInt32(Math.Round(MS1DensityTemp.Average(), 0)));
                 }
                 else {

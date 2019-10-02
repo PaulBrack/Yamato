@@ -14,50 +14,43 @@ namespace SwaMe
 
         public void GenerateChromatogram(Run run)
         {
-            //Interpolation and smoothing to acquire chromatogram metrics
+            //Crawdad
             foreach (BasePeak basepeak in run.BasePeaks)
             {
                 double[] intensities = basepeak.Spectrum.Select(x => (double)x.Intensity).ToArray();
                 double[] starttimes = basepeak.Spectrum.Select(x => (double)x.RetentionTime).ToArray();
-
-                //if there are less than two datapoints we cannot calculate chromatogrammetrics:
-                if (starttimes.Count() < 2)
-                    continue;
-
-                //if there are not enough datapoints, interpolate:
-                if (starttimes.Count() < 100)
+                pwiz.Crawdad.CrawdadPeakFinder cPF = new pwiz.Crawdad.CrawdadPeakFinder();
+                cPF.SetChromatogram(intensities,starttimes);
+                List<pwiz.Crawdad.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
+                double TotalFWHM = 0;
+                double TotalPC = 0;
+                foreach (pwiz.Crawdad.CrawdadPeak crawPeak in crawPeaks)
                 {
-                    RTandInt ri = Interpolate(starttimes, intensities);
-                    intensities = ri.intensities;
-                    starttimes = ri.starttimes;
+                    double peakTime = starttimes[crawPeak.TimeIndex];
+                    double fwhm = crawPeak.Fwhm;
+                    if (fwhm == 0 )
+                    {
+                        logger.Info( "FWHM is zero. ");
+                        continue;
+                    }
+
+                    TotalFWHM += fwhm;
+                    TotalPC += 1 + (peakTime / fwhm);
+                }
+                if (crawPeaks.Count() > 0)
+                {
+                    basepeak.FWHM = TotalFWHM / crawPeaks.Count();
+                    basepeak.PeakCapacity = TotalPC / crawPeaks.Count();
+                    basepeak.Peaksym = 1;
+                }
+                else
+                {
+                    basepeak.FWHM = 0;
+                    basepeak.PeakCapacity = 0;
+                    basepeak.Peaksym = 1;
                 }
 
-                double[,] array3 = new double[1, intensities.Length];
-                for (int i = 0; i < intensities.Length; i++)
-                {
-                    array3[0, i] = intensities[i];
-                }
 
-                WaveletLibrary.Matrix dataMatrix = new WaveletLibrary.Matrix(array3);
-
-                var transform = new WaveletLibrary.WaveletTransform(new WaveletLibrary.HaarLift(), 1);
-                dataMatrix = transform.DoForward(dataMatrix);
-
-                double[] Smoothedms2bpc = new double[intensities.Length];
-                for (int i = 0; i < intensities.Length; i++)
-                {
-                    Smoothedms2bpc[i] = dataMatrix.toArray[0, i];
-                }
-                //Find the fwhm:
-                double maxIntens = Smoothedms2bpc.Max();
-                int mIIndex = Array.IndexOf(Smoothedms2bpc, Smoothedms2bpc.Max());
-                double baseline = Smoothedms2bpc.Where(i => i > 0).DefaultIfEmpty(int.MinValue).Min();
-                basepeak.FWHM = CalculateFWHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
-                double peakTime = starttimes[mIIndex];
-                double fwfpct = CalculateFpctHM(starttimes, Smoothedms2bpc, maxIntens, mIIndex, baseline);
-                double f = Math.Abs(peakTime - fwfpct);
-                basepeak.Peaksym = fwfpct / (2 * f);
-                basepeak.PeakCapacity = 1 + (peakTime / basepeak.FWHM);
             }
         }
 
@@ -76,7 +69,6 @@ namespace SwaMe
                     
                     Dotproduct dp = new Dotproduct();
                     SmoothedPeak sp = new SmoothedPeak();
-                    sp.peakArea = 0;
                     List<double[]> transSmoothInt = new List<double[]>();
                     int peakPosition = 0;
                     for (int yyy = 0; yyy < pPeak.Alltransitions.Count() - 1; yyy++)

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CWT\CWT.csproj" />
     <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
   </ItemGroup>
 

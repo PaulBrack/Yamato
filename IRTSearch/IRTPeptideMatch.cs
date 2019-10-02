@@ -152,6 +152,7 @@ namespace IRTSearcher
                                     foreach (var at in ip.AssociatedTransitions)
                                     {
                                         List<SpectrumPoint> tempList = new List<SpectrumPoint>();
+
                                         possPeak.Alltransitions.Add(tempList);//alltransitions are used to calculate MS1 peak metrics here we create an empty vector to which we later add
                                     }
                                     possPeak.BasePeak = temp[0];
@@ -241,7 +242,7 @@ namespace IRTSearcher
                                     if (Count > 0)
                                     {
 
-                                        pp.Alltransitions[iterator].Add(scan.Spectrum.Where(i => Math.Abs(i.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance /*&& Math.Abs(i.RetentionTime - pp.BasePeak.RetentionTime) < irtTolerance*/).OrderBy(x => x.Intensity).ToList().First());
+                                        pp.Alltransitions[iterator].Add(scan.Spectrum.Where(i => Math.Abs(i.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance ).OrderBy(x => x.Intensity).ToList().Last());
 
                                     }
                                 }
