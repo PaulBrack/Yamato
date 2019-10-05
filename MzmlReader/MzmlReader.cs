@@ -39,44 +39,46 @@ namespace MzmlParser
         {
             Run run = new Run();
             run.MissingScans = 0;
-
-            try
+            if (!path.Contains("*"))
             {
-                using (Stream stream = new FileStream(path, FileMode.Open))
+                try
                 {
-                    logger.Info("Starting analysis on file: {0}. Please be patient.", path);
-                }
-            }
-            catch (IOException ex)
-            {
-                logger.Error(ex, "This file {0} is in use. Please close the application using it and try again.", path);
-            }
-            using (XmlReader reader = XmlReader.Create(path))
-            {
-                while (reader.Read())
-                {
-                    if (reader.IsStartElement())
+                    using (Stream stream = new FileStream(path, FileMode.Open))
                     {
-                        switch (reader.LocalName)
-                        {
-                            case "sourceFile":
-                                ReadSourceFileMetaData(reader, run);
-                                break;
-                            case "spectrum":
-                                ReadSpectrum(reader, run, massTolerance, storeScansInMemory, targetMzs);
-                                break;
-                            case "referenceableParamGroup":
-                                if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
-                                    SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
-                                break;
-                        }
+                        logger.Info("Starting analysis on file: {0}. Please be patient.", path);
                     }
+                }
+                catch (IOException ex)
+                {
+                    logger.Error(ex, "This file {0} is in use. Please close the application using it and try again.", path);
+                }
+                using (XmlReader reader = XmlReader.Create(path))
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.IsStartElement())
+                        {
+                            switch (reader.LocalName)
+                            {
+                                case "sourceFile":
+                                    ReadSourceFileMetaData(reader, run);
+                                    break;
+                                case "spectrum":
+                                    ReadSpectrum(reader, run, massTolerance, storeScansInMemory, targetMzs);
+                                    break;
+                                case "referenceableParamGroup":
+                                    if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
+                                        SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
+                                    break;
+                            }
+                        }
 
+                    }
                 }
             }
-
             cde.Signal();
             cde.Wait();
+            cde.Reset(1);
             FindMs2IsolationWindows(run);
             return run;
         }
@@ -85,7 +87,12 @@ namespace MzmlParser
         public void ReadSourceFileMetaData(XmlReader reader, Run run)
         {
             bool cvParamsRead = false;
-            run.SourceFileName = reader.GetAttribute("name");
+            run.SourceFileName = Path.GetFileNameWithoutExtension(reader.GetAttribute("name"));
+            if (run.SourceFileName.ToLower().EndsWith(".wiff"))//in a .wiff.scan file you need to remove both extensions
+            {
+                run.SourceFileName = Path.GetFileNameWithoutExtension(run.SourceFileName);
+            }
+            run.SourceFileType = Path.GetExtension(reader.GetAttribute("name"));
             run.SourceFilePath = reader.GetAttribute("location");
 
             while (reader.Read() && !cvParamsRead)
@@ -124,7 +131,7 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
-            if (run.SourceFileName.ToUpper().EndsWith("WIFF") || run.SourceFileName.ToUpper().EndsWith("SCAN"))
+            if (run.SourceFileType.ToUpper().EndsWith("WIFF") || run.SourceFileName.ToUpper().EndsWith("SCAN"))
             {
                 scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
             }
@@ -140,7 +147,7 @@ namespace MzmlParser
                         {
                             case "MS:1000511":
                                 scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                if (run.SourceFileName.ToUpper().EndsWith("RAW"))
+                                if (run.SourceFileType.ToUpper().EndsWith("RAW"))
                                 {
                                     if (scan.Scan.MsLevel == 1)
                                     {

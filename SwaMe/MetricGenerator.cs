@@ -45,7 +45,7 @@ namespace SwaMe
             }
             
             fileMaker.MakeMetricsPerRTsegmentFile(rtMetrics);
-            fileMaker.MakeMetricsPerSwathFile(swathMetrics);
+            fileMaker.MakeMetricsPerSwathFile(swathMetrics, inputFilePath);
             fileMaker.CreateAndSaveMzqc();
         }
 
