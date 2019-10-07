@@ -18,13 +18,9 @@ namespace Yamato.Console
 
 
 
-        //Logger.Info(cpf.HelloWorld());
-
         static void Main(string[] args)
         {
-           // crawdadyamatowrapper.paul.CrawdadPeakFinder cpf = new crawdadyamatowrapper.paul.CrawdadPeakFinder().
-            string s = new crawdadyamatowrapper.paul.CrawdadPeakFinder().HelloWorld();
-            logger.Info(s);
+           
 
 
 
@@ -99,7 +95,7 @@ namespace Yamato.Console
                 }
                 
                 run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath,massTolerance);
+                new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath,massTolerance, irt);
                 logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 logger.Info("Done!");
             });
@@ -125,7 +121,7 @@ namespace Yamato.Console
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
         public int Division { get; set; } = 1;
 
-        [Option('m', "masstolerance", Required = false, HelpText = "m/z tolerance. The closest m/z value to the m/z of the basepeak that is still within this value from the basepeak m/z are part of the same chromatogram. Similarly with iRT peptide searching, this is the tolerance that will allow two values to be considered the same peak.")]
+        [Option('m', "masstolerance", Required = false, HelpText = "mass tolerance in daltons. This will be used to distinguish which peaks are part of the same chromatogram. Similarly with iRT peptide searching, this is the tolerance that will allow two values to be considered the same peak.")]
         public float MassTolerance { get; set; } = 0.05F;
 
         [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]

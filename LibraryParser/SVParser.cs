@@ -223,8 +223,17 @@ namespace LibraryParser
                 {
                     line = temp.Split('\t');
                 }
-
-                double transitionMz = double.Parse(line[transMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
+                double transitionMz = 0;
+                try
+                {
+                    transitionMz = double.Parse(line[transMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
+                }
+                catch (IOException ex)
+                {
+                    logger.Error(ex, "There seems to be a problem with separating values in the iRT peptides file. Please go through the file and try to determine the cause.");
+                    throw ex;
+                }
+                
                 Alltransitions.Add(transitionMz);
             }
             return Alltransitions;

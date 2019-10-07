@@ -6,7 +6,7 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division,  string inputFilePath, double massTolerance)
+        public void GenerateMetrics(Run run, int division,  string inputFilePath, double massTolerance, bool irt)
         {
            
             //Acquire RTDuration:
@@ -16,7 +16,7 @@ namespace SwaMe
             ChromatogramMetricGenerator chromatogramMetrics = new ChromatogramMetricGenerator();
             chromatogramMetrics.GenerateChromatogram(run);
 
-            if (run.IRTPeaks != null)
+            if (irt)
             {
                 chromatogramMetrics.GenerateiRTChromatogram(run, massTolerance);
             }
