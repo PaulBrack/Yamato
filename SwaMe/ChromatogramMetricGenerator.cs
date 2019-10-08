@@ -119,7 +119,7 @@ namespace SwaMe
 
                     sp.DotProduct = Math.Pow(dp.TiriPair, 2) / (dp.Tsquared * dp.Rsquared);
                     double RTscore = CalcRTScore(Count, run, sp);
-                    double score = 0.4 * sp.DotProduct+ 0.01 * pPeak.Alltransitions[0].Count()/(rank/10) + 0.4* RTscore;///The rank is a rank of the intensity as the peaks were sorted by intensity, the rank is simply the order it occurred in
+                    double score = 0.4 * sp.DotProduct+ 0.01 * pPeak.Alltransitions[0].Count()/(rank/10) + 0.4* RTscore; //ALgorithm changed so score penalises less for a lower rough peak area estimation (rank here is used as a substitute for intensity) and puts a higher value on dotproduct
                     if (highestScore < score)
                     {
                         highestScore = score;
@@ -128,7 +128,6 @@ namespace SwaMe
                         irtpeak.Peaksym = sp.PSAllTransitions / irtpeak.AssociatedTransitions.Count();
                     }
 
-                    logger.Info(Convert.ToString(sp.RT)+"-"+Convert.ToString(irtpeak.Mz)+"-"+Convert.ToString(RTscore));
                     rank++;//Because we have ordered the possible peaks according to their intensities, this value corresponds to their intensity rank 
                 }
                 Count++;

@@ -6,6 +6,7 @@ using LibraryParser;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.IO;
 
 namespace Yamato.Console
 {
@@ -72,14 +73,12 @@ namespace Yamato.Console
                         }
                         else
                         {
-                            division = 1;
-                            logger.Info("Your entry for division is not within the range 1-100. A division of 1 was therefore used.");
+                            throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
                         }
                     }
                     else
                     {
-                        division = 100;
-                        logger.Info("Your entry for division is not within the range 1-100. A division of 100 was therefore used.");
+                        throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
                     }
 
                     double massTolerance;
@@ -89,7 +88,8 @@ namespace Yamato.Console
                     string iRTpath = "none";
                     bool irt = false;
                     if (!String.IsNullOrEmpty(options.IRTFile))
-                    { iRTpath = options.IRTFile.ToLower();
+                    {
+                        iRTpath = options.IRTFile.ToLower();
                         irt = true;
                         if (iRTpath.Contains("traml"))
                         {
@@ -124,17 +124,18 @@ namespace Yamato.Console
                     }
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance);
+                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     logger.Info("Done!");
-                
-                
+
+
+
+
+                    run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
+                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
+                    logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                    logger.Info("Done!");
                 }
-                
-                run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath,massTolerance, irt);
-                logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-                logger.Info("Done!");
             });
             LogManager.Shutdown();
         }
