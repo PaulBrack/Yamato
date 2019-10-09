@@ -41,18 +41,7 @@ namespace MzmlParser
             run.MissingScans = 0;
             if (!path.Contains("*"))
             {
-                try
-                {
-                    using (Stream stream = new FileStream(path, FileMode.Open))
-                    {
-                        logger.Info("Starting analysis on file: {0}. Please be patient.", path);
-                    }
-                }
-                catch (IOException ex)
-                {
-                    string exceptionInfo = ("Unable to open the file "+ path + ". Is it perhaps in use?");
-                    throw new IOException(exceptionInfo);
-                }
+                
                 using (XmlReader reader = XmlReader.Create(path))
                 {
                     while (reader.Read())
