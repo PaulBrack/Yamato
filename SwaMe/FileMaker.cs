@@ -16,6 +16,7 @@ namespace SwaMe
         private int MS2Count;
         private double cycleTimes50;
         private double cycleTimesIQR;
+        private int totalMS2IonCount;
         private string inputFilePath;
         private double RTDuration;
         private double swathSizeDifference;
@@ -23,7 +24,7 @@ namespace SwaMe
         private SwathGrouper.SwathMetrics swathMetrics;
         private RTGrouper.RTMetrics rtMetrics;
 
-        public FileMaker(int division, string inputFilePath, MzmlParser.Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, double cycleTimes50, double cycleTimesIQR, int MS2Density50, int MS2DensityIQR, int MS1Count)
+        public FileMaker(int division, string inputFilePath, MzmlParser.Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, double cycleTimes50, double cycleTimesIQR, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count)
         {
             this.swathMetrics = swathMetrics;
             this.division = division;
@@ -35,6 +36,7 @@ namespace SwaMe
             this.MS2Count = MS2Count;
             this.cycleTimes50 = cycleTimes50;
             this.cycleTimesIQR = cycleTimesIQR;
+            this.totalMS2IonCount = totalMS2IonCount;
             this.MS2Density50 = MS2Density50;
             this.MS2DensityIQR = MS2DensityIQR;
             this.MS1Count = MS1Count;
@@ -113,7 +115,7 @@ namespace SwaMe
         {
             string undividedFile = "undividedMetrics_" + run.SourceFileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(undividedFile);
-            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t CycleTimes50 \t CycleTimesIQR \t MS2Density50 \t MS2DensityIQR \t MS1Count");
+            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t CycleTimes50 \t CycleTimesIQR \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count");
             streamWriter.Write("\n");
             streamWriter.Write(run.SourceFileName);
             streamWriter.Write("\t");
@@ -130,6 +132,8 @@ namespace SwaMe
             streamWriter.Write(cycleTimes50);
             streamWriter.Write("\t");
             streamWriter.Write(cycleTimesIQR);
+            streamWriter.Write("\t");
+            streamWriter.Write(totalMS2IonCount);
             streamWriter.Write("\t");
             streamWriter.Write(MS2Density50);
             streamWriter.Write("\t");
@@ -181,6 +185,7 @@ namespace SwaMe
             qualityParameters[3] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: NumOfSwaths", unit = Count, value = swathMetrics.maxswath };
             qualityParameters[4] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: CycleTimes50", unit = Hertz, value = cycleTimes50 };
             qualityParameters[5] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: CycleTimesIQR", unit = Hertz, value = cycleTimesIQR };
+            qualityParameters[6] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: TotalMS2IonCount", unit = Count, value = totalMS2IonCount };
             qualityParameters[6] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: MS2Density50", unit = Count, value = MS2Density50 };
             qualityParameters[7] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: MS2DensityIQR", unit = Count, value = MS2DensityIQR };
             qualityParameters[8] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:4000059", name = "Quameter metric: MS1-Count", unit = Count, value = MS1Count };

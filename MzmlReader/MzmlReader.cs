@@ -50,7 +50,7 @@ namespace MzmlParser
                 }
                 catch (IOException ex)
                 {
-                    string exceptionInfo = ("Unable to open the file {path}. Please close the application using it and try again.");
+                    string exceptionInfo = ("Unable to open the file "+ path + ". Is it perhaps in use?");
                     throw new IOException(exceptionInfo);
                 }
                 using (XmlReader reader = XmlReader.Create(path))
