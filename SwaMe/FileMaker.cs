@@ -73,7 +73,7 @@ namespace SwaMe
         {
             string metricsPerRTSegmentFile = "RTDividedMetrics_"+ run.SourceFileName+ ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
-            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t PeakSymmetry \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAverage \t DeltaTICIQR \t AveScanTime \t AveMS2Density \t AveMS1Density \t MS2TICTotal \t MS1TICTotal");
+            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t PeakSymmetry \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAverage \t DeltaTICIQR \t AveCycleTime \t AveMS2Density \t AveMS1Density \t MS2TICTotal \t MS1TICTotal");
 
             for (int segment = 0; segment < division; segment++)
             {
