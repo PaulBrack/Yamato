@@ -22,9 +22,6 @@ namespace Yamato.Console
         static void Main(string[] args)
         {
            
-
-
-
             Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
             UpdateLoggingLevels(options);
@@ -114,9 +111,19 @@ namespace Yamato.Console
                     if (options.Threading == false)
                         mzmlParser.Threading = false;
 
-
+                    string fileReadingProblems = CheckFileIsReadableOrComplain(inputFilePath);
+                    if (fileReadingProblems == null)
+                    {
+                        logger.Info("Starting analysis on {0}.", inputFilePath);
+                    }
+                    else
+                    {
+                        logger.Error("Unable to open the file, {0}. ",inputFilePath);
+                    }
 
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, targetMzs);
+
+                    
                     if (irt)
                     {
                         IRTSearcher.IRTPeptideMatch ip = new IRTSearcher.IRTPeptideMatch();
@@ -140,7 +147,23 @@ namespace Yamato.Console
             LogManager.Shutdown();
         }
 
-        private static void UpdateLoggingLevels(Options options)
+        private static string CheckFileIsReadableOrComplain(string inputFilePath)
+        {
+            try
+            {
+                using (Stream stream = new FileStream(inputFilePath, FileMode.Open))
+                {
+                    string everythingIsFine = null;
+                    return everythingIsFine;
+                }
+            }
+            catch (IOException)
+            {
+                return String.Format("Unable to open the file: {0}.", inputFilePath);
+            }
+        }
+
+    private static void UpdateLoggingLevels(Options options)
         {
             logger.Info("Verbose output selected: enabled logging for all levels");
             foreach (var rule in LogManager.Configuration.LoggingRules)
