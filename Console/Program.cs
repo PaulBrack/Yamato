@@ -111,16 +111,14 @@ namespace Yamato.Console
                     if (options.Threading == false)
                         mzmlParser.Threading = false;
 
-                    try
+                    string fileReadingProblems = CheckFileIsReadableOrComplain(inputFilePath);
+                    if (fileReadingProblems == null)
                     {
-                        using (Stream stream = new FileStream(inputFilePath, FileMode.Open))
-                        {
-                            logger.Info("Starting analysis on file: {0}. Please be patient.", inputFilePath);
-                        }
+                        logger.Info("Starting analysis on {0}.", inputFilePath);
                     }
-                    catch (IOException ex)
+                    else
                     {
-                        logger.Error(ex, String.Format("Unable to open the file: {0}.", inputFilePath));
+                        logger.Error("Unable to open the file, {0}. ",inputFilePath);
                     }
 
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, targetMzs);
@@ -149,7 +147,23 @@ namespace Yamato.Console
             LogManager.Shutdown();
         }
 
-        private static void UpdateLoggingLevels(Options options)
+        private static string CheckFileIsReadableOrComplain(string inputFilePath)
+        {
+            try
+            {
+                using (Stream stream = new FileStream(inputFilePath, FileMode.Open))
+                {
+                    string everythingIsFine = null;
+                    return everythingIsFine;
+                }
+            }
+            catch (IOException)
+            {
+                return String.Format("Unable to open the file: {0}.", inputFilePath);
+            }
+        }
+
+    private static void UpdateLoggingLevels(Options options)
         {
             logger.Info("Verbose output selected: enabled logging for all levels");
             foreach (var rule in LogManager.Configuration.LoggingRules)
