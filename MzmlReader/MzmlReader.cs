@@ -121,7 +121,7 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
-            if (run.SourceFileType.ToUpper().EndsWith("WIFF") || run.SourceFileName.ToUpper().EndsWith("SCAN"))
+            if (run.SourceFileType.ToUpper().EndsWith("WIFF") || run.SourceFileType.ToUpper().EndsWith("SCAN"))
             {
                 scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
             }
