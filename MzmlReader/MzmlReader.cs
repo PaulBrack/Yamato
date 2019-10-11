@@ -41,7 +41,7 @@ namespace MzmlParser
             run.MissingScans = 0;
             if (!path.Contains("*"))
             {
-                
+
                 using (XmlReader reader = XmlReader.Create(path))
                 {
                     while (reader.Read())
@@ -120,7 +120,7 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
-            if (run.SourceFileType.ToUpper().EndsWith("WIFF") || run.SourceFileType.ToUpper().EndsWith("SCAN"))
+            if (run.SourceFileType.EndsWith("wiff", StringComparison.InvariantCultureIgnoreCase) || run.SourceFileType.ToUpper().EndsWith("scan", StringComparison.InvariantCultureIgnoreCase))
             {
                 scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
             }
@@ -300,25 +300,10 @@ namespace MzmlParser
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
             if (storeScansInMemory && scan.Scan.MsLevel == 1 | scan.Scan.IsolationWindowTargetMz == 0 | (targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowUpperBoundary))))
-            {   
-             scan.Scan.Spectrum = spectrum;
-            }
-
-
-            if (spectrum.Sum(x => x.Intensity) > 2000000)
             {
-                logger.Info("Length of u intensities {0}", intensities.Length);
-                logger.Info("Max of u intensities {0}", intensities.Max());
-
-                
-                DoubleVector dvIntensities = new DoubleVector(Array.ConvertAll(intensities, x => (double)x));
-                
-                PeakFinderSavitzkyGolay pf = new PeakFinderSavitzkyGolay(dvIntensities, 10, 5);
-                pf.LocatePeaks();
-                logger.Info("Length of f intensities {0}", pf.NumberPeaks);
-                logger.Info("Max of f intensities {0}", pf.GetAllPeaks().Max(x => x.X));
-                logger.Info("Max of f intensities {0}", pf.GetAllPeaks().Max(x => x.Y));
+                scan.Scan.Spectrum = spectrum;
             }
+
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];
@@ -412,7 +397,6 @@ namespace MzmlParser
             System.Array.Resize(ref array, 5);
             return array;
         }
-
 
         private void FindMs2IsolationWindows(Run run)
         {
