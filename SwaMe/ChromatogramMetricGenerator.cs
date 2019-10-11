@@ -19,12 +19,12 @@ namespace SwaMe
             {
                 double[] intensities = basepeak.Spectrum.Select(x => (double)x.Intensity).ToArray();
                 double[] starttimes = basepeak.Spectrum.Select(x => (double)x.RetentionTime).ToArray();
-                pwiz.Crawdad.CrawdadPeakFinder cPF = new pwiz.Crawdad.CrawdadPeakFinder();
+                CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
                 cPF.SetChromatogram(intensities,starttimes);
-                List<pwiz.Crawdad.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
+                List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
                 double TotalFWHM = 0;
                 double TotalPC = 0;
-                foreach (pwiz.Crawdad.CrawdadPeak crawPeak in crawPeaks)
+                foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
                 {
                     double peakTime = starttimes[crawPeak.TimeIndex];
                     double fwhm = crawPeak.Fwhm;

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+ <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,16 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CrawdadSharp\CrawdadSharp\CrawdadSharp.csproj" />
     <ProjectReference Include="..\CWT\CWT.csproj" />
     <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
     <ProjectReference Include="..\MzmlReader\MzmlParser.csproj" />
     <ProjectReference Include="..\MzqcGenerator\MzqcGenerator.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Crawdad">
-      <HintPath>Crawdad.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

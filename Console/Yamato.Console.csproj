@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net461</TargetFramework>
+     <TargetFramework>netcoreapp2.2</TargetFramework>
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
@@ -20,12 +20,6 @@
     <ProjectReference Include="..\MzmlReader\MzmlParser.csproj" />
     <ProjectReference Include="..\Prognosticator\Prognosticator.csproj" />
     <ProjectReference Include="..\SwaMe\SwaMe.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Crawdad">
-      <HintPath>Crawdad.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
