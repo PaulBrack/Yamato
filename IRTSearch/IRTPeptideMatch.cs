@@ -19,7 +19,6 @@ namespace IRTSearcher
 
         private static CountdownEvent cde = new CountdownEvent(1);
 
-
         public Run ParseLibrary(Run run, string iRTpath, double massTolerance)
         {
             CheckIrtPathAccessible(iRTpath);
@@ -30,27 +29,27 @@ namespace IRTSearcher
             {
                 TraMLReader traMLReader = new TraMLReader();
                 irtLibrary = traMLReader.LoadLibrary(run.iRTpath);
+
+                run.IRTPeaks = new List<IRTPeak>();
+                for (int i = 0; i < irtLibrary.PeptideList.Count; i++)
                 {
-                    run.IRTPeaks = new List<IRTPeak>();
-                    for (int i = 0; i < irtLibrary.PeptideList.Count; i++)
+                    IRTPeak peak = new IRTPeak();
+                    Library.Peptide irtLibPeptide = (Library.Peptide)irtLibrary.PeptideList[i];
+                    peak.ExpectedRetentionTime = irtLibPeptide.RetentionTime;
+                    peak.Mz = GetTheoreticalMz(irtLibPeptide.Sequence, irtLibPeptide.ChargeState);
+
+                    for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
                     {
-                        IRTPeak peak = new IRTPeak();
-                        Library.Peptide irtLibPeptide = (Library.Peptide)irtLibrary.PeptideList[i];
-                        peak.ExpectedRetentionTime = irtLibPeptide.RetentionTime;
-                        peak.Mz = GetTheoreticalMz(irtLibPeptide.Sequence, irtLibPeptide.ChargeState);
-
-                        for (int transition = 0; transition < irtLibrary.TransitionList.Count; transition++)
+                        if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
                         {
-                            if (Math.Abs(((Library.Transition)irtLibrary.TransitionList[transition]).PrecursorMz - peak.Mz) < 0.02)//chose this value as the smallest difference between two biognosis peptides is this
-                            {
-                                peak.AssociatedTransitions.Add((Library.Transition)irtLibrary.TransitionList[transition]);
-                            }
+                            peak.AssociatedTransitions.Add((Library.Transition)irtLibrary.TransitionList[transition]);
                         }
-
-                        run.IRTPeaks.Add(peak);
-                        run.IRTPeaks = run.IRTPeaks.OrderBy(x => x.ExpectedRetentionTime).ToList();
                     }
+
+                    run.IRTPeaks.Add(peak);
+                    run.IRTPeaks = run.IRTPeaks.OrderBy(x => x.ExpectedRetentionTime).ToList();
                 }
+
             }
             else if (run.iRTpath.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase) || run.iRTpath.EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || run.iRTpath.EndsWith("txt", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -112,17 +111,16 @@ namespace IRTSearcher
 
         public static void ReadSpectrum(Run run, double massTolerance)
         {
-            foreach (Scan scan in run.Ms1Scans.Where(x=>x.Spectrum!=null))
+            foreach (Scan scan in run.Ms1Scans.Where(x => x.Spectrum != null))
             {
-                
+
                 lock (Lock)//Otherwise threading adds everything to posspeaks before checking if there already is something
                 {
                     foreach (IRTPeak ip in run.IRTPeaks)
                     {
-                    int tempCount= scan.Spectrum.Count(x => Math.Abs(ip.Mz - x.Mz) <= massTolerance);
+                        int tempCount = scan.Spectrum.Count(x => Math.Abs(ip.Mz - x.Mz) <= massTolerance);
                         if (tempCount > 0)
                         {
-
                             List<SpectrumPoint> temp = scan.Spectrum.Where(x => Math.Abs(ip.Mz - x.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList();
                             if (ip.PossPeaks.Count() > 1)
                             {
@@ -160,7 +158,7 @@ namespace IRTSearcher
                                 }
                             }
 
-                          
+
                             else
                             {
 
@@ -206,7 +204,7 @@ namespace IRTSearcher
             lock (Lock)
             {
                 foreach (PossiblePeak pp in peak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList())
-            {
+                {
                     /*List<string> stringlist = new List<string>();
                     List<Scan> matchingscans = new List<Scan>();
                     foreach (Library.Transition transition in peak.AssociatedTransitions)
@@ -231,7 +229,7 @@ namespace IRTSearcher
 
                     foreach (Scan scan in run.Ms2Scans)
                     {
-                        if (scan != null && Math.Abs(scan.ScanStartTime-pp.BasePeak.RetentionTime ) <irtTolerance)
+                        if (scan != null && Math.Abs(scan.ScanStartTime - pp.BasePeak.RetentionTime) < irtTolerance)
                         {
                             for (int iterator = 0; iterator < peak.AssociatedTransitions.Count(); iterator++)
                             {
@@ -242,7 +240,7 @@ namespace IRTSearcher
                                     if (Count > 0)
                                     {
 
-                                        pp.Alltransitions[iterator].Add(scan.Spectrum.Where(i => Math.Abs(i.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance ).OrderBy(x => x.Intensity).ToList().Last());
+                                        pp.Alltransitions[iterator].Add(scan.Spectrum.Where(i => Math.Abs(i.Mz - peak.AssociatedTransitions[iterator].ProductMz) <= massTolerance).OrderBy(x => x.Intensity).ToList().Last());
 
                                     }
                                 }
@@ -252,9 +250,9 @@ namespace IRTSearcher
 
                 }
             }
-            
-           cde.Signal();
-            
+
+            cde.Signal();
+
         }
 
         private static void irtSearch(Run run, double massTolerance)
