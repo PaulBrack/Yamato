@@ -16,7 +16,6 @@ namespace IRTSearcher
         private static readonly Object Lock = new Object();
         const double irtTolerance = 0.5;
 
-
         private static CountdownEvent cde = new CountdownEvent(1);
 
         public Run ParseLibrary(Run run, string iRTpath, double massTolerance)

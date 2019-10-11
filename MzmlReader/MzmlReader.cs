@@ -39,8 +39,7 @@ namespace MzmlParser
         {
             Run run = new Run();
             run.MissingScans = 0;
-            if (!path.Contains("*"))
-            {
+
 
                 using (XmlReader reader = XmlReader.Create(path))
                 {
@@ -64,7 +63,7 @@ namespace MzmlParser
                         }
                     }
                 }
-            }
+
             cde.Signal();
             cde.Wait();
             cde.Reset(1);

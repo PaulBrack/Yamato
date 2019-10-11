@@ -44,7 +44,6 @@ namespace Yamato.Console
 
                 foreach (string inputFilePath in inputFiles)
                 {
-
                     logger.Info("Loading file: {0}", inputFilePath);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
@@ -60,7 +59,6 @@ namespace Yamato.Console
                     massTolerance = options.MassTolerance;
                     List<double> targetMzs = new List<double>();
 
-                    string iRTpath = "none";
                     bool irt = false;
                     if (!String.IsNullOrEmpty(options.IRTFile))
                     {
@@ -68,7 +66,7 @@ namespace Yamato.Console
                         if (options.IRTFile.EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
                         {
                             TraMLReader tr = new TraMLReader();
-                            targetMzs = tr.CollectTransitions(iRTpath);
+                            targetMzs = tr.CollectTransitions(options.IRTFile);
                         }
                         else if (options.IRTFile.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.EndsWith("txt", StringComparison.InvariantCultureIgnoreCase))
                         {
@@ -95,7 +93,7 @@ namespace Yamato.Console
                     if (irt)
                     {
                         IRTSearcher.IRTPeptideMatch ip = new IRTSearcher.IRTPeptideMatch();
-                        run = ip.ParseLibrary(run, iRTpath, massTolerance);
+                        run = ip.ParseLibrary(run, options.IRTFile, massTolerance);
                     }
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
@@ -117,6 +115,7 @@ namespace Yamato.Console
             try
             {
                 Stream stream = new FileStream(inputFilePath, FileMode.Open);
+                stream.Close();
             }
             catch (IOException)
             {
