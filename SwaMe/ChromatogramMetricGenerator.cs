@@ -85,10 +85,9 @@ namespace SwaMe
                                 continue;
 
                             double[,] intensitiesArray= new double[1, intensities.Length];
+
                             for (int i = 0; i < intensities.Length; i++)
-                            {
                                 intensitiesArray[0, i] = intensities[i];
-                            }
 
                             WaveletLibrary.Matrix dataMatrix = new WaveletLibrary.Matrix(intensitiesArray);
 
@@ -269,15 +268,14 @@ namespace SwaMe
                 RTscore = 1 / Math.Pow(sp.RT - 0.227, 2);//The power and times ten calculation was added to penalize a peptide greatly for occurring later in the RT. Due to our not wanting to hardcode any peptide standard RTs, we would like to keep the order that the peptides are presented. Therefore, the first peptide should rather occur too early than too late.
             return RTscore;
         }
-        public Dotproduct CalcDotProductParameters(int yyy, IRTPeak irtpeak, Dotproduct dp, double[] intensities, int peakPosition)
+        public Dotproduct CalcDotProductParameters(int i, IRTPeak irtpeak, Dotproduct dp, double[] intensities, int peakPosition)
         {
-            double Ri = irtpeak.AssociatedTransitions[yyy].ProductIonIntensity;
+            double Ri = irtpeak.AssociatedTransitions[i].ProductIonIntensity;
             double Ti = 0;
-            if (intensities.Count() > yyy)
+            if (intensities.Count() > i)
             {
                 if( intensities.Count() > peakPosition)
                 {
-                
                     Ti = intensities[peakPosition];
                 }
                 else { Ti =0; }

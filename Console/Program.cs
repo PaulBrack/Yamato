@@ -11,50 +11,38 @@ using System.IO;
 namespace Yamato.Console
 {
 
-    
+
     class Program
     {
-        
         private static Logger logger = LogManager.GetCurrentClassLogger();
-
-
 
         static void Main(string[] args)
         {
-           
+
             Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
-            UpdateLoggingLevels(options);
+                UpdateLoggingLevels(options);
 
-            List<string> inputFiles = new List<string>();
+                List<string> inputFiles = new List<string>();
 
-            if (options.InputFile.Contains("*"))//multiple files
-            {
-                if (options.InputFile.ToLower().Contains("mzml"))
+                if (options.LoadFromDirectory != null && options.LoadFromDirectory == true)//multiple files
                 {
-                    string filepath = Environment.CurrentDirectory;
-                    DirectoryInfo d = new DirectoryInfo(filepath);
-                    logger.Info("Analyzing files in the following directory: {0} ",filepath);
-                    foreach (var file in d.GetFiles("*.mzML"))
-                    {
+                    var directoryPath = Path.GetDirectoryName(options.InputFile);
+                    DirectoryInfo di = new DirectoryInfo(directoryPath);
+                    logger.Info("Attempting to load files with the extension .mzml in the following directory: {0}", directoryPath);
+                    foreach (var file in di.GetFiles("*.mzml", SearchOption.TopDirectoryOnly))
                         inputFiles.Add(file.FullName);
-                    }
+
                     if (inputFiles.Count == 0)
                     {
-                         logger.Info("Something's not right. Are you sure there are mzML files in the {0} directory?",filepath);
+                        logger.Error("Unable to locate any MZML files in {0} directory", directoryPath);
+                        throw new FileNotFoundException();
                     }
                 }
-                else
-                {
-                    logger.Error("The filetype you have specified is invalid. At present only support for mzml files is included.");//At present we can only include mzml files.
-                }
-            }
-            else //single file
-            {
-                inputFiles.Add(options.InputFile);
-            }
+                else //single file
+                    inputFiles.Add(options.InputFile);
 
-            foreach (string inputFilePath in inputFiles)
+                foreach (string inputFilePath in inputFiles)
                 {
 
                     logger.Info("Loading file: {0}", inputFilePath);
@@ -62,21 +50,11 @@ namespace Yamato.Console
                     sw.Start();
 
                     int division;
-                    if (options.Division < 100)
-                    {
-                        if (options.Division > 0)
-                        {
-                            division = options.Division;
-                        }
-                        else
-                        {
-                            throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
-                        }
-                    }
+                    if (options.Division < 100 && options.Division > 0)
+                        division = options.Division;
                     else
-                    {
                         throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
-                    }
+
 
                     double massTolerance;
                     massTolerance = options.MassTolerance;
@@ -86,17 +64,16 @@ namespace Yamato.Console
                     bool irt = false;
                     if (!String.IsNullOrEmpty(options.IRTFile))
                     {
-                        iRTpath = options.IRTFile.ToLower();
                         irt = true;
-                        if (iRTpath.Contains("traml"))
+                        if (options.IRTFile.EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
                         {
                             TraMLReader tr = new TraMLReader();
                             targetMzs = tr.CollectTransitions(iRTpath);
                         }
-                        else if (iRTpath.Contains("csv") || iRTpath.Contains("tsv") || iRTpath.Contains("txt"))
+                        else if (options.IRTFile.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.EndsWith("txt", StringComparison.InvariantCultureIgnoreCase))
                         {
                             SVReader sr = new SVReader();
-                            targetMzs = sr.CollectTransitions(iRTpath);
+                            targetMzs = sr.CollectTransitions(options.IRTFile);
                         }
                         if (targetMzs.Count() < 1)
                         {
@@ -111,19 +88,10 @@ namespace Yamato.Console
                     if (options.Threading == false)
                         mzmlParser.Threading = false;
 
-                    string fileReadingProblems = CheckFileIsReadableOrComplain(inputFilePath);
-                    if (fileReadingProblems == null)
-                    {
-                        logger.Info("Starting analysis on {0}.", inputFilePath);
-                    }
-                    else
-                    {
-                        logger.Error("Unable to open the file, {0}. ",inputFilePath);
-                    }
+                    CheckFileIsReadableOrComplain(inputFilePath);
 
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, targetMzs);
 
-                    
                     if (irt)
                     {
                         IRTSearcher.IRTPeptideMatch ip = new IRTSearcher.IRTPeptideMatch();
@@ -135,9 +103,6 @@ namespace Yamato.Console
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     logger.Info("Done!");
 
-
-
-
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
@@ -147,23 +112,20 @@ namespace Yamato.Console
             LogManager.Shutdown();
         }
 
-        private static string CheckFileIsReadableOrComplain(string inputFilePath)
+        private static void CheckFileIsReadableOrComplain(string inputFilePath)
         {
             try
             {
-                using (Stream stream = new FileStream(inputFilePath, FileMode.Open))
-                {
-                    string everythingIsFine = null;
-                    return everythingIsFine;
-                }
+                Stream stream = new FileStream(inputFilePath, FileMode.Open);
             }
             catch (IOException)
             {
-                return String.Format("Unable to open the file: {0}.", inputFilePath);
+                logger.Error(String.Format("Unable to open the file: {0}.", inputFilePath));
+                throw;
             }
         }
 
-    private static void UpdateLoggingLevels(Options options)
+        private static void UpdateLoggingLevels(Options options)
         {
             logger.Info("Verbose output selected: enabled logging for all levels");
             foreach (var rule in LogManager.Configuration.LoggingRules)
@@ -176,6 +138,9 @@ namespace Yamato.Console
 
     public class Options
     {
+        [Option("dir", Required = false, HelpText = "Load from directory: reads the directory path of the input file path and runs on all .mzml files in that directory")]
+        public bool? LoadFromDirectory { get; set; }
+
         [Option('i', "inputfile", Required = true, HelpText = "Input file path.")]
         public String InputFile { get; set; }
 
