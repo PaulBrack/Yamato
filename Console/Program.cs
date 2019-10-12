@@ -5,93 +5,123 @@ using NLog;
 using LibraryParser;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.IO;
 
 namespace Yamato.Console
 {
+
+
     class Program
     {
-        
         private static Logger logger = LogManager.GetCurrentClassLogger();
-     
 
         static void Main(string[] args)
         {
+
             Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
                 UpdateLoggingLevels(options);
-                
-                string inputFilePath = options.InputFile;
-                logger.Info("Loading file: {0}", inputFilePath);
 
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+                List<string> inputFiles = new List<string>();
 
-                int division;
-                if (options.Division <100)
+                if (options.LoadFromDirectory != null && options.LoadFromDirectory == true)//multiple files
                 {
-                    if (options.Division > 0)
+                    var directoryPath = Path.GetDirectoryName(options.InputFile);
+                    DirectoryInfo di = new DirectoryInfo(directoryPath);
+                    logger.Info("Attempting to load files with the extension .mzml in the following directory: {0}", directoryPath);
+                    foreach (var file in di.GetFiles("*.mzml", SearchOption.TopDirectoryOnly))
+                        inputFiles.Add(file.FullName);
+
+                    if (inputFiles.Count == 0)
                     {
+                        logger.Error("Unable to locate any MZML files in {0} directory", directoryPath);
+                        throw new FileNotFoundException();
+                    }
+                }
+                else //single file
+                    inputFiles.Add(options.InputFile);
+
+                foreach (string inputFilePath in inputFiles)
+                {
+                    logger.Info("Loading file: {0}", inputFilePath);
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+
+                    int division;
+                    if (options.Division < 100 && options.Division > 0)
                         division = options.Division;
-                    }
                     else
-                    {
-                        division = 1;
-                        logger.Info("Your entry for division is not within the range 1-100. A division of 1 was therefore used.");
-                    }
-                }
-                else
-                {
-                    division = 100;
-                    logger.Info("Your entry for division is not within the range 1-100. A division of 100 was therefore used.");
-                }
-                
-                double massTolerance;
-                massTolerance = options.MassTolerance;
-                List<double> targetMzs = new List<double>();
+                        throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
 
-                string iRTpath = "none";
-                bool irt = false;
-                if (!String.IsNullOrEmpty(options.IRTFile))
-                { iRTpath = options.IRTFile.ToLower();
-                    irt = true;
-                    if (iRTpath.Contains("traml"))
+
+                    double massTolerance;
+                    massTolerance = options.MassTolerance;
+                    List<double> targetMzs = new List<double>();
+
+                    bool irt = false;
+                    if (!String.IsNullOrEmpty(options.IRTFile))
                     {
-                        TraMLReader tr = new TraMLReader();
-                        targetMzs = tr.CollectTransitions(iRTpath);
+                        irt = true;
+                        if (options.IRTFile.EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            TraMLReader tr = new TraMLReader();
+                            targetMzs = tr.CollectTransitions(options.IRTFile);
+                        }
+                        else if (options.IRTFile.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.EndsWith("txt", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            SVReader sr = new SVReader();
+                            targetMzs = sr.CollectTransitions(options.IRTFile);
+                        }
+                        if (targetMzs.Count() < 1)
+                        {
+                            logger.Error("iRTfile was provided, but transitions could not be determined.");
+                        }
                     }
-                    else if (iRTpath.Contains("csv") || iRTpath.Contains("tsv") || iRTpath.Contains("txt"))
+
+
+                    MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
+                    if (options.ParseBinaryData == false)
+                        mzmlParser.ParseBinaryData = false;
+                    if (options.Threading == false)
+                        mzmlParser.Threading = false;
+
+                    CheckFileIsReadableOrComplain(inputFilePath);
+
+                    MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, targetMzs);
+
+                    if (irt)
                     {
-                        SVReader sr = new SVReader();
-                        targetMzs = sr.CollectTransitions(iRTpath);
+                        IRTSearcher.IRTPeptideMatch ip = new IRTSearcher.IRTPeptideMatch();
+                        run = ip.ParseLibrary(run, options.IRTFile, massTolerance);
                     }
-                    if (targetMzs.Count() < 1)
-                    {
-                        logger.Error("iRTfile was provided, but transitions could not be determined.");
-                    }
+
+                    run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
+                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
+                    logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                    logger.Info("Done!");
+
+                    run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
+                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
+                    logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                    logger.Info("Done!");
                 }
-                
-
-                MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
-                if (options.ParseBinaryData == false)
-                    mzmlParser.ParseBinaryData = false;
-                if (options.Threading == false)
-                    mzmlParser.Threading = false;
-
-                
-
-                MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, targetMzs);
-                if (irt)
-                {
-                    IRTSearcher.IRTPeptideMatch ip = new IRTSearcher.IRTPeptideMatch();
-                    run = ip.ParseLibrary(run, iRTpath, massTolerance);
-                }
-                
-                run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath,massTolerance);
-                logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-                logger.Info("Done!");
             });
             LogManager.Shutdown();
+        }
+
+        private static void CheckFileIsReadableOrComplain(string inputFilePath)
+        {
+            try
+            {
+                Stream stream = new FileStream(inputFilePath, FileMode.Open);
+                stream.Close();
+            }
+            catch (IOException)
+            {
+                logger.Error(String.Format("Unable to open the file: {0}.", inputFilePath));
+                throw;
+            }
         }
 
         private static void UpdateLoggingLevels(Options options)
@@ -107,13 +137,16 @@ namespace Yamato.Console
 
     public class Options
     {
+        [Option("dir", Required = false, HelpText = "Load from directory: reads the directory path of the input file path and runs on all .mzml files in that directory")]
+        public bool? LoadFromDirectory { get; set; }
+
         [Option('i', "inputfile", Required = true, HelpText = "Input file path.")]
         public String InputFile { get; set; }
 
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
         public int Division { get; set; } = 1;
 
-        [Option('m', "masstolerance", Required = false, HelpText = "m/z tolerance. The closest m/z value to the m/z of the basepeak that is still within this value from the basepeak m/z are part of the same chromatogram. Similarly with iRT peptide searching, this is the tolerance that will allow two values to be considered the same peak.")]
+        [Option('m', "masstolerance", Required = false, HelpText = "mass tolerance in daltons. This will be used to distinguish which peaks are part of the same chromatogram. Similarly with iRT peptide searching, this is the tolerance that will allow two values to be considered the same peak.")]
         public float MassTolerance { get; set; } = 0.05F;
 
         [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]

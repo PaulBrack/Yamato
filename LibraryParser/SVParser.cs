@@ -29,12 +29,12 @@ namespace LibraryParser
             logger.Info("Loading file: {0}", path);
             string sep = "";
             Library library = new Library();
-            IEnumerable <string[]> allLines;
+            List<string> allLines;
             if (File.ReadLines(path).Contains("//r//n"))
-                allLines = File.ReadLines(path).Select(a => a.Split("//r//n"));
+                allLines = File.ReadLines(path).ToList();
             else
-                allLines = File.ReadLines(path).Select(a => a.Split("//n"));
-            string heading = allLines.ElementAt(0)[0];
+                allLines = File.ReadLines(path).ToList();
+            string heading = allLines.ElementAt(0);
             string[] line = { };
             int sequenceIndex = 100;
             int pepMzIndex = 100;
@@ -45,45 +45,45 @@ namespace LibraryParser
             if (heading.Contains(";"))
             {
                 sep = "semi-colon";
-                line = heading.Split(";");
+                line = heading.Split(';');
             }
             else if (heading.Contains(","))
             {
                 sep = "comma";
-                line = heading.Split(",");
+                line = heading.Split(',');
             }
-            else if (heading.Contains("\t")|| heading.Contains(" "))
+            else if (heading.Contains("\t") || heading.Contains(" "))
             {
                 sep = "tab";
-                line = heading.Split("\t");
+                line = heading.Split('\t');
             }
             else
             {
                 logger.Info("Seperated value file provided for iRT peptides, however the separater could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
                 Environment.Exit(0);
             }
-            
 
-            
+
+
             for (int position = 0; position < line.Count(); position++)
-               {
-               if (line[position].ToLower().Contains("peptidesequence") || line[position].ToLower().Contains("nominal sequence"))
-                    {
-                        sequenceIndex = position;
-                    }
-               else if (line[position].ToLower().Contains("precursormz") || line[position].ToLower().Contains("q1 monoisotopic"))
-                    {
-                        pepMzIndex = position;
-                    }
-               else if (line[position].ToLower().Contains("productmz") || line[position].ToLower().Contains("q3"))
-                    {
-                        transMzIndex = position;
-                    }
-               else if (line[position].ToLower().Contains("relative intensity") || line[position].ToLower().Contains("libraryintensity"))
-                    {
-                        intensityIndex = position;
-                    }
-               }
+            {
+                if (line[position].ToLower().Contains("peptidesequence") || line[position].ToLower().Contains("nominal sequence"))
+                {
+                    sequenceIndex = position;
+                }
+                else if (line[position].ToLower().Contains("precursormz") || line[position].ToLower().Contains("q1 monoisotopic"))
+                {
+                    pepMzIndex = position;
+                }
+                else if (line[position].ToLower().Contains("productmz") || line[position].ToLower().Contains("q3"))
+                {
+                    transMzIndex = position;
+                }
+                else if (line[position].ToLower().Contains("relative intensity") || line[position].ToLower().Contains("libraryintensity"))
+                {
+                    intensityIndex = position;
+                }
+            }
             if (sequenceIndex == 100 || pepMzIndex == 100 || transMzIndex == 100 || intensityIndex == 100)
             {
                 logger.Info("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
@@ -92,36 +92,36 @@ namespace LibraryParser
             }
 
             for (int iii = 1; iii < allLines.Count(); iii++)
-                {
-                    string temp = allLines.ElementAt(iii)[0];
-                    
-                    if (sep== "semi-colon")
-                    {
-                        line = temp.Split(";");
-                    }
-                    else if (sep == "comma")
-                    {
-                        line = temp.Split(",");
-                    }
-                    else if (sep == "tab")
-                    {
-                        line = temp.Split("\t");
-                    }
+            {
+                string temp = allLines.ElementAt(iii);
 
-                    double precursorMz = double.Parse(line[pepMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
+                if (sep == "semi-colon")
+                {
+                    line = temp.Split(';');
+                }
+                else if (sep == "comma")
+                {
+                    line = temp.Split(',');
+                }
+                else if (sep == "tab")
+                {
+                    line = temp.Split('\t');
+                }
+
+                double precursorMz = double.Parse(line[pepMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
 
                 if (mzLastPeptide != precursorMz)
-                    {
-                        mzLastPeptide = precursorMz;
-                        AddPeptide(library, line, sequenceIndex, pepMzIndex);
-                        AddTransition(library, line, mzLastPeptide, transMzIndex, intensityIndex, precursorMz);
-                    }
-                    else
-                    {
-                        AddTransition(library, line, mzLastPeptide, transMzIndex, intensityIndex, precursorMz);
-                    }
+                {
+                    mzLastPeptide = precursorMz;
+                    AddPeptide(library, line, sequenceIndex, pepMzIndex);
+                    AddTransition(library, line, mzLastPeptide, transMzIndex, intensityIndex, precursorMz);
+                }
+                else
+                {
+                    AddTransition(library, line, mzLastPeptide, transMzIndex, intensityIndex, precursorMz);
+                }
             }
-            
+
             return library;
         }
 
@@ -145,7 +145,7 @@ namespace LibraryParser
             }
             else transition.ProductMz = mzLastPeptide;
             transition.ProductIonIntensity = double.Parse(line[intensityIndex].Replace(",", "."), CultureInfo.InvariantCulture);
-            string keystring = transition.Id +"-"+ transition.PrecursorMz;
+            string keystring = transition.Id + "-" + transition.PrecursorMz;
             if (library.TransitionList.Contains(keystring))
             {
                 logger.Info("Two of the same peptide - transition combinations were detected. The second entry was not added as a valid transition.Please check your file for duplication.");
@@ -162,12 +162,12 @@ namespace LibraryParser
         {
             List<double> Alltransitions = new List<double>();
             string sep = "";
-            IEnumerable<string[]> allLines;
+            List<string> allLines;
             if (File.ReadLines(path).Contains("//r//n"))
-                allLines = File.ReadLines(path).Select(a => a.Split("//r//n"));
+                allLines = File.ReadLines(path).ToList();
             else
-                allLines = File.ReadLines(path).Select(a => a.Split("//n"));
-            string heading = allLines.ElementAt(0)[0];
+                allLines = File.ReadLines(path).ToList();
+            string heading = allLines.ElementAt(0);
             string[] line = { };
             int transMzIndex = 100;
 
@@ -175,17 +175,17 @@ namespace LibraryParser
             if (heading.Contains(";"))
             {
                 sep = "semi-colon";
-                line = heading.Split(";");
+                line = heading.Split(';');
             }
             else if (heading.Contains(","))
             {
                 sep = "comma";
-                line = heading.Split(",");
+                line = heading.Split(',');
             }
             else if (heading.Contains("\t") || heading.Contains(" "))
             {
                 sep = "tab";
-                line = heading.Split("\t");
+                line = heading.Split('\t');
             }
             else
             {
@@ -209,22 +209,31 @@ namespace LibraryParser
 
             for (int iii = 1; iii < allLines.Count(); iii++)
             {
-                string temp = allLines.ElementAt(iii)[0];
+                string temp = allLines.ElementAt(iii);
 
                 if (sep == "semi-colon")
                 {
-                    line = temp.Split(";");
+                    line = temp.Split(';');
                 }
                 else if (sep == "comma")
                 {
-                    line = temp.Split(",");
+                    line = temp.Split(',');
                 }
                 else if (sep == "tab")
                 {
-                    line = temp.Split("\t");
+                    line = temp.Split('\t');
                 }
-
-                double transitionMz = double.Parse(line[transMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
+                double transitionMz = 0;
+                try
+                {
+                    transitionMz = double.Parse(line[transMzIndex].Replace(",", "."), CultureInfo.InvariantCulture);
+                }
+                catch (IOException ex)
+                {
+                    logger.Error(ex, "There seems to be a problem with separating values in the iRT peptides file. Please go through the file and try to determine the cause.");
+                    throw ex;
+                }
+                
                 Alltransitions.Add(transitionMz);
             }
             return Alltransitions;

@@ -2,7 +2,7 @@
   "profiles": {
     "Console": {
       "commandName": "Project",
-      "commandLineArgs": "-i C:\\wiffs\\SWATH_OC_107_1.mzML -r C:\\wiffs\\hroest_DIA_iRT.TraML"
+      "commandLineArgs": "-i c:\\wiffs\\SWATH_OC_244_1_2.mzml -r c:\\wiffs\\hroest_DIA_iRT.TraML -t false"
     }
   }
 }

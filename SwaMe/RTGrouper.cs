@@ -56,10 +56,10 @@ namespace SwaMe
                 //Check to see in which RTsegment this basepeak is:
                 for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
                 {
-                    if (basepeak.RetentionTime < RTsegs[0]) basepeak.RTsegment = 0;
+                    if (basepeak.RetentionTime > RTsegs.Last()) basepeak.RTsegment = RTsegs.Count()-1;
                     if (basepeak.RetentionTime > RTsegs[segmentboundary - 1] && basepeak.RetentionTime < RTsegs[segmentboundary])
                     {
-                        basepeak.RTsegment = segmentboundary;
+                        basepeak.RTsegment = segmentboundary-1;
                     }
                 }
             }
@@ -70,10 +70,10 @@ namespace SwaMe
                 //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
                 for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
                 {
-                    if (scan.ScanStartTime < RTsegs[0]) { scan.RTsegment = 0; break; }
+                    if (scan.ScanStartTime > RTsegs.Last()) scan.RTsegment = RTsegs.Count()-1;
                     else if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
                     {
-                        scan.RTsegment = segmentboundary;
+                        scan.RTsegment = segmentboundary-1;
                         break;
                     }
                     else if (scan.ScanStartTime > RTsegs[segmentboundary] && segmentboundary == RTsegs.Count()) { scan.RTsegment = segmentboundary + 1; break; }
@@ -86,11 +86,14 @@ namespace SwaMe
                 //Check to see in which RTsegment this basepeak is:
                 for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
                 {
-                    if (scan.ScanStartTime < RTsegs[0]) scan.RTsegment = 0;
-                    if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
+                    if (scan.ScanStartTime > RTsegs.Last()) scan.RTsegment = RTsegs.Count()-1;
+                    else if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
                     {
-                        scan.RTsegment = segmentboundary;
+                        scan.RTsegment = segmentboundary - 1;
+                        break;
                     }
+                    else if (scan.ScanStartTime > RTsegs[segmentboundary] && segmentboundary == RTsegs.Count()) { scan.RTsegment = segmentboundary + 1; break; }
+
                 }
             }
 
@@ -185,13 +188,13 @@ namespace SwaMe
                     }
                 }
 
-                cycleTime.Add((lastCycle - firstCycle) / (lastScanStartTime - firstScanStartTime));
+                cycleTime.Add((lastScanStartTime - firstScanStartTime)/(lastCycle - firstCycle));
                 if (PeakwidthsTemp.Count > 0)
                 {
                     Peakwidths.Add(PeakwidthsTemp.Average());
-                    PeakSymmetry.Add(Math.Truncate(Math.Ceiling(PeaksymTemp.Average())));
-                    PeakCapacity.Add(Math.Truncate(Math.Ceiling(PeakCapacityTemp.Average())));
-                    PeakPrecision.Add(Math.Truncate(Math.Ceiling(PeakprecisionTemp.Average())));
+                    PeakSymmetry.Add(PeaksymTemp.Average());
+                    PeakCapacity.Add(PeakCapacityTemp.Average());
+                    PeakPrecision.Add(PeakprecisionTemp.Average());
                 }
                 else {
                     Peakwidths.Add(0);
@@ -201,7 +204,7 @@ namespace SwaMe
                 }
                 if (MS1PeakprecisionTemp.Count > 0)
                 {
-                    MS1PeakPrecision.Add(Math.Truncate(Math.Ceiling(MS1PeakprecisionTemp.Average())));
+                    MS1PeakPrecision.Add(MS1PeakprecisionTemp.Average());
                     MS1Density.Add(Convert.ToInt32(Math.Round(MS1DensityTemp.Average(), 0)));
                 }
                 else {

@@ -6,7 +6,7 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division,  string inputFilePath, double massTolerance)
+        public void GenerateMetrics(Run run, int division,  string inputFilePath, double massTolerance, bool irt)
         {
            
             //Acquire RTDuration:
@@ -16,10 +16,8 @@ namespace SwaMe
             ChromatogramMetricGenerator chromatogramMetrics = new ChromatogramMetricGenerator();
             chromatogramMetrics.GenerateChromatogram(run);
 
-            if (run.IRTPeaks != null)
-            {
+            if (irt)
                 chromatogramMetrics.GenerateiRTChromatogram(run, massTolerance);
-            }
 
             //Calculating the largestswath
             double swathSizeDifference = CalcSwathSizeDiff(run);
@@ -37,7 +35,7 @@ namespace SwaMe
             //Create IQR so you can calculate IQR:            
             RTGrouper rtGrouper = new RTGrouper { };
             RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
-            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
+            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
             fileMaker.MakeUndividedMetricsFile();
             if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
             {
@@ -45,7 +43,7 @@ namespace SwaMe
             }
             
             fileMaker.MakeMetricsPerRTsegmentFile(rtMetrics);
-            fileMaker.MakeMetricsPerSwathFile(swathMetrics);
+            fileMaker.MakeMetricsPerSwathFile(swathMetrics, inputFilePath);
             fileMaker.CreateAndSaveMzqc();
         }
 

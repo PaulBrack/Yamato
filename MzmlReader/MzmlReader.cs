@@ -7,6 +7,7 @@ using System.Threading;
 using Ionic.Zlib;
 using System.IO;
 using System.Collections.Generic;
+using CenterSpace.NMath.Core;
 
 namespace MzmlParser
 {
@@ -39,43 +40,33 @@ namespace MzmlParser
             Run run = new Run();
             run.MissingScans = 0;
 
-            try
-            {
-                using (Stream stream = new FileStream(path, FileMode.Open))
+
+                using (XmlReader reader = XmlReader.Create(path))
                 {
-                    logger.Info("Starting analysis on file: {0}. Please be patient.", path);
-                }
-            }
-            catch (IOException ex)
-            {
-                logger.Error(ex, "This file {0} is in use. Please close the application using it and try again.", path);
-            }
-            using (XmlReader reader = XmlReader.Create(path))
-            {
-                while (reader.Read())
-                {
-                    if (reader.IsStartElement())
+                    while (reader.Read())
                     {
-                        switch (reader.LocalName)
+                        if (reader.IsStartElement())
                         {
-                            case "sourceFile":
-                                ReadSourceFileMetaData(reader, run);
-                                break;
-                            case "spectrum":
-                                ReadSpectrum(reader, run, massTolerance, storeScansInMemory, targetMzs);
-                                break;
-                            case "referenceableParamGroup":
-                                if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
-                                    SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
-                                break;
+                            switch (reader.LocalName)
+                            {
+                                case "sourceFile":
+                                    ReadSourceFileMetaData(reader, run);
+                                    break;
+                                case "spectrum":
+                                    ReadSpectrum(reader, run, massTolerance, storeScansInMemory, targetMzs);
+                                    break;
+                                case "referenceableParamGroup":
+                                    if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
+                                        SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
+                                    break;
+                            }
                         }
                     }
-
                 }
-            }
 
             cde.Signal();
             cde.Wait();
+            cde.Reset(1);
             FindMs2IsolationWindows(run);
             return run;
         }
@@ -84,7 +75,12 @@ namespace MzmlParser
         public void ReadSourceFileMetaData(XmlReader reader, Run run)
         {
             bool cvParamsRead = false;
-            run.SourceFileName = reader.GetAttribute("name");
+            run.SourceFileName = Path.GetFileNameWithoutExtension(reader.GetAttribute("name"));
+            if (run.SourceFileName.ToLower().EndsWith(".wiff"))//in a .wiff.scan file you need to remove both extensions
+            {
+                run.SourceFileName = Path.GetFileNameWithoutExtension(run.SourceFileName);
+            }
+            run.SourceFileType = Path.GetExtension(reader.GetAttribute("name"));
             run.SourceFilePath = reader.GetAttribute("location");
 
             while (reader.Read() && !cvParamsRead)
@@ -123,7 +119,7 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
-            if (run.SourceFileName.ToUpper().EndsWith("WIFF") || run.SourceFileName.ToUpper().EndsWith("SCAN"))
+            if (run.SourceFileType.EndsWith("wiff", StringComparison.InvariantCultureIgnoreCase) || run.SourceFileType.ToUpper().EndsWith("scan", StringComparison.InvariantCultureIgnoreCase))
             {
                 scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
             }
@@ -139,7 +135,7 @@ namespace MzmlParser
                         {
                             case "MS:1000511":
                                 scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                if (run.SourceFileName.ToUpper().EndsWith("RAW"))
+                                if (run.SourceFileType.ToUpper().EndsWith("RAW"))
                                 {
                                     if (scan.Scan.MsLevel == 1)
                                     {
@@ -302,10 +298,11 @@ namespace MzmlParser
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
-            if (storeScansInMemory && scan.Scan.MsLevel == 1 | scan.Scan.IsolationWindowTargetMz == 0|(targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowUpperBoundary))))
-                {
-                    scan.Scan.Spectrum = spectrum;
-                }
+            if (storeScansInMemory && scan.Scan.MsLevel == 1 | scan.Scan.IsolationWindowTargetMz == 0 | (targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowUpperBoundary))))
+            {
+                scan.Scan.Spectrum = spectrum;
+            }
+
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
             scan.Scan.BasePeakMz = mzs[Array.IndexOf(intensities, intensities.Max())];
@@ -399,7 +396,6 @@ namespace MzmlParser
             System.Array.Resize(ref array, 5);
             return array;
         }
-
 
         private void FindMs2IsolationWindows(Run run)
         {
