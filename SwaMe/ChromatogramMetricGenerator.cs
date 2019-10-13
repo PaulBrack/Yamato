@@ -19,10 +19,19 @@ namespace SwaMe
             {
                 double[] intensities = basepeak.Spectrum.Select(x => (double)x.Intensity).ToArray();
                 double[] starttimes = basepeak.Spectrum.Select(x => (double)x.RetentionTime).ToArray();
+                if (intensities.Count() > 1)
+                {
+                    RTandInt inter = new RTandInt();
+                    inter = Interpolate(starttimes, intensities);
+                    starttimes = inter.starttimes;
+                    intensities = inter.intensities;
+                }
+
                 CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
                 cPF.SetChromatogram(intensities,starttimes);
                 List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
                 double TotalFWHM = 0;
+                double TotalFWPCNT = 0;
                 double TotalPC = 0;
                 foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
                 {
@@ -33,21 +42,21 @@ namespace SwaMe
                         logger.Info( "FWHM is zero. ");
                         continue;
                     }
-
+                    TotalFWPCNT += crawPeak.Fwfpct;
                     TotalFWHM += fwhm;
                     TotalPC += 1 + (peakTime / fwhm);
                 }
                 if (crawPeaks.Count() > 0)
                 {
                     basepeak.FWHM = TotalFWHM / crawPeaks.Count();
+                    basepeak.Peaksym = TotalFWPCNT / crawPeaks.Count();
                     basepeak.PeakCapacity = TotalPC / crawPeaks.Count();
-                    basepeak.Peaksym = 1;
                 }
                 else
                 {
                     basepeak.FWHM = 0;
                     basepeak.PeakCapacity = 0;
-                    basepeak.Peaksym = 1;
+                    basepeak.Peaksym = 0;
                 }
 
 
