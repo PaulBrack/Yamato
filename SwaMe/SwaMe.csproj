@@ -11,16 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CrawdadSharp\CrawdadSharp\CrawdadSharp.csproj" />
     <ProjectReference Include="..\CWT\CWT.csproj" />
     <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
     <ProjectReference Include="..\MzmlReader\MzmlParser.csproj" />
     <ProjectReference Include="..\MzqcGenerator\MzqcGenerator.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="CrawdadSharp">
-      <HintPath>CrawdadSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

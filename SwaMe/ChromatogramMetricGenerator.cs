@@ -26,7 +26,6 @@ namespace SwaMe
                     starttimes = inter.starttimes;
                     intensities = inter.intensities;
                 }
-
                 CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
                 cPF.SetChromatogram(intensities,starttimes);
                 List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
