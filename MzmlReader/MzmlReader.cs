@@ -329,9 +329,23 @@ namespace MzmlParser
                     //Check to see if we have a basepeak we can add points to
                     else
                     {
+                        bool withinRTtolerance = false;
                         foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.RetentionTime - scan.Scan.ScanStartTime) <= rtTolerance && Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance))
                         {
                             bp.Spectrum.Add(spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= massTolerance).OrderByDescending(x => x.Intensity).First());
+                            withinRTtolerance = true;
+                        }
+                       if (withinRTtolerance == false)
+                        {
+                            spectrum.Select(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance);
+                            BasePeak basePeak = new BasePeak()
+                            {
+                                Mz = scan.Scan.BasePeakMz,
+                                RetentionTime = scan.Scan.ScanStartTime,
+                                Intensity = scan.Scan.BasePeakIntensity,
+                                Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.Scan.BasePeakMz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList()
+                            };
+                            run.BasePeaks.Add(basePeak);
                         }
                     }
                 }
