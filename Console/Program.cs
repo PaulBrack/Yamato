@@ -83,10 +83,6 @@ namespace Yamato.Console
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     logger.Info("Done!");
 
-                    run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
-                    logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-                    logger.Info("Done!");
                 }
             });
             LogManager.Shutdown();
