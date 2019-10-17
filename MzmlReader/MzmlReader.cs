@@ -8,9 +8,11 @@ using Ionic.Zlib;
 using System.IO;
 using System.Collections.Generic;
 using CenterSpace.NMath.Core;
+using LibraryParser;
 
 namespace MzmlParser
 {
+
     public class MzmlReader
     {
         public MzmlReader()
@@ -35,39 +37,41 @@ namespace MzmlParser
         private static readonly Object Lock = new Object();
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
 
-        public Run LoadMzml(string path, double massTolerance, bool storeScansInMemory, List<double> targetMzs)
+        public Run LoadMzml(string path, double massTolerance, bool storeScansInMemory, string irtPath)
         {
             Run run = new Run();
             run.MissingScans = 0;
 
-
-                using (XmlReader reader = XmlReader.Create(path))
+            TraMLReader traMLReader = new TraMLReader();
+            run.IrtLibrary = traMLReader.LoadLibrary(irtPath);
+            using (XmlReader reader = XmlReader.Create(path))
+            {
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    if (reader.IsStartElement())
                     {
-                        if (reader.IsStartElement())
+                        switch (reader.LocalName)
                         {
-                            switch (reader.LocalName)
-                            {
-                                case "sourceFile":
-                                    ReadSourceFileMetaData(reader, run);
-                                    break;
-                                case "spectrum":
-                                    ReadSpectrum(reader, run, massTolerance, storeScansInMemory, targetMzs);
-                                    break;
-                                case "referenceableParamGroup":
-                                    if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
-                                        SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
-                                    break;
-                            }
+                            case "sourceFile":
+                                ReadSourceFileMetaData(reader, run);
+                                break;
+                            case "spectrum":
+                                ReadSpectrum(reader, run, massTolerance, storeScansInMemory);
+                                break;
+                            case "referenceableParamGroup":
+                                if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
+                                    SurveyScanReferenceableParamGroupId = reader.GetAttribute("id");
+                                break;
                         }
                     }
                 }
+            }
 
             cde.Signal();
             cde.Wait();
-            cde.Reset(1);
+
             FindMs2IsolationWindows(run);
+
             return run;
         }
 
@@ -108,7 +112,7 @@ namespace MzmlParser
             }
         }
 
-        public void ReadSpectrum(XmlReader reader, Run run, double massTolerance, bool storeScansInMemory, List<double> targetMzs)
+        public void ReadSpectrum(XmlReader reader, Run run, double massTolerance, bool storeScansInMemory)
         {
             ScanAndTempProperties scan = new ScanAndTempProperties();
 
@@ -199,11 +203,11 @@ namespace MzmlParser
                         if (Threading)
                         {
                             cde.AddCount();
-                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, storeScansInMemory, targetMzs));
+                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, storeScansInMemory));
                         }
                         else
                         {
-                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, storeScansInMemory, targetMzs);
+                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading, massTolerance, storeScansInMemory);
                         }
                     }
                     else
@@ -280,7 +284,7 @@ namespace MzmlParser
             }
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, double massTolerance, bool storeScansInMemory, List<double> targetMzs)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, double massTolerance, bool storeScansInMemory)
         {
 
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
@@ -298,10 +302,9 @@ namespace MzmlParser
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
-            if (storeScansInMemory && scan.Scan.MsLevel == 1 | scan.Scan.IsolationWindowTargetMz == 0 | (targetMzs.Any(x => ((x - massTolerance) >= scan.Scan.IsolationWindowLowerBoundary) && ((x + massTolerance) <= scan.Scan.IsolationWindowUpperBoundary))))
-            {
-                scan.Scan.Spectrum = spectrum;
-            }
+            //if (storeScansInMemory)
+            //    scan.Scan.Spectrum = spectrum;
+
 
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
@@ -351,6 +354,24 @@ namespace MzmlParser
                 }
             }
 
+            foreach (Library.Peptide peptide in run.IrtLibrary.PeptideList.Values)
+            {
+                var irtIntensities = new List<float>();
+                bool foundAllTransitions = true;
+                foreach (Library.Transition t in run.IrtLibrary.TransitionList.Values.OfType<Library.Transition>().Where(x => x.PeptideId == peptide.Id))
+                {
+                    var spectrumPoints = spectrum.Where(x => Math.Abs(x.Mz - t.ProductMz) < 0.02 && x.Intensity > 200);
+                    if (spectrumPoints.Any())
+                        irtIntensities.Add(spectrumPoints.Max(x => x.Intensity));
+                    else
+                    {
+                        foundAllTransitions = false;
+                        break;
+                    }
+                }
+                if (foundAllTransitions)
+                    run.CandidateHits.Add(new CandidateHit() { PeptideSequence = peptide.Sequence, Intensities = irtIntensities, RetentionTime = scan.Scan.ScanStartTime });
+            }
             if (threading)
             {
                 cde.Signal();

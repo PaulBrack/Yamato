@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.IO;
+using MzmlParser;
 
 namespace Yamato.Console
 {
@@ -57,28 +58,11 @@ namespace Yamato.Console
 
                     double massTolerance;
                     massTolerance = options.MassTolerance;
-                    List<double> targetMzs = new List<double>();
+
 
                     bool irt = false;
                     if (!String.IsNullOrEmpty(options.IRTFile))
-                    {
                         irt = true;
-                        if (options.IRTFile.EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            TraMLReader tr = new TraMLReader();
-                            targetMzs = tr.CollectTransitions(options.IRTFile);
-                        }
-                        else if (options.IRTFile.EndsWith("csv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.EndsWith("txt", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            SVReader sr = new SVReader();
-                            targetMzs = sr.CollectTransitions(options.IRTFile);
-                        }
-                        if (targetMzs.Count() < 1)
-                        {
-                            logger.Error("iRTfile was provided, but transitions could not be determined.");
-                        }
-                    }
-
 
                     MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
                     if (options.ParseBinaryData == false)
@@ -88,13 +72,11 @@ namespace Yamato.Console
 
                     CheckFileIsReadableOrComplain(inputFilePath);
 
-                    MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, targetMzs);
+                    MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, options.IRTFile);
 
-                    if (irt)
-                    {
-                        IRTSearcher.IRTPeptideMatch ip = new IRTSearcher.IRTPeptideMatch();
-                        run = ip.ParseLibrary(run, options.IRTFile, massTolerance);
-                    }
+                    var chosenCandidates = new List<CandidateHit>();
+                    foreach (string peptideSequence in run.CandidateHits.Select(x => x.PeptideSequence).Distinct())
+                        chosenCandidates.Add(run.CandidateHits.Where(x => x.PeptideSequence == peptideSequence).OrderBy(x => x.Intensities.Min()).Last());
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
@@ -137,7 +119,7 @@ namespace Yamato.Console
 
     public class Options
     {
-        [Option("dir", Required = false, HelpText = "Load from directory: reads the directory path of the input file path and runs on all .mzml files in that directory")]
+        [Option("dir", Required = false, HelpText = "Load from directory: if true, reads the directory path of the input file path and runs on all .mzml files in that directory")]
         public bool? LoadFromDirectory { get; set; }
 
         [Option('i', "inputfile", Required = true, HelpText = "Input file path.")]
