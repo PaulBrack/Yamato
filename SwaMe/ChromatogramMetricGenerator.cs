@@ -17,45 +17,49 @@ namespace SwaMe
             //Crawdad
             foreach (BasePeak basepeak in run.BasePeaks)
             {
-                double[] intensities = basepeak.Spectrum.Select(x => (double)x.Intensity).ToArray();
-                double[] starttimes = basepeak.Spectrum.Select(x => (double)x.RetentionTime).ToArray();
-                if (intensities.Count() > 1)
+                //for each peak within the spectrum 
+                for (int yyy = 0; yyy < basepeak.bpkRTs.Count(); yyy++)
                 {
-                    RTandInt inter = new RTandInt();
-                    inter = Interpolate(starttimes, intensities);
-                    starttimes = inter.starttimes;
-                    intensities = inter.intensities;
-                }
-                CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
-                cPF.SetChromatogram(intensities,starttimes);
-                List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
-                double TotalFWHM = 0;
-                double TotalFWPCNT = 0;
-                double TotalPC = 0;
-                foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
-                {
-                    double peakTime = starttimes[crawPeak.TimeIndex];
-                    double fwhm = crawPeak.Fwhm;
-                    if (fwhm == 0 )
+                    double[] intensities = basepeak.Spectrum.Select(x => (double)x.Intensity).ToArray();
+                    double[] starttimes = basepeak.Spectrum.Select(x => (double)x.RetentionTime).ToArray();
+                    if (intensities.Count() > 1)
                     {
-                        logger.Info( "FWHM is zero. ");
-                        continue;
+                        RTandInt inter = new RTandInt();
+                        inter = Interpolate(starttimes, intensities);
+                        starttimes = inter.starttimes;
+                        intensities = inter.intensities;
                     }
-                    TotalFWPCNT += crawPeak.Fwfpct;
-                    TotalFWHM += fwhm;
-                    TotalPC += 1 + (peakTime / fwhm);
-                }
-                if (crawPeaks.Count() > 0)
-                {
-                    basepeak.FWHM = TotalFWHM / crawPeaks.Count();
-                    basepeak.Peaksym = TotalFWPCNT / crawPeaks.Count();
-                    basepeak.PeakCapacity = TotalPC / crawPeaks.Count();
-                }
-                else
-                {
-                    basepeak.FWHM = 0;
-                    basepeak.PeakCapacity = 0;
-                    basepeak.Peaksym = 0;
+                    CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
+                    cPF.SetChromatogram(intensities, starttimes);
+                    List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
+                    double TotalFWHM = 0;
+                    double TotalFWPCNT = 0;
+                    double TotalPC = 0;
+                    foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
+                    {
+                        double peakTime = starttimes[crawPeak.TimeIndex];
+                        double fwhm = crawPeak.Fwhm;
+                        if (fwhm == 0)
+                        {
+                            logger.Info("FWHM is zero. ");
+                            continue;
+                        }
+                        TotalFWPCNT += crawPeak.Fwfpct;
+                        TotalFWHM += fwhm;
+                        TotalPC += 1 + (peakTime / fwhm);
+                    }
+                    if (crawPeaks.Count() > 0)
+                    {
+                        basepeak.FWHMs.Add(TotalFWHM / crawPeaks.Count());
+                        basepeak.Peaksyms.Add(TotalFWPCNT / crawPeaks.Count());
+                        basepeak.PeakCapacities.Add(TotalPC / crawPeaks.Count());
+                    }
+                    else
+                    {
+                        basepeak.FWHMs.Add(0);
+                        basepeak.PeakCapacities.Add(0);
+                        basepeak.Peaksyms.Add(0);
+                    }
                 }
 
 
