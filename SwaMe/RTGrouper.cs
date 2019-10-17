@@ -47,19 +47,27 @@ namespace SwaMe
 
             for (int i = 0; i < division; i++)
             {
-                RTsegs[i] = run.BasePeaks[0].RetentionTime + RTsegment * i;
+                RTsegs[i] = run.BasePeaks[0].bpkRTs[0] + RTsegment * i;
             }
 
             //dividing basepeaks into segments
             foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
             {
                 //Check to see in which RTsegment this basepeak is:
-                for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
+                for (int iii = 0; iii < basepeak.bpkRTs.Count()-1; iii++)
                 {
-                    if (basepeak.RetentionTime > RTsegs.Last()) basepeak.RTsegment = RTsegs.Count()-1;
-                    if (basepeak.RetentionTime > RTsegs[segmentboundary - 1] && basepeak.RetentionTime < RTsegs[segmentboundary])
+                    for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
                     {
-                        basepeak.RTsegment = segmentboundary-1;
+                        if (basepeak.bpkRTs[iii] > RTsegs.Last())
+                        {
+                            basepeak.RTsegments.Add(RTsegs.Count() - 1);
+                            break;
+                        }
+                        else if (basepeak.bpkRTs[iii] > RTsegs[segmentboundary - 1] && basepeak.bpkRTs[iii] < RTsegs[segmentboundary])
+                        {
+                            basepeak.RTsegments.Add(segmentboundary - 1);
+                            break;
+                        }
                     }
                 }
             }
@@ -117,7 +125,7 @@ namespace SwaMe
 
             //Calculations for peakprecision MS2:
 
-            var meanIntensityOfAllBpks = run.BasePeaks.Select(x => x.Intensity).Average();
+            var meanIntensityOfAllBpks = run.BasePeaks.Select(x => x.Intensities.Sum()).Average();
             var meanMzOfAllBpks = run.BasePeaks.Select(x => x.Mz).Average();
 
             //Calculations for peakprecision MS1:
@@ -142,13 +150,15 @@ namespace SwaMe
                 List<double> PeakprecisionTemp = new List<double>();
                 foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
                 {
-
-                    if (basepeak.RTsegment == segment)
+                    for (int iii = 0; iii < basepeak.RTsegments.Count(); iii++)
                     {
-                        PeakwidthsTemp.Add(basepeak.FWHM);
-                        PeaksymTemp.Add(basepeak.Peaksym);
-                        PeakprecisionTemp.Add(basepeak.Intensity / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
-                        PeakCapacityTemp.Add(basepeak.PeakCapacity);
+                        if (basepeak.RTsegments[iii] == segment)
+                        {
+                            PeakwidthsTemp.Add(basepeak.FWHMs[iii]);
+                            PeaksymTemp.Add(basepeak.Peaksyms[iii]);
+                            PeakprecisionTemp.Add(basepeak.Intensities[iii] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
+                            PeakCapacityTemp.Add(basepeak.PeakCapacities[iii]);
+                        }
                     }
                 }
                 double firstScanStartTime = 1000;
