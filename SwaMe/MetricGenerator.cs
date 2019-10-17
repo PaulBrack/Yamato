@@ -10,7 +10,7 @@ namespace SwaMe
         {
            
             //Acquire RTDuration: last minus first
-            double RTDuration = run.BasePeaks.Last().bpkRTs.Last() - run.BasePeaks.First().bpkRTs.First();
+            double RTDuration = run.BasePeaks.Last().BpkRTs.Last() - run.BasePeaks.First().BpkRTs.First();
 
             //Interpolate, Smooth, create chromatogram and generate chromatogram metrics
             ChromatogramMetricGenerator chromatogramMetrics = new ChromatogramMetricGenerator();

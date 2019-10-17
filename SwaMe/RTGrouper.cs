@@ -47,29 +47,34 @@ namespace SwaMe
 
             for (int i = 0; i < division; i++)
             {
-                RTsegs[i] = run.BasePeaks[0].bpkRTs[0] + RTsegment * i;
+                RTsegs[i] = run.BasePeaks[0].BpkRTs[0] + RTsegment * i;
             }
 
             //dividing basepeaks into segments
             foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
             {
                 //Check to see in which RTsegment this basepeak is:
-                for (int iii = 0; iii < basepeak.bpkRTs.Count()-1; iii++)
+                foreach (double rt in basepeak.BpkRTs)
                 {
-                    for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
+                    if (rt > RTsegs.Last())
                     {
-                        if (basepeak.bpkRTs[iii] > RTsegs.Last())
-                        {
-                            basepeak.RTsegments.Add(RTsegs.Count() - 1);
-                            break;
-                        }
-                        else if (basepeak.bpkRTs[iii] > RTsegs[segmentboundary - 1] && basepeak.bpkRTs[iii] < RTsegs[segmentboundary])
+                        basepeak.RTsegments.Add(RTsegs.Count() - 1);
+                    }
+                    else if (RTsegs.Count()>1 && rt < RTsegs[1])
+                    {
+                        basepeak.RTsegments.Add(RTsegs.First());
+                    }
+                    else for (int segmentboundary= 2; segmentboundary < RTsegs.Count();segmentboundary++)
+                    {
+                        if (rt > RTsegs[segmentboundary - 1] && rt < RTsegs[segmentboundary])
                         {
                             basepeak.RTsegments.Add(segmentboundary - 1);
-                            break;
+                            segmentboundary = RTsegs.Count();//move to the next bpkRT
                         }
+                        
                     }
                 }
+               
             }
 
             //dividing ms2scans into segments of RT
