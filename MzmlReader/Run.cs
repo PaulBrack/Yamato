@@ -12,7 +12,7 @@ namespace MzmlParser
             Ms2Scans = new ConcurrentBag<Scan>();
             Chromatograms = new Chromatograms();
             BasePeaks = new List<BasePeak>();
-            CandidateHits = new List<CandidateHit>();
+            IRTHits = new List<CandidateHit>();
         }
         public String SourceFileType { get; set; }
         public String SourceFileName { get; set; }
@@ -28,8 +28,7 @@ namespace MzmlParser
         public String FilePropertiesAccession;
         public LibraryParser.Library IrtLibrary { get; set; }
         public List<IRTPeak> IRTPeaks { get; set; }
-
-        public List<CandidateHit> CandidateHits { get; set; }
+        public List<CandidateHit> IRTHits { get; set; }
     }
 
     public class Chromatograms

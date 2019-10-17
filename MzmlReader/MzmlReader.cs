@@ -41,7 +41,7 @@ namespace MzmlParser
         {
             Run run = new Run();
             bool irt = false;
-            if (ExtractBasePeaks == true)
+            if (ExtractBasePeaks)
             {
                 Stopwatch sw2 = new Stopwatch();
                 sw2.Start();
@@ -98,7 +98,7 @@ namespace MzmlParser
                     {
                         if (reader.LocalName == "spectrum")
                         {
-                            QuickScan qs = new QuickScan();
+                            QuickScan summaryScan = new QuickScan();
                             while (reader.Read())
                             {
                                 if (reader.IsStartElement())
@@ -108,10 +108,10 @@ namespace MzmlParser
                                         switch (reader.GetAttribute("accession"))
                                         {
                                             case "MS:1000511":
-                                                qs.mslevel = int.Parse(reader.GetAttribute("value"));
+                                                summaryScan.Mslevel = int.Parse(reader.GetAttribute("value"));
                                                 break;
                                             case "MS:1000016":
-                                                qs.scanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                                summaryScan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                                 break;
                                         }
 
@@ -119,7 +119,7 @@ namespace MzmlParser
 
                                     if (reader.LocalName == "binaryDataArray")
                                     {
-                                        if (qs.mslevel == 2)
+                                        if (summaryScan.Mslevel == 2)
                                         {
                                             string base64 = String.Empty;
                                             int bits = 0;
@@ -169,15 +169,15 @@ namespace MzmlParser
                                                     binaryDataArrayRead = true;
                                                     if (intensityArray)
                                                     {
-                                                        qs.base64IntensityArray = base64;
-                                                        qs.intensityBitLength = bits;
-                                                        qs.intensityZlibCompressed = IsZlibCompressed;
+                                                        summaryScan.Base64IntensityArray = base64;
+                                                        summaryScan.IntensityBitLength = bits;
+                                                        summaryScan.IntensityZlibCompressed = IsZlibCompressed;
                                                     }
                                                     else if (mzArray)
                                                     {
-                                                        qs.base64MzArray = base64;
-                                                        qs.mzBitLength = bits;
-                                                        qs.mzZlibCompressed = IsZlibCompressed;
+                                                        summaryScan.Base64MzArray = base64;
+                                                        summaryScan.MzBitLength = bits;
+                                                        summaryScan.MzZlibCompressed = IsZlibCompressed;
                                                     }
                                                 }
                                             }
@@ -186,9 +186,9 @@ namespace MzmlParser
                                     }
 
                                 }
-                                if (qs.mslevel == 2 && reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
+                                if (summaryScan.Mslevel == 2 && reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                                 {
-                                    AddInfoToBasePeaks(run, qs, massTolerance, rtTolerance);
+                                    AddInfoToBasePeaks(run, summaryScan, massTolerance, rtTolerance);
                                 }
 
                             }
@@ -203,15 +203,15 @@ namespace MzmlParser
 
         public void AddInfoToBasePeaks(Run run, QuickScan qs, double massTolerance, double rtTolerance)
         {
-            float[] intensities = ExtractFloatArray(qs.base64IntensityArray, qs.intensityZlibCompressed, qs.intensityBitLength);
-            float[] mzs = ExtractFloatArray(qs.base64MzArray, qs.mzZlibCompressed, qs.mzBitLength);
+            float[] intensities = ExtractFloatArray(qs.Base64IntensityArray, qs.IntensityZlibCompressed, qs.IntensityBitLength);
+            float[] mzs = ExtractFloatArray(qs.Base64MzArray, qs.MzZlibCompressed, qs.MzBitLength);
             float basepeakIntensity = intensities.Max();
             int maxIndex = intensities.ToList().IndexOf(basepeakIntensity);
             double mz = mzs[maxIndex];
 
             if (run.BasePeaks.Count(x => Math.Abs(x.Mz - mz) < massTolerance) < 1)//If a basepeak with this mz doesn't exist yet add it
             {
-                BasePeak bp = new BasePeak(mz, qs.scanStartTime, basepeakIntensity);
+                BasePeak bp = new BasePeak(mz, qs.ScanStartTime, basepeakIntensity);
                 run.BasePeaks.Add(bp);
             }
             else //we do have a match, now lets figure out if they fall within the rtTolerance
@@ -222,7 +222,7 @@ namespace MzmlParser
                     bool found = false;
                     for (int rt = 0; rt < thisbp.BpkRTs.Count(); rt++)
                     {
-                        if (Math.Abs(thisbp.BpkRTs[rt] - qs.scanStartTime) < rtTolerance)//this is part of a previous basepeak, or at least considered to be 
+                        if (Math.Abs(thisbp.BpkRTs[rt] - qs.ScanStartTime) < rtTolerance)//this is part of a previous basepeak, or at least considered to be 
                         {
                             found = true;
                             break;
@@ -231,7 +231,7 @@ namespace MzmlParser
                     }
                     if (found == false)//This is considered to be a new instance
                     {
-                        thisbp.BpkRTs.Add(qs.scanStartTime);
+                        thisbp.BpkRTs.Add(qs.ScanStartTime);
                         thisbp.Intensities.Add(basepeakIntensity);
                     }
                 }
@@ -499,7 +499,7 @@ namespace MzmlParser
                         }
                     }
                     if (foundAllTransitions)
-                        run.CandidateHits.Add(new CandidateHit() { PeptideSequence = peptide.Sequence, Intensities = irtIntensities, RetentionTime = scan.Scan.ScanStartTime });
+                        run.IRTHits.Add(new CandidateHit() { PeptideSequence = peptide.Sequence, Intensities = irtIntensities, RetentionTime = scan.Scan.ScanStartTime });
                 }
             }
             if (threading)

@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MzmlParser
+﻿namespace MzmlParser
 {
-    public class QuickScan
+    public class QuickScan 
     {
-        public int mslevel { get; set; }
-        public double scanStartTime { get; set; }
-        public string base64IntensityArray { get; set; }
-        public int intensityBitLength { get; set; }
-        public bool intensityZlibCompressed { get; set; }
-        public string base64MzArray { get; set; }
-        public int mzBitLength { get; set; }
-        public bool mzZlibCompressed { get; set; }
+        public int Mslevel { get; set; }
+        public double ScanStartTime { get; set; }
+        public string Base64IntensityArray { get; set; }
+        public int IntensityBitLength { get; set; }
+        public bool IntensityZlibCompressed { get; set; }
+        public string Base64MzArray { get; set; }
+        public int MzBitLength { get; set; }
+        public bool MzZlibCompressed { get; set; }
     }
+
+
 }
 

@@ -75,8 +75,9 @@ namespace Yamato.Console
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, options.IRTFile);
 
                     var chosenCandidates = new List<CandidateHit>();
-                    foreach (string peptideSequence in run.CandidateHits.Select(x => x.PeptideSequence).Distinct())
-                        chosenCandidates.Add(run.CandidateHits.Where(x => x.PeptideSequence == peptideSequence).OrderBy(x => x.Intensities.Min()).Last());
+                    foreach (string peptideSequence in run.IRTHits.Select(x => x.PeptideSequence).Distinct())
+                        chosenCandidates.Add(run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).OrderBy(x => x.Intensities.Min()).Last());
+                    run.IRTHits = chosenCandidates;
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
