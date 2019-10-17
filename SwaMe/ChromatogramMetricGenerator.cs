@@ -18,7 +18,7 @@ namespace SwaMe
             foreach (BasePeak basepeak in run.BasePeaks)
             {
                 //for each peak within the spectrum 
-                for (int yyy = 0; yyy < basepeak.bpkRTs.Count(); yyy++)
+                for (int yyy = 0; yyy < basepeak.BpkRTs.Count(); yyy++)
                 {
                     double[] intensities = basepeak.Spectrum.Select(x => (double)x.Intensity).ToArray();
                     double[] starttimes = basepeak.Spectrum.Select(x => (double)x.RetentionTime).ToArray();

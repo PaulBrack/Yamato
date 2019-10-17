@@ -13,7 +13,7 @@ namespace MzmlParser
         public List<double> FWHMs;
         public List<double> Peaksyms;
         public List<double> PeakCapacities;
-        public List<double> bpkRTs;
+        public List<double> BpkRTs;
 
         public BasePeak (Scan scan, double massTolerance, List<SpectrumPoint>spectrum)
         {
@@ -21,19 +21,21 @@ namespace MzmlParser
             Intensities = new List<double>();
             Intensities.Add(scan.BasePeakIntensity);
             Spectrum = spectrum.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= massTolerance).OrderByDescending(x => x.Intensity).Take(1).ToList();
-            bpkRTs = new List<double>();
-            bpkRTs.Add(scan.ScanStartTime);
+            BpkRTs = new List<double>();
+            BpkRTs.Add(scan.ScanStartTime);
             RTsegments = new List<double>();
             FWHMs = new List<double>();
             Peaksyms = new List<double>();
             PeakCapacities = new List<double>();
         }
-        public BasePeak(double mz)
+        public BasePeak(double mz, double scanStartTime, double basepeakintensity)
         {
             Mz = mz;
             Intensities = new List<double>();
+            Intensities.Add(basepeakintensity);
             Spectrum = new List<SpectrumPoint>();
-            bpkRTs = new List<double>();
+            BpkRTs = new List<double>();
+            BpkRTs.Add(scanStartTime);
             RTsegments = new List<double>();
             FWHMs = new List<double>();
             Peaksyms = new List<double>();
