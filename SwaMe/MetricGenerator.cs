@@ -17,7 +17,7 @@ namespace SwaMe
             chromatogramMetrics.GenerateChromatogram(run);
 
             if (irt)
-                chromatogramMetrics.GenerateiRTChromatogram(run, massTolerance);
+                chromatogramMetrics.GenerateiRTChromatogram(run);
 
             //Calculating the largestswath
             double swathSizeDifference = CalcSwathSizeDiff(run);

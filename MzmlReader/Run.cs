@@ -29,6 +29,7 @@ namespace MzmlParser
         public LibraryParser.Library IrtLibrary { get; set; }
         public List<IRTPeak> IRTPeaks { get; set; }
         public List<CandidateHit> IRTHits { get; set; }
+        public AnalysisSettings AnalysisSettings { get; set; }
     }
 
     public class Chromatograms
@@ -37,5 +38,10 @@ namespace MzmlParser
         public List<(double, double)> Ms2Tic { get; set; }
         public List<(double, double)> Ms1Bpc { get; set; }
         public List<(double, double)> Ms2Bpc { get; set; }
+    }
+    public class AnalysisSettings
+    {
+        public double MassTolerance { get; set; }
+        public double RtTolerance { get; set; }
     }
 }
