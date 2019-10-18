@@ -36,12 +36,10 @@ namespace MzmlParser
         private static readonly Object Lock = new Object();
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
 
-        public Run LoadMzml(string path, double massTolerance, bool storeScansInMemory, string irtPath)
+        public Run LoadMzml(string path, bool storeScansInMemory, AnalysisSettings analysisSettings)
         {
-            Run run = new Run();
-            run.AnalysisSettings.MassTolerance = massTolerance;
-            run.AnalysisSettings.RtTolerance = 2.5; //2.5 mins on either side
-            bool irt = false;
+            Run run = new Run() { AnalysisSettings = analysisSettings };
+            bool irt = run.AnalysisSettings.IrtLibrary != null;
             if (ExtractBasePeaks)
             {
                 Stopwatch sw2 = new Stopwatch();
@@ -51,13 +49,7 @@ namespace MzmlParser
                 sw2.Stop();
             }
             run.MissingScans = 0;
-            if (!String.IsNullOrEmpty(irtPath))
-            {
-                irt = true;
-                TraMLReader traMLReader = new TraMLReader();
-                run.IrtLibrary = traMLReader.LoadLibrary(irtPath);
-                
-            }
+
             using (XmlReader reader = XmlReader.Create(path))
             {
                 while (reader.Read())
@@ -70,7 +62,7 @@ namespace MzmlParser
                                 ReadSourceFileMetaData(reader, run);
                                 break;
                             case "spectrum":
-                                ReadSpectrum(reader, run, storeScansInMemory, irt);
+                                ReadSpectrum(reader, run, irt);
                                 break;
                             case "referenceableParamGroup":
                                 if (String.IsNullOrEmpty(SurveyScanReferenceableParamGroupId))
@@ -281,7 +273,7 @@ namespace MzmlParser
             }
         }
 
-        public void ReadSpectrum(XmlReader reader, Run run, bool storeScansInMemory, bool irt)
+        public void ReadSpectrum(XmlReader reader, Run run, bool irt)
         {
             ScanAndTempProperties scan = new ScanAndTempProperties();
 
@@ -372,11 +364,11 @@ namespace MzmlParser
                         if (Threading)
                         {
                             cde.AddCount();
-                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, storeScansInMemory, irt));
+                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, irt));
                         }
                         else
                         {
-                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading,  storeScansInMemory, irt);
+                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading, irt);
                         }
                     }
                     else
@@ -453,7 +445,7 @@ namespace MzmlParser
             }
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, bool storeScansInMemory, bool irt)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, bool irt)
         {
 
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
@@ -490,11 +482,11 @@ namespace MzmlParser
             }
             if (irt)
             {
-                foreach (Library.Peptide peptide in run.IrtLibrary.PeptideList.Values)
+                foreach (Library.Peptide peptide in run.AnalysisSettings.IrtLibrary.PeptideList.Values)
                 {
                     var irtIntensities = new List<float>();
                     bool foundAllTransitions = true;
-                    foreach (Library.Transition t in run.IrtLibrary.TransitionList.Values.OfType<Library.Transition>().Where(x => x.PeptideId == peptide.Id))
+                    foreach (Library.Transition t in run.AnalysisSettings.IrtLibrary.TransitionList.Values.OfType<Library.Transition>().Where(x => x.PeptideId == peptide.Id))
                     {
                         var spectrumPoints = spectrum.Where(x => Math.Abs(x.Mz - t.ProductMz) < 0.02 && x.Intensity > 200);
                         if (spectrumPoints.Any())

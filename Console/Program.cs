@@ -72,15 +72,24 @@ namespace Yamato.Console
 
                     CheckFileIsReadableOrComplain(inputFilePath);
 
-                    MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, massTolerance, irt, options.IRTFile);
+
+                    AnalysisSettings analysisSettings = new AnalysisSettings() { MassTolerance = massTolerance, RtTolerance = 2.5 };
+                    if (!String.IsNullOrEmpty(options.IRTFile))
+                    {
+                        irt = true;
+                        TraMLReader traMLReader = new TraMLReader();
+                        analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
+                    }
+                    MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, irt, analysisSettings);
 
                     var chosenCandidates = new List<CandidateHit>();
                     foreach (string peptideSequence in run.IRTHits.Select(x => x.PeptideSequence).Distinct())
                         chosenCandidates.Add(run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).OrderBy(x => x.Intensities.Min()).Last());
                     run.IRTHits = chosenCandidates;
 
+                    
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, massTolerance, irt);
+                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt);
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     logger.Info("Done!");
 

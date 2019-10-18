@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using LibraryParser;
 
 namespace MzmlParser
 {
@@ -26,7 +27,6 @@ namespace MzmlParser
         public List<(double, double)> IsolationWindows { get; set; }
         public int MissingScans { get; set; }
         public String FilePropertiesAccession;
-        public LibraryParser.Library IrtLibrary { get; set; }
         public List<IRTPeak> IRTPeaks { get; set; }
         public List<CandidateHit> IRTHits { get; set; }
         public AnalysisSettings AnalysisSettings { get; set; }
@@ -43,5 +43,6 @@ namespace MzmlParser
     {
         public double MassTolerance { get; set; }
         public double RtTolerance { get; set; }
+        public Library IrtLibrary { get; set;}
     }
 }

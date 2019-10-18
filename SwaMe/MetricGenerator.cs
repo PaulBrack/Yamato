@@ -6,7 +6,7 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division,  string inputFilePath, double massTolerance, bool irt)
+        public void GenerateMetrics(Run run, int division,  string inputFilePath, bool irt)
         {
            
             //Acquire RTDuration: last minus first
