@@ -62,7 +62,7 @@ namespace SwaMe
                     }
                     else if (RTsegs.Count()>1 && rt < RTsegs[1])
                     {
-                        basepeak.RTsegments.Add(RTsegs.First());
+                        basepeak.RTsegments.Add(0);
                     }
                     else for (int segmentboundary= 2; segmentboundary < RTsegs.Count();segmentboundary++)
                     {

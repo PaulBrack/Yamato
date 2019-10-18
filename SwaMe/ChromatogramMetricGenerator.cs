@@ -20,8 +20,9 @@ namespace SwaMe
                 //for each peak within the spectrum 
                 for (int yyy = 0; yyy < basepeak.BpkRTs.Count(); yyy++)
                 {
-                    double[] intensities = basepeak.Spectrum.Select(x => (double)x.Intensity).ToArray();
-                    double[] starttimes = basepeak.Spectrum.Select(x => (double)x.RetentionTime).ToArray();
+                    //change these two arrays to be only the spectra surrounding that bpkrt:
+                    double[] intensities = basepeak.Spectrum.Where(x=>Math.Abs(x.RetentionTime-basepeak.BpkRTs[yyy])<run.AnalysisSettings.RtTolerance).Select(x => (double)x.Intensity).ToArray();
+                    double[] starttimes = basepeak.Spectrum.Where(x => Math.Abs(x.RetentionTime - basepeak.BpkRTs[yyy]) < run.AnalysisSettings.RtTolerance).Select(x => (double)x.RetentionTime).ToArray();
                     if (intensities.Count() > 1)
                     {
                         RTandInt inter = new RTandInt();
@@ -66,7 +67,7 @@ namespace SwaMe
             }
         }
 
-        public void GenerateiRTChromatogram(Run run, double massTolerance)
+        public void GenerateiRTChromatogram(Run run)
         {
             int Count = 0;
             foreach (IRTPeak irtpeak in run.IRTPeaks)

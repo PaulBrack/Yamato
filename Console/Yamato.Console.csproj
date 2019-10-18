@@ -11,7 +11,6 @@
     <PackageReference Include="CenterSpace.NMath.Standard.Windows.X64" Version="7.0.0.47" />
     <PackageReference Include="CommandLineParser" Version="2.6.0" />
     <PackageReference Include="MathNet.Numerics" Version="4.8.1" />
-    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
     <PackageReference Include="NLog" Version="4.6.7" />
   </ItemGroup>
 
