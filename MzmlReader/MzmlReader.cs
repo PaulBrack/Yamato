@@ -485,19 +485,24 @@ namespace MzmlParser
                 foreach (Library.Peptide peptide in run.AnalysisSettings.IrtLibrary.PeptideList.Values)
                 {
                     var irtIntensities = new List<float>();
-                    bool foundAllTransitions = true;
-                    foreach (Library.Transition t in run.AnalysisSettings.IrtLibrary.TransitionList.Values.OfType<Library.Transition>().Where(x => x.PeptideId == peptide.Id))
+                    var minPeptides = 3;
+
+
+                    var peptideTransitions = run.AnalysisSettings.IrtLibrary.TransitionList.Values.OfType<Library.Transition>().Where(x => x.PeptideId == peptide.Id);
+                    int currentIteration = 1;
+                    foreach (Library.Transition t in peptideTransitions)
                     {
-                        var spectrumPoints = spectrum.Where(x => Math.Abs(x.Mz - t.ProductMz) < 0.02 && x.Intensity > 200);
-                        if (spectrumPoints.Any())
-                            irtIntensities.Add(spectrumPoints.Max(x => x.Intensity));
-                        else
+                        if (peptideTransitions.Count() - currentIteration < minPeptides)
                         {
-                            foundAllTransitions = false;
-                            break;
+                            var spectrumPoints = spectrum.Where(x => x.Intensity > 200 && Math.Abs(x.Mz - t.ProductMz) < 0.05);
+                            if (spectrumPoints.Any())
+                                irtIntensities.Add(spectrumPoints.Max(x => x.Intensity));
+                            currentIteration++;
                         }
+                        else
+                            break;
                     }
-                    if (foundAllTransitions)
+                    if (irtIntensities.Count >= minPeptides)
                         run.IRTHits.Add(new CandidateHit() { PeptideSequence = peptide.Sequence, Intensities = irtIntensities, RetentionTime = scan.Scan.ScanStartTime });
                 }
             }
