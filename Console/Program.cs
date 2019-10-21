@@ -72,8 +72,12 @@ namespace Yamato.Console
 
                     CheckFileIsReadableOrComplain(inputFilePath);
 
+                    AnalysisSettings analysisSettings = new AnalysisSettings() {
+                        MassTolerance = options.irtMassTolerance,
+                        RtTolerance = 2.5,
+                        IrtMinIntensity = options.irtMinIntensity
+                    };
 
-                    AnalysisSettings analysisSettings = new AnalysisSettings() { MassTolerance = massTolerance, RtTolerance = 2.5 };
                     if (!String.IsNullOrEmpty(options.IRTFile))
                     {
                         irt = true;
@@ -147,8 +151,14 @@ namespace Yamato.Console
         [Option('t', "threading", Required = false, HelpText = "whether threading is used")]
         public bool? Threading { get; set; } = true;
 
-        [Option('r', "iRT filepath", Required = false, HelpText = "iRT file path")]
+        [Option('r', "irtFile", Required = false, HelpText = "iRT file path")]
         public String IRTFile { get; set; } = null;
+
+        [Option("irttolerance", Required = false, HelpText = "iRT mass tolerance")]
+        public double irtMassTolerance { get; set; } = 0.05;
+
+        [Option("irtminintensity", Required = false, HelpText = "iRT min intensity")]
+        public double irtMinIntensity { get; set; } = 200;
     }
 }
 
