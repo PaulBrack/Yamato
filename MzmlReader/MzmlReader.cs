@@ -492,7 +492,7 @@ namespace MzmlParser
                     int currentIteration = 1;
                     foreach (Library.Transition t in peptideTransitions)
                     {
-                        var spectrumPoints = spectrum.Where(x => x.Intensity > 200 && Math.Abs(x.Mz - t.ProductMz) < 0.05);
+                        var spectrumPoints = spectrum.Where(x => x.Intensity > run.AnalysisSettings.IrtMinIntensity && Math.Abs(x.Mz - t.ProductMz) < run.AnalysisSettings.IrtMassTolerance);
                         if (spectrumPoints.Any())
                             irtIntensities.Add(spectrumPoints.Max(x => x.Intensity));
                         currentIteration++;

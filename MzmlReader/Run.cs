@@ -43,6 +43,20 @@ namespace MzmlParser
     {
         public double MassTolerance { get; set; }
         public double RtTolerance { get; set; }
-        public Library IrtLibrary { get; set;}
+        public Library IrtLibrary { get; set; }
+        public double IrtMassTolerance { get; set; }
+        public double IrtMinIntensity { get; set; }
+
+        public AnalysisSettings()
+        {
+            IrtMassTolerance = 0.05;
+            IrtMinIntensity = 200;
+        }
+
+        public void SetGlobalMassTolerance (int tolerance)
+        {
+            MassTolerance = tolerance;
+            IrtMassTolerance = tolerance;
+        }
     }
 }
