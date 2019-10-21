@@ -205,7 +205,7 @@ namespace MzmlParser
                 int maxIndex = intensities.ToList().IndexOf(basepeakIntensity);
                 double mz = mzs[maxIndex];
 
-                if (run.BasePeaks.Count(x => Math.Abs(x.Mz - mz) <run.AnalysisSettings.MassTolerance) < 1)//If a basepeak with this mz doesn't exist yet add it
+                if (run.BasePeaks.Count(x => Math.Abs(x.Mz - mz) < run.AnalysisSettings.MassTolerance) < 1)//If a basepeak with this mz doesn't exist yet add it
                 {
                     BasePeak bp = new BasePeak(mz, qs.ScanStartTime, basepeakIntensity);
                     run.BasePeaks.Add(bp);
@@ -234,7 +234,7 @@ namespace MzmlParser
                 }
             }
             else { basepeakIntensity = 0; }
-            
+
         }
 
         public void ReadSourceFileMetaData(XmlReader reader, Run run)
@@ -492,15 +492,11 @@ namespace MzmlParser
                     int currentIteration = 1;
                     foreach (Library.Transition t in peptideTransitions)
                     {
-                        if (peptideTransitions.Count() - currentIteration < minPeptides)
-                        {
-                            var spectrumPoints = spectrum.Where(x => x.Intensity > 200 && Math.Abs(x.Mz - t.ProductMz) < 0.05);
-                            if (spectrumPoints.Any())
-                                irtIntensities.Add(spectrumPoints.Max(x => x.Intensity));
-                            currentIteration++;
-                        }
-                        else
-                            break;
+                        var spectrumPoints = spectrum.Where(x => x.Intensity > 200 && Math.Abs(x.Mz - t.ProductMz) < 0.05);
+                        if (spectrumPoints.Any())
+                            irtIntensities.Add(spectrumPoints.Max(x => x.Intensity));
+                        currentIteration++;
+
                     }
                     if (irtIntensities.Count >= minPeptides)
                         run.IRTHits.Add(new CandidateHit() { PeptideSequence = peptide.Sequence, Intensities = irtIntensities, RetentionTime = scan.Scan.ScanStartTime });
