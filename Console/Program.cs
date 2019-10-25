@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.IO;
 using MzmlParser;
+using System.Collections.Concurrent;
 
 namespace Yamato.Console
 {
@@ -55,10 +56,8 @@ namespace Yamato.Console
                     else
                         throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
 
-
                     double massTolerance;
                     massTolerance = options.MassTolerance;
-
 
                     bool irt = false;
                     if (!String.IsNullOrEmpty(options.IRTFile))
@@ -73,9 +72,11 @@ namespace Yamato.Console
                     CheckFileIsReadableOrComplain(inputFilePath);
 
                     AnalysisSettings analysisSettings = new AnalysisSettings() {
-                        MassTolerance = options.irtMassTolerance,
-                        RtTolerance = 2.5,
-                        IrtMinIntensity = options.irtMinIntensity
+                        MassTolerance = options.IrtMassTolerance,
+                        RtTolerance = options.RtTolerance,
+                        IrtMinIntensity = options.IrtMinIntensity,
+                        IrtMinPeptides = options.IrtMinPeptides,
+                        IrtMassTolerance = options.IrtMassTolerance
                     };
 
                     if (!String.IsNullOrEmpty(options.IRTFile))
@@ -86,7 +87,7 @@ namespace Yamato.Console
                     }
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, irt, analysisSettings);
 
-                    var chosenCandidates = new List<CandidateHit>();
+                    var chosenCandidates = new ConcurrentBag<CandidateHit>();
                     foreach (string peptideSequence in run.IRTHits.Select(x => x.PeptideSequence).Distinct())
                     {
                         var a = run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).ToList(); // pick the potential hits for this peptide
@@ -155,10 +156,16 @@ namespace Yamato.Console
         public String IRTFile { get; set; } = null;
 
         [Option("irttolerance", Required = false, HelpText = "iRT mass tolerance")]
-        public double irtMassTolerance { get; set; } = 0.05;
+        public double IrtMassTolerance { get; set; } = 0.05;
 
         [Option("irtminintensity", Required = false, HelpText = "iRT min intensity")]
-        public double irtMinIntensity { get; set; } = 200;
+        public double IrtMinIntensity { get; set; } = 500;
+
+        [Option("irtminpeptides", Required = false, HelpText = "iRT min peptides")]
+        public int IrtMinPeptides { get; set; } = 3;
+
+        [Option("rttolerance", Required = false, HelpText = "RT tolerance")]
+        public double RtTolerance { get; set; } = 2.5;
     }
 }
 

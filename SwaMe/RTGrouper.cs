@@ -47,7 +47,7 @@ namespace SwaMe
 
             for (int i = 0; i < division; i++)
             {
-                RTsegs[i] = run.BasePeaks[0].BpkRTs[0] + RTsegment * i;
+                RTsegs[i] = run.BasePeaks.First().BpkRTs[0] + RTsegment * i;
             }
 
             //dividing basepeaks into segments

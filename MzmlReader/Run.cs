@@ -12,8 +12,8 @@ namespace MzmlParser
             Ms1Scans = new List<Scan>();
             Ms2Scans = new ConcurrentBag<Scan>();
             Chromatograms = new Chromatograms();
-            BasePeaks = new List<BasePeak>();
-            IRTHits = new List<CandidateHit>();
+            BasePeaks = new ConcurrentBag<BasePeak>();
+            IRTHits = new ConcurrentBag<CandidateHit>();
         }
         public String SourceFileType { get; set; }
         public String SourceFileName { get; set; }
@@ -22,13 +22,13 @@ namespace MzmlParser
         public String CompletionTime { get; set; }
         public List<Scan> Ms1Scans { get; set; }
         public ConcurrentBag<Scan> Ms2Scans { get; set; }
-        public List<BasePeak> BasePeaks { get; set; }
+        public ConcurrentBag<BasePeak> BasePeaks { get; set; }
         public Chromatograms Chromatograms { get; set; }
         public List<(double, double)> IsolationWindows { get; set; }
         public int MissingScans { get; set; }
         public String FilePropertiesAccession;
         public List<IRTPeak> IRTPeaks { get; set; }
-        public List<CandidateHit> IRTHits { get; set; }
+        public ConcurrentBag<CandidateHit> IRTHits { get; set; }
         public AnalysisSettings AnalysisSettings { get; set; }
     }
 
@@ -46,6 +46,7 @@ namespace MzmlParser
         public Library IrtLibrary { get; set; }
         public double IrtMassTolerance { get; set; }
         public double IrtMinIntensity { get; set; }
+        public int IrtMinPeptides { get; set; }
         public void SetGlobalMassTolerance (int tolerance)
         {
             MassTolerance = tolerance;

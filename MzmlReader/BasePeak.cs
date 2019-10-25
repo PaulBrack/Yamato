@@ -41,6 +41,5 @@ namespace MzmlParser
             Peaksyms = new List<double>();
             PeakCapacities = new List<double>();
         }
-
     }
 }
