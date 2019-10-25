@@ -21,7 +21,7 @@ namespace SwaMe
                 for (int yyy = 0; yyy < basepeak.BpkRTs.Count(); yyy++)
                 {
                     //change these two arrays to be only the spectra surrounding that bpkrt:
-                    double[] intensities = basepeak.Spectrum.Where(x=>Math.Abs(x.RetentionTime-basepeak.BpkRTs[yyy])<run.AnalysisSettings.RtTolerance).Select(x => (double)x.Intensity).ToArray();
+                    double[] intensities = basepeak.Spectrum.Where(x => Math.Abs(x.RetentionTime - basepeak.BpkRTs[yyy]) < run.AnalysisSettings.RtTolerance).Select(x => (double)x.Intensity).ToArray();
                     double[] starttimes = basepeak.Spectrum.Where(x => Math.Abs(x.RetentionTime - basepeak.BpkRTs[yyy]) < run.AnalysisSettings.RtTolerance).Select(x => (double)x.RetentionTime).ToArray();
                     if (intensities.Count() > 1)
                     {
@@ -31,28 +31,32 @@ namespace SwaMe
                         intensities = inter.intensities;
                     }
                     CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
-                    cPF.SetChromatogram(intensities, starttimes);
+                    cPF.SetChromatogram(starttimes, intensities);
                     List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
                     double TotalFWHM = 0;
-                    double TotalFWPCNT = 0;
+                    double TotalPeakSym = 0;
                     double TotalPC = 0;
                     foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
                     {
                         double peakTime = starttimes[crawPeak.TimeIndex];
                         double fwhm = crawPeak.Fwhm;
+                        double fvalue = crawPeak.Fvalue;
                         if (fwhm == 0)
                         {
-                            logger.Info("FWHM is zero. ");
                             continue;
                         }
-                        TotalFWPCNT += crawPeak.Fwfpct;
+                        else if (fvalue != 0)
+                        {
+                            TotalPeakSym += crawPeak.Fwfpct / (2 * crawPeak.Fvalue);
+                        }
                         TotalFWHM += fwhm;
-                        TotalPC += 1 + (peakTime / fwhm);
+                        TotalPC += 1 + (peakTime / fwhm);//PeakCapacity is calculated as per Dolan et al.,2009, PubMed 10536823
+
                     }
                     if (crawPeaks.Count() > 0)
                     {
                         basepeak.FWHMs.Add(TotalFWHM / crawPeaks.Count());
-                        basepeak.Peaksyms.Add(TotalFWPCNT / crawPeaks.Count());
+                        basepeak.Peaksyms.Add(TotalPeakSym / crawPeaks.Count());
                         basepeak.PeakCapacities.Add(TotalPC / crawPeaks.Count());
                     }
                     else
@@ -62,8 +66,6 @@ namespace SwaMe
                         basepeak.Peaksyms.Add(0);
                     }
                 }
-
-
             }
         }
 
@@ -79,7 +81,7 @@ namespace SwaMe
                 irtpeak.PossPeaks = irtpeak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
                 foreach (PossiblePeak pPeak in irtpeak.PossPeaks)
                 {
-                    
+
                     Dotproduct dp = new Dotproduct();
                     SmoothedPeak sp = new SmoothedPeak();
                     List<double[]> transSmoothInt = new List<double[]>();
@@ -97,7 +99,7 @@ namespace SwaMe
                             if (starttimes.Count() < 2)
                                 continue;
 
-                            double[,] intensitiesArray= new double[1, intensities.Length];
+                            double[,] intensitiesArray = new double[1, intensities.Length];
 
                             for (int i = 0; i < intensities.Length; i++)
                                 intensitiesArray[0, i] = intensities[i];
@@ -113,9 +115,10 @@ namespace SwaMe
                                 Smoothed[i] = dataMatrix.toArray[0, i];
                             }
                             transSmoothInt.Add(Smoothed);
-                            
-                            if (yyy == 0) {
-                             peakPosition = Array.IndexOf(intensities, intensities.Max());
+
+                            if (yyy == 0)
+                            {
+                                peakPosition = Array.IndexOf(intensities, intensities.Max());
                             }
                             //Calculate all the parameters for dotproducts that need to be summed accross transitions:
                             dp = CalcDotProductParameters(yyy, irtpeak, dp, intensities, peakPosition);
@@ -126,12 +129,12 @@ namespace SwaMe
                         {
                             transSmoothInt.Add(null);//just to maintain the order in future analyses
                         }
-                       
+
                     }
 
                     sp.DotProduct = Math.Pow(dp.TiriPair, 2) / (dp.Tsquared * dp.Rsquared);
                     double RTscore = CalcRTScore(Count, run, sp);
-                    double score = 0.4 * sp.DotProduct+ 0.01 * pPeak.Alltransitions[0].Count()/(rank/10) + 0.4* RTscore; //ALgorithm changed so score penalises less for a lower rough peak area estimation (rank here is used as a substitute for intensity) and puts a higher value on dotproduct
+                    double score = 0.4 * sp.DotProduct + 0.01 * pPeak.Alltransitions[0].Count() / (rank / 10) + 0.4 * RTscore; //ALgorithm changed so score penalises less for a lower rough peak area estimation (rank here is used as a substitute for intensity) and puts a higher value on dotproduct
                     if (highestScore < score)
                     {
                         highestScore = score;
@@ -145,7 +148,7 @@ namespace SwaMe
                 Count++;
             }
         }
-                 
+
         public double CalculateFWHM(double[] starttimes, double[] intensities, double maxIntens, int mIIndex, double baseline)
         {
             double halfMax = (maxIntens - baseline) / 2 + baseline;
@@ -160,7 +163,6 @@ namespace SwaMe
                 }
                 else if (i == 0 && starttimes[i] >= halfMax) { halfRT2 = starttimes[0]; break; }
             }
-
             for (int i = mIIndex; i < intensities.Length; i++)
             {
                 if (intensities[i] < halfMax)
@@ -168,9 +170,12 @@ namespace SwaMe
                     halfRT2 = starttimes[i];
                     break;
                 }
-                else if (i == mIIndex && starttimes[i] >= halfMax) { halfRT2 = starttimes[intensities.Length - 1]; break; }
+                else if (i == mIIndex && starttimes[i] >= halfMax)
+                {
+                    halfRT2 = starttimes[intensities.Length - 1];
+                    break;
+                }
             }
-
             return halfRT2 - halfRT1;
         }
 
@@ -198,7 +203,6 @@ namespace SwaMe
                 }
                 else if (i == mIIndex && starttimes[i] >= fiveMax) { fiveRT2 = starttimes[intensities.Length - 1]; }
             }
-
             return fiveRT2 - fiveRT1;
         }
 
@@ -226,7 +230,6 @@ namespace SwaMe
                     if (starttimesList[currentintensity] < placetobe) { continue; }
                     else
                     {
-
                         if (currentintensity > 0)
                         {
                             if (starttimesList[currentintensity] == placetobe) { placetobe = placetobe + 0.01; }
@@ -241,7 +244,6 @@ namespace SwaMe
                             intensityList.Insert(currentintensity, newIntensity);
                             starttimesList.Insert(currentintensity, placetobe);
                         }
-
                         break;
                     }
                 }
@@ -249,7 +251,6 @@ namespace SwaMe
             RTandInt ri = new RTandInt();
             ri.intensities = intensityList.Select(item => Convert.ToDouble(item)).ToArray();
             ri.starttimes = starttimesList.Select(item => Convert.ToDouble(item)).ToArray();
-
             return ri;
         }
 
@@ -258,7 +259,7 @@ namespace SwaMe
             public double[] starttimes;
             public double[] intensities;
         }
-        public SmoothedPeak ProducePeakMetrics(double[] starttimes, double[] Smoothed,IRTPeak irtpeak, SmoothedPeak sp )
+        public SmoothedPeak ProducePeakMetrics(double[] starttimes, double[] Smoothed, IRTPeak irtpeak, SmoothedPeak sp)
         {
             int mIIndex = Array.IndexOf(Smoothed, Smoothed.Max());
             double height = Smoothed.Max();
@@ -272,10 +273,10 @@ namespace SwaMe
             sp.PSAllTransitions += tempFWfpt / (2 * f);
             return sp;
         }
-        public double CalcRTScore(int Count, Run run,  SmoothedPeak sp)
+        public double CalcRTScore(int Count, Run run, SmoothedPeak sp)
         {
             double RTscore = 0;
-            if (Count > 0 && Count < run.IRTPeaks.Count() - 1 &&  run.IRTPeaks[Count - 1].RetentionTime < sp.RT)//if this is not the peaks for the first iRT peptide, we give the peak an RTscore based on whether it is sequential to the last iRT peptide or not
+            if (Count > 0 && Count < run.IRTPeaks.Count() - 1 && run.IRTPeaks[Count - 1].RetentionTime < sp.RT)//if this is not the peaks for the first iRT peptide, we give the peak an RTscore based on whether it is sequential to the last iRT peptide or not
                 RTscore = 1;
             else if (Count == 0 && sp.RT != 0)//if this is the first irtpeptide, we want to score its RT based on its proximity to the beginning of the run
                 RTscore = 1 / Math.Pow(sp.RT - 0.227, 2);//The power and times ten calculation was added to penalize a peptide greatly for occurring later in the RT. Due to our not wanting to hardcode any peptide standard RTs, we would like to keep the order that the peptides are presented. Therefore, the first peptide should rather occur too early than too late.
@@ -287,17 +288,19 @@ namespace SwaMe
             double Ti = 0;
             if (intensities.Count() > i)
             {
-                if( intensities.Count() > peakPosition)
+                if (intensities.Count() > peakPosition)
                 {
                     Ti = intensities[peakPosition];
                 }
-                else { Ti =0; }
+                else
+                {
+                    Ti = 0;
+                }
             }
             dp.TiriPair += Ti * Ri;
             dp.Tsquared += Ti * Ti;
             dp.Rsquared += Ri * Ri;
             dp.Tisum += Ti;
-
             return dp;
         }
     }
