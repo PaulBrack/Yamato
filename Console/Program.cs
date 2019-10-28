@@ -56,9 +56,6 @@ namespace Yamato.Console
                     else
                         throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
 
-                    double massTolerance;
-                    massTolerance = options.MassTolerance;
-
                     bool irt = false;
                     if (!String.IsNullOrEmpty(options.IRTFile))
                         irt = true;
@@ -72,7 +69,7 @@ namespace Yamato.Console
                     CheckFileIsReadableOrComplain(inputFilePath);
 
                     AnalysisSettings analysisSettings = new AnalysisSettings() {
-                        MassTolerance = options.IrtMassTolerance,
+                        MassTolerance = options.MassTolerance,
                         RtTolerance = options.RtTolerance,
                         IrtMinIntensity = options.IrtMinIntensity,
                         IrtMinPeptides = options.IrtMinPeptides,
