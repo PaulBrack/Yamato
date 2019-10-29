@@ -174,7 +174,7 @@ namespace SwaMe
             {
                 List<double> PeakwidthsTemp = new List<double>();
                 List<double> PeaksymTemp = new List<double>();
-                List<double> PeakCapacityTemp = new List<double>();
+                List<double> FwBaselinesTemp = new List<double>();
                 List<double> PeakprecisionTemp = new List<double>();
                 foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
                 {
@@ -185,7 +185,7 @@ namespace SwaMe
                             PeakwidthsTemp.Add(basepeak.FWHMs[iii]);
                             PeaksymTemp.Add(basepeak.Peaksyms[iii]);
                             PeakprecisionTemp.Add(basepeak.Intensities[iii] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
-                            PeakCapacityTemp.Add(basepeak.PeakCapacities[iii]);
+                            FwBaselinesTemp.Add(basepeak.FWBaselines[iii]);
                         }
                     }
                 }
@@ -231,7 +231,7 @@ namespace SwaMe
                 {
                     Peakwidths.Add(PeakwidthsTemp.Average());
                     PeakSymmetry.Add(PeaksymTemp.Average());
-                    PeakCapacity.Add(PeakCapacityTemp.Average());
+                    PeakCapacity.Add(RTsegment / FwBaselinesTemp.Average());//PeakCapacity is calculated as per Dolan et al.,2009, PubMed 10536823);
                     PeakPrecision.Add(PeakprecisionTemp.Average());
                 }
                 else {

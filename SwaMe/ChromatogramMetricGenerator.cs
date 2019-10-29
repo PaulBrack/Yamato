@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.Interpolation;
@@ -35,7 +35,7 @@ namespace SwaMe
                     List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
                     double TotalFWHM = 0;
                     double TotalPeakSym = 0;
-                    double TotalPC = 0;
+                    double TotalBaseWidth = 0;
                     foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
                     {
                         double peakTime = starttimes[crawPeak.TimeIndex];
@@ -50,19 +50,21 @@ namespace SwaMe
                             TotalPeakSym += crawPeak.Fwfpct / (2 * crawPeak.Fvalue);
                         }
                         TotalFWHM += fwhm;
-                        TotalPC += 1 + (peakTime / fwhm);//PeakCapacity is calculated as per Dolan et al.,2009, PubMed 10536823
+                        if (!float.IsNaN(crawPeak.FwBaseline)) { TotalBaseWidth += crawPeak.FwBaseline; }
+                        else { TotalBaseWidth += crawPeak.Fwfpct; }
+                        
 
                     }
                     if (crawPeaks.Count() > 0)
                     {
                         basepeak.FWHMs.Add(TotalFWHM / crawPeaks.Count());
                         basepeak.Peaksyms.Add(TotalPeakSym / crawPeaks.Count());
-                        basepeak.PeakCapacities.Add(TotalPC / crawPeaks.Count());
+                        basepeak.FWBaselines.Add(TotalBaseWidth / crawPeaks.Count());
                     }
                     else
                     {
                         basepeak.FWHMs.Add(0);
-                        basepeak.PeakCapacities.Add(0);
+                        basepeak.FWBaselines.Add(0);
                         basepeak.Peaksyms.Add(0);
                     }
                 }
