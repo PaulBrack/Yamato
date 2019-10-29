@@ -41,6 +41,8 @@ namespace MzmlParser
             Run run = new Run() { AnalysisSettings = analysisSettings };
             bool irt = run.AnalysisSettings.IrtLibrary != null;
             run.MissingScans = 0;
+            run.StartTime = 100;
+            run.LastScanTime = 0;
 
             ReadMzml(path, run, irt);
 
@@ -49,7 +51,9 @@ namespace MzmlParser
 
             FindMs2IsolationWindows(run);
             foreach(Scan scan in run.Ms2Scans)
-            { 
+            {
+                run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
+                run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
                 foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= run.AnalysisSettings.MassTolerance))
                 {
                     var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);

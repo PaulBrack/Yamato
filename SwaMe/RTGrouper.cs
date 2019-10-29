@@ -45,12 +45,11 @@ namespace SwaMe
             double RTsegment = RTDuration / division;
             double[] RTsegs = new double[division];
 
-            double runStart = run.Ms2Scans.OrderBy(x => x.ScanStartTime).First().ScanStartTime;
 
             for (int i = 0; i < division; i++)
             {
 
-                RTsegs[i] = runStart + RTsegment * i;
+                RTsegs[i] = run.StartTime + RTsegment * i;
             }
 
             //dividing basepeaks into segments

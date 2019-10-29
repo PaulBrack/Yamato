@@ -15,6 +15,8 @@ namespace MzmlParser
             BasePeaks = new ConcurrentBag<BasePeak>();
             IRTHits = new ConcurrentBag<CandidateHit>();
         }
+        public double StartTime { get; set; }
+        public double LastScanTime { get; set; }
         public String SourceFileType { get; set; }
         public String SourceFileName { get; set; }
         public String SourceFilePath { get; set; }
