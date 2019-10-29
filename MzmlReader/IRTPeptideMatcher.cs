@@ -18,9 +18,9 @@ namespace MzmlParser
 
         private static CandidateHit ChoosePeptideCandidate(Run run, ConcurrentBag<CandidateHit> chosenCandidates, string peptideSequence)
         {
-            var a = run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).ToList(); // pick the potential hits for this peptide
-            a = a.Where(x => x.Intensities.Count() == a.OrderBy(y => y.Intensities.Count()).Last().Intensities.Count()).ToList(); // pick the hits matching the most transitions
-            return a.OrderBy(x => x.Intensities.Min()).Last(); // pick the hit with the highest minimum intensity value
+            var hits = run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).ToList(); // pick the potential hits for this peptide
+            hits = hits.Where(x => x.Intensities.Count() == a.OrderBy(y => y.Intensities.Count()).Last().Intensities.Count()).ToList(); // pick the hits matching the most transitions
+            return hits.OrderBy(x => x.Intensities.Min()).Last(); // pick the hit with the highest minimum intensity value
         }
     }
 }
