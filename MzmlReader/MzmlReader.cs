@@ -8,7 +8,6 @@ using Ionic.Zlib;
 using System.IO;
 using System.Collections.Generic;
 using LibraryParser;
-using System.Diagnostics;
 
 namespace MzmlParser
 {
@@ -48,11 +47,13 @@ namespace MzmlParser
 
             cde.Signal();
             cde.Wait();
+            cde.Reset(1);
 
-            FindMs2IsolationWindows(run);
             AddBasePeakSpectra(run);
 
-            run.IRTHits = IrtPeptideMatcher.ChooseIrtPeptides(run);
+            cde.Signal();
+            cde.Wait();
+            IrtPeptideMatcher.ChooseIrtPeptides(run);
 
             return run;
         }
@@ -88,7 +89,7 @@ namespace MzmlParser
         {
             float[] intensities = ExtractFloatArray(qs.Base64IntensityArray, qs.IntensityZlibCompressed, qs.IntensityBitLength);
             float[] mzs = ExtractFloatArray(qs.Base64MzArray, qs.MzZlibCompressed, qs.MzBitLength);
-            
+
 
         }
 
@@ -360,7 +361,7 @@ namespace MzmlParser
             }
             else { basepeakIntensity = 0; }
             //Extract info for Basepeak chromatograms
-            
+
             if (irt)
                 FindIrtPeptideCandidates(scan, run, spectrum);
 
@@ -396,15 +397,22 @@ namespace MzmlParser
         {
             foreach (Scan scan in run.Ms2Scans)
             {
-                run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
-                run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
-                foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= run.AnalysisSettings.MassTolerance))
-                {
-                    var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
-                    if (temp.Any())
-                        bp.Spectrum.Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
-                }
+                cde.AddCount();
+                ThreadPool.QueueUserWorkItem(state => FindBasePeaks(run, scan));
             }
+        }
+
+        private static void FindBasePeaks(Run run, Scan scan)
+        {
+            run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
+            run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
+            foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= run.AnalysisSettings.MassTolerance))
+            {
+                var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
+                if (temp.Any())
+                    bp.Spectrum.Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
+            }
+            cde.Signal();
         }
 
         private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed, int bits)

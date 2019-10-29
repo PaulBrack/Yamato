@@ -85,10 +85,6 @@ namespace Yamato.Console
                     }
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, irt, analysisSettings);
 
-                    ConcurrentBag<CandidateHit> chosenCandidates = IrtPeptideMatcher.ChooseIrtPeptides(run);
-                    run.IRTHits = chosenCandidates;
-
-
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt);
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
