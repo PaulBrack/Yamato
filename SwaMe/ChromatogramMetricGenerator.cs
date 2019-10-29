@@ -33,9 +33,9 @@ namespace SwaMe
                     CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
                     cPF.SetChromatogram(starttimes, intensities);
                     List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
-                    double TotalFWHM = 0;
-                    double TotalPeakSym = 0;
-                    double TotalBaseWidth = 0;
+                    double totalFwhm = 0;
+                    double totalPeakSym = 0;
+                    double totalBaseWidth = 0;
                     foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
                     {
                         double peakTime = starttimes[crawPeak.TimeIndex];
@@ -47,19 +47,20 @@ namespace SwaMe
                         }
                         else if (fvalue != 0)
                         {
-                            TotalPeakSym += crawPeak.Fwfpct / (2 * crawPeak.Fvalue); //From USP31: General Chapters <621> Chromatography equation for calculating the tailing factor(Available at: http://www.uspbpep.com/usp31/v31261/usp31nf26s1_c621.asp). A high value means that the peak is highly asymmetrical.
+                            totalPeakSym += crawPeak.Fwfpct / (2 * crawPeak.Fvalue); //From USP31: General Chapters <621> Chromatography equation for calculating the tailing factor(Available at: http://www.uspbpep.com/usp31/v31261/usp31nf26s1_c621.asp). A high value means that the peak is highly asymmetrical.
                         }
-                        TotalFWHM += fwhm;
-                        if (!float.IsNaN(crawPeak.FwBaseline)) TotalBaseWidth += crawPeak.FwBaseline; 
-                        else { TotalBaseWidth += crawPeak.Fwfpct; }
+                        totalFwhm += fwhm;
+                        if (!float.IsNaN(crawPeak.FwBaseline)) totalBaseWidth += crawPeak.FwBaseline; 
+                        else
+                            totalBaseWidth += crawPeak.Fwfpct;
                         
 
                     }
                     if (crawPeaks.Count() > 0)
                     {
-                        basepeak.FWHMs.Add(TotalFWHM / crawPeaks.Count());
-                        basepeak.Peaksyms.Add(TotalPeakSym / crawPeaks.Count());
-                        basepeak.FullWidthBaselines.Add(TotalBaseWidth / crawPeaks.Count());
+                        basepeak.FWHMs.Add(totalFwhm / crawPeaks.Count());
+                        basepeak.Peaksyms.Add(totalPeakSym / crawPeaks.Count());
+                        basepeak.FullWidthBaselines.Add(totalBaseWidth / crawPeaks.Count());
                     }
                     else
                     {
@@ -88,11 +89,11 @@ namespace SwaMe
                     SmoothedPeak sp = new SmoothedPeak();
                     List<double[]> transSmoothInt = new List<double[]>();
                     int peakPosition = 0;
-                    for (int yyy = 0; yyy < pPeak.Alltransitions.Count() - 1; yyy++)
+                    for (int i = 0; i < pPeak.Alltransitions.Count() - 1; i++)
                     {
-                        if (pPeak.Alltransitions[yyy].Count() != 0)
+                        if (pPeak.Alltransitions[i].Count() != 0)
                         {
-                            var transitionSpectrum = pPeak.Alltransitions[yyy];
+                            var transitionSpectrum = pPeak.Alltransitions[i];
                             double[] intensities = transitionSpectrum.OrderBy(x => x.RetentionTime).Select(x => (double)x.Intensity).ToArray();
                             double[] starttimes = transitionSpectrum.OrderBy(x => x.RetentionTime).Select(x => (double)x.RetentionTime).ToArray();
                             length = intensities.Count();
@@ -103,8 +104,8 @@ namespace SwaMe
 
                             double[,] intensitiesArray = new double[1, intensities.Length];
 
-                            for (int i = 0; i < intensities.Length; i++)
-                                intensitiesArray[0, i] = intensities[i];
+                            for (int j = 0; j < intensities.Length; j++)
+                                intensitiesArray[0, j] = intensities[j];
 
                             WaveletLibrary.Matrix dataMatrix = new WaveletLibrary.Matrix(intensitiesArray);
 
@@ -112,18 +113,16 @@ namespace SwaMe
                             dataMatrix = transform.DoForward(dataMatrix);
 
                             double[] Smoothed = new double[intensities.Length];
-                            for (int i = 0; i < intensities.Length; i++)
-                            {
-                                Smoothed[i] = dataMatrix.toArray[0, i];
-                            }
+                            for (int j = 0; j < intensities.Length; j++)
+                                Smoothed[j] = dataMatrix.toArray[0, j];
+
                             transSmoothInt.Add(Smoothed);
 
-                            if (yyy == 0)
-                            {
+                            if (i == 0)
                                 peakPosition = Array.IndexOf(intensities, intensities.Max());
-                            }
+
                             //Calculate all the parameters for dotproducts that need to be summed accross transitions:
-                            dp = CalcDotProductParameters(yyy, irtpeak, dp, intensities, peakPosition);
+                            dp = CalcDotProductParameters(i, irtpeak, dp, intensities, peakPosition);
                             //Collect the peak metrics for each transition, which will then be averaged out for all transitions accross a possible peak
                             sp = ProducePeakMetrics(starttimes, intensities, irtpeak, sp);
                         }
