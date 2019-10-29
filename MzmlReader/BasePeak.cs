@@ -12,7 +12,7 @@ namespace MzmlParser
         public List<double> RTsegments { get; set; }
         public List<double> FWHMs;
         public List<double> Peaksyms;
-        public List<double> PeakCapacities;
+        public List<double> FullWidthBaselines;
         public List<double> BpkRTs;
 
         public BasePeak (Scan scan, double massTolerance, List<SpectrumPoint>spectrum)
@@ -26,7 +26,7 @@ namespace MzmlParser
             RTsegments = new List<double>();
             FWHMs = new List<double>();
             Peaksyms = new List<double>();
-            PeakCapacities = new List<double>();
+            FullWidthBaselines = new List<double>();
         }
         public BasePeak(double mz, double scanStartTime, double basepeakintensity)
         {
@@ -39,7 +39,7 @@ namespace MzmlParser
             RTsegments = new List<double>();
             FWHMs = new List<double>();
             Peaksyms = new List<double>();
-            PeakCapacities = new List<double>();
+            FullWidthBaselines = new List<double>();
         }
     }
 }

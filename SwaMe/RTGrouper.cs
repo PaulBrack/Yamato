@@ -172,20 +172,20 @@ namespace SwaMe
 
             for (int segment = 0; segment < division; segment++)
             {
-                List<double> PeakwidthsTemp = new List<double>();
-                List<double> PeaksymTemp = new List<double>();
-                List<double> PeakCapacityTemp = new List<double>();
-                List<double> PeakprecisionTemp = new List<double>();
+                List<double> peakwidthsTemp = new List<double>();
+                List<double> peaksymTemp = new List<double>();
+                List<double> fullWidthBaselinesTemp = new List<double>();
+                List<double> peakprecisionTemp = new List<double>();
                 foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
                 {
                     for (int iii = 0; iii < basepeak.RTsegments.Count(); iii++)
                     {
                         if (basepeak.RTsegments[iii] == segment)
                         {
-                            PeakwidthsTemp.Add(basepeak.FWHMs[iii]);
-                            PeaksymTemp.Add(basepeak.Peaksyms[iii]);
-                            PeakprecisionTemp.Add(basepeak.Intensities[iii] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
-                            PeakCapacityTemp.Add(basepeak.PeakCapacities[iii]);
+                            peakwidthsTemp.Add(basepeak.FWHMs[iii]);
+                            peaksymTemp.Add(basepeak.Peaksyms[iii]);
+                            peakprecisionTemp.Add(basepeak.Intensities[iii] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
+                            fullWidthBaselinesTemp.Add(basepeak.FullWidthBaselines[iii]);
                         }
                     }
                 }
@@ -227,12 +227,12 @@ namespace SwaMe
                 }
 
                 cycleTime.Add((lastScanStartTime - firstScanStartTime)/(lastCycle - firstCycle));
-                if (PeakwidthsTemp.Count > 0)
+                if (peakwidthsTemp.Count > 0)
                 {
-                    Peakwidths.Add(PeakwidthsTemp.Average());
-                    PeakSymmetry.Add(PeaksymTemp.Average());
-                    PeakCapacity.Add(PeakCapacityTemp.Average());
-                    PeakPrecision.Add(PeakprecisionTemp.Average());
+                    Peakwidths.Add(peakwidthsTemp.Average());
+                    PeakSymmetry.Add(peaksymTemp.Average());
+                    PeakCapacity.Add(RTsegment / fullWidthBaselinesTemp.Average());//PeakCapacity is calculated as per Dolan et al.,2009, PubMed 10536823);
+                    PeakPrecision.Add(peakprecisionTemp.Average());
                 }
                 else {
                     Peakwidths.Add(0);
