@@ -46,7 +46,7 @@ namespace SwaMe
 
 
             for (int i = 0; i < division; i++)
-                rtSegs[i] = runStart + rtSegment * i;
+                rtSegs[i] = run.StartTime + rtSegment * i;
 
             //dividing basepeaks into segments
             foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
