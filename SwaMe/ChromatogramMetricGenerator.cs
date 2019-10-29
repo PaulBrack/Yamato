@@ -47,10 +47,10 @@ namespace SwaMe
                         }
                         else if (fvalue != 0)
                         {
-                            TotalPeakSym += crawPeak.Fwfpct / (2 * crawPeak.Fvalue);
+                            TotalPeakSym += crawPeak.Fwfpct / (2 * crawPeak.Fvalue); //From USP31: General Chapters <621> Chromatography equation for calculating the tailing factor(Available at: http://www.uspbpep.com/usp31/v31261/usp31nf26s1_c621.asp). A high value means that the peak is highly asymmetrical.
                         }
                         TotalFWHM += fwhm;
-                        if (!float.IsNaN(crawPeak.FwBaseline)) { TotalBaseWidth += crawPeak.FwBaseline; }
+                        if (!float.IsNaN(crawPeak.FwBaseline)) TotalBaseWidth += crawPeak.FwBaseline; 
                         else { TotalBaseWidth += crawPeak.Fwfpct; }
                         
 
@@ -59,12 +59,12 @@ namespace SwaMe
                     {
                         basepeak.FWHMs.Add(TotalFWHM / crawPeaks.Count());
                         basepeak.Peaksyms.Add(TotalPeakSym / crawPeaks.Count());
-                        basepeak.FWBaselines.Add(TotalBaseWidth / crawPeaks.Count());
+                        basepeak.FullWidthBaselines.Add(TotalBaseWidth / crawPeaks.Count());
                     }
                     else
                     {
                         basepeak.FWHMs.Add(0);
-                        basepeak.FWBaselines.Add(0);
+                        basepeak.FullWidthBaselines.Add(0);
                         basepeak.Peaksyms.Add(0);
                     }
                 }
