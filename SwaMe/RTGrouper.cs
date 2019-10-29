@@ -47,7 +47,8 @@ namespace SwaMe
 
             for (int i = 0; i < division; i++)
             {
-                RTsegs[i] = run.BasePeaks.First().BpkRTs[0] + RTsegment * i;
+
+                RTsegs[i] = run.Ms2Scans.OrderBy(x=>x.ScanStartTime).First().ScanStartTime + RTsegment * i;
             }
 
             //dividing basepeaks into segments
@@ -81,6 +82,25 @@ namespace SwaMe
             foreach (MzmlParser.Scan scan in run.Ms2Scans)
             {
                 //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
+                
+                    if (scan.ScanStartTime > RTsegs.Last())
+                    {
+                        scan.RTsegment=RTsegs.Count() - 1;
+                    }
+                    else if (RTsegs.Count() > 1 && scan.ScanStartTime < RTsegs[1])
+                    {
+                        scan.RTsegment = 0;
+                    }
+                    else for (int segmentboundary = 2; segmentboundary < RTsegs.Count(); segmentboundary++)
+                        {
+                            if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
+                            {
+                                 scan.RTsegment =segmentboundary - 1;
+                            }
+
+                        }
+                
+
                 for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
                 {
                     if (scan.ScanStartTime > RTsegs.Last()) scan.RTsegment = RTsegs.Count()-1;
