@@ -50,17 +50,9 @@ namespace MzmlParser
             cde.Wait();
 
             FindMs2IsolationWindows(run);
-            foreach(Scan scan in run.Ms2Scans)
-            {
-                run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
-                run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
-                foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= run.AnalysisSettings.MassTolerance))
-                {
-                    var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
-                    if (temp.Any())
-                        bp.Spectrum.Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
-                }
-            }
+            AddBasePeakSpectra(run);
+
+            run.IRTHits = IrtPeptideMatcher.ChooseIrtPeptides(run);
 
             return run;
         }
@@ -397,6 +389,21 @@ namespace MzmlParser
                 }
                 if (irtIntensities.Count >= run.AnalysisSettings.IrtMinPeptides)
                     run.IRTHits.Add(new CandidateHit() { PeptideSequence = peptide.Sequence, Intensities = irtIntensities, RetentionTime = scan.Scan.ScanStartTime });
+            }
+        }
+
+        private static void AddBasePeakSpectra(Run run)
+        {
+            foreach (Scan scan in run.Ms2Scans)
+            {
+                run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
+                run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
+                foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= run.AnalysisSettings.MassTolerance))
+                {
+                    var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
+                    if (temp.Any())
+                        bp.Spectrum.Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
+                }
             }
         }
 

@@ -68,7 +68,8 @@ namespace Yamato.Console
 
                     CheckFileIsReadableOrComplain(inputFilePath);
 
-                    AnalysisSettings analysisSettings = new AnalysisSettings() {
+                    AnalysisSettings analysisSettings = new AnalysisSettings()
+                    {
                         MassTolerance = options.MassTolerance,
                         RtTolerance = options.RtTolerance,
                         IrtMinIntensity = options.IrtMinIntensity,
@@ -84,16 +85,10 @@ namespace Yamato.Console
                     }
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, irt, analysisSettings);
 
-                    var chosenCandidates = new ConcurrentBag<CandidateHit>();
-                    foreach (string peptideSequence in run.IRTHits.Select(x => x.PeptideSequence).Distinct())
-                    {
-                        var a = run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).ToList(); // pick the potential hits for this peptide
-                        a = a.Where(x => x.Intensities.Count() == a.OrderBy(y => y.Intensities.Count()).Last().Intensities.Count()).ToList(); // pick the hits matching the most transitions
-                        chosenCandidates.Add(a.OrderBy(x => x.Intensities.Min()).Last()); // pick the hit with the highest minimum intensity value
-                    }
+                    ConcurrentBag<CandidateHit> chosenCandidates = IrtPeptideMatcher.ChooseIrtPeptides(run);
                     run.IRTHits = chosenCandidates;
 
-                    
+
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt);
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));

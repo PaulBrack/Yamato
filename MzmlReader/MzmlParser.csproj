@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CWT\CWT.csproj" />
-    <ProjectReference Include="..\IRTSearch\IRTSearcher.csproj" />
     <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
   </ItemGroup>
 

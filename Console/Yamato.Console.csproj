@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IRTSearch\IRTSearcher.csproj" />
     <ProjectReference Include="..\MzmlReader\MzmlParser.csproj" />
     <ProjectReference Include="..\Prognosticator\Prognosticator.csproj" />
     <ProjectReference Include="..\SwaMe\SwaMe.csproj" />
