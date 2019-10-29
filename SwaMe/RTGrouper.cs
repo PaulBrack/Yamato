@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace SwaMe
@@ -16,11 +15,11 @@ namespace SwaMe
             public List<double> MS1PeakPrecision;
             public List<int> MS1Density;
             public List<int> MS2Density;
-            public List<double> cycleTime;
-            public List<double> MS1TICTotal;
-            public List<double> MS2TICTotal;
-            public List<double> TICchange50List;
-            public List<double> TICchangeIQRList;
+            public List<double> CycleTime;
+            public List<double> MS1TicTotal;
+            public List<double> MS2TicTotal;
+            public List<double> TicChange50List;
+            public List<double> TicChangeIqrList;
 
             public RTMetrics(List<double> MS1TICTotal, List<double> MS2TICTotal, List<double> cycleTime, List<double> TICchange50List, List<double> TICchangeIQRList, List<int> MS1Density, List<int> MS2Density, List<double> Peakwidths, List<double> PeakSymmetry, List<double> PeakCapacity, List<double> PeakPrecision, List<double> MS1PeakPrecision)
             {
@@ -31,26 +30,23 @@ namespace SwaMe
                 this.MS1PeakPrecision = MS1PeakPrecision;
                 this.MS1Density = MS1Density;
                 this.MS2Density = MS2Density;
-                this.cycleTime = cycleTime;
-                this.MS1TICTotal = MS1TICTotal;
-                this.MS2TICTotal = MS2TICTotal;
-                this.TICchange50List = TICchange50List;
-                this.TICchangeIQRList = TICchangeIQRList;
+                this.CycleTime = cycleTime;
+                this.MS1TicTotal = MS1TICTotal;
+                this.MS2TicTotal = MS2TICTotal;
+                this.TicChange50List = TICchange50List;
+                this.TicChangeIqrList = TICchangeIQRList;
             }
 
         }
 
-        public RTMetrics DivideByRT(MzmlParser.Run run, int division, double RTDuration)
+        public RTMetrics DivideByRT(MzmlParser.Run run, int division, double rtDuration)
         {
-            double RTsegment = RTDuration / division;
-            double[] RTsegs = new double[division];
+            double rtSegment = rtDuration / division;
+            double[] rtSegs = new double[division];
 
 
             for (int i = 0; i < division; i++)
-            {
-
-                RTsegs[i] = run.StartTime + RTsegment * i;
-            }
+                rtSegs[i] = runStart + rtSegment * i;
 
             //dividing basepeaks into segments
             foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
@@ -58,25 +54,19 @@ namespace SwaMe
                 //Check to see in which RTsegment this basepeak is:
                 foreach (double rt in basepeak.BpkRTs)
                 {
-                    if (rt > RTsegs.Last())
-                    {
-                        basepeak.RTsegments.Add(RTsegs.Count() - 1);
-                    }
-                    else if (RTsegs.Count()>1 && rt < RTsegs[1])
-                    {
+                    if (rt > rtSegs.Last())
+                        basepeak.RTsegments.Add(rtSegs.Count() - 1);
+                    else if (rtSegs.Count() > 1 && rt < rtSegs[1])
                         basepeak.RTsegments.Add(0);
-                    }
-                    else for (int segmentboundary= 2; segmentboundary < RTsegs.Count();segmentboundary++)
-                    {
-                        if (rt > RTsegs[segmentboundary - 1] && rt < RTsegs[segmentboundary])
+                    else for (int segmentboundary = 2; segmentboundary < rtSegs.Count(); segmentboundary++)
                         {
-                            basepeak.RTsegments.Add(segmentboundary - 1);
-                            segmentboundary = RTsegs.Count();//move to the next bpkRT
+                            if (rt > rtSegs[segmentboundary - 1] && rt < rtSegs[segmentboundary])
+                            {
+                                basepeak.RTsegments.Add(segmentboundary - 1);
+                                segmentboundary = rtSegs.Count();//move to the next bpkRT
+                            }
                         }
-                        
-                    }
                 }
-               
             }
 
             //dividing ms2scans into segments of RT
@@ -84,34 +74,32 @@ namespace SwaMe
             {
                 //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
                 //We assign to the segmentdivider below. So if >a and <b, it is assigned to segment a.
-                
-                    if (scan.ScanStartTime > RTsegs.Last())//If the scan is after the last segment divider, it falls into the last segment
-                    {
-                        scan.RTsegment=RTsegs.Count() - 1;
-                    }
-                    else if (RTsegs.Count() > 1 && scan.ScanStartTime < RTsegs[1])//If the scan is before the second segment divider it should fall in the first segment. (assuming that the user has selected to have more than one segment)
-                    {
-                        scan.RTsegment = 0;
-                    }
-                    else for (int segmentboundary = 2; segmentboundary < RTsegs.Count(); segmentboundary++)//If the scan is not in the first or last segment
-                        {
-                            if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])// If the scan is larger than the previous boundary and smaller than this boundary, assign to the previous segment.
-                            {
-                                 scan.RTsegment =segmentboundary - 1;
-                            }
 
-                        }
-                
+                if (scan.ScanStartTime > rtSegs.Last())//If the scan is after the last segment divider, it falls into the last segment
+                    scan.RTsegment = rtSegs.Count() - 1;
+                else if (rtSegs.Count() > 1 && scan.ScanStartTime < rtSegs[1])//If the scan is before the second segment divider it should fall in the first segment. (assuming that the user has selected to have more than one segment)
+                    scan.RTsegment = 0;
+                else for (int segmentboundary = 2; segmentboundary < rtSegs.Count(); segmentboundary++)//If the scan is not in the first or last segment
+                    {
+                        if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])// If the scan is larger than the previous boundary and smaller than this boundary, assign to the previous segment.
+                            scan.RTsegment = segmentboundary - 1;
+                    }
 
-                for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
+
+                for (int segmentboundary = 1; segmentboundary < rtSegs.Count(); segmentboundary++)
                 {
-                    if (scan.ScanStartTime > RTsegs.Last()) scan.RTsegment = RTsegs.Count()-1;
-                    else if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
+                    if (scan.ScanStartTime > rtSegs.Last())
+                        scan.RTsegment = rtSegs.Count() - 1;
+                    else if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])
                     {
-                        scan.RTsegment = segmentboundary-1;
+                        scan.RTsegment = segmentboundary - 1;
                         break;
                     }
-                    else if (scan.ScanStartTime > RTsegs[segmentboundary] && segmentboundary == RTsegs.Count()) { scan.RTsegment = segmentboundary + 1; break; }
+                    else if (scan.ScanStartTime > rtSegs[segmentboundary] && segmentboundary == rtSegs.Count())
+                    {
+                        scan.RTsegment = segmentboundary + 1;
+                        break;
+                    }
                 }
             }
 
@@ -119,35 +107,37 @@ namespace SwaMe
             foreach (MzmlParser.Scan scan in run.Ms1Scans)
             {
                 //Check to see in which RTsegment this basepeak is:
-                for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
+                for (int segmentboundary = 1; segmentboundary < rtSegs.Count(); segmentboundary++)
                 {
-                    if (scan.ScanStartTime > RTsegs.Last()) scan.RTsegment = RTsegs.Count()-1;
-                    else if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])
+                    if (scan.ScanStartTime > rtSegs.Last())
+                        scan.RTsegment = rtSegs.Count() - 1;
+                    else if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])
                     {
                         scan.RTsegment = segmentboundary - 1;
                         break;
                     }
-                    else if (scan.ScanStartTime > RTsegs[segmentboundary] && segmentboundary == RTsegs.Count()) { scan.RTsegment = segmentboundary + 1; break; }
+                    else if (scan.ScanStartTime > rtSegs[segmentboundary] && segmentboundary == rtSegs.Count())
+                    {
+                        scan.RTsegment = segmentboundary + 1;
+                        break;
+                    }
 
                 }
             }
 
             //Retrieve TICChange metrics and divide into rtsegs
-            List<double> TICchange50List = new List<double>();
-            List<double> TICchangeIQRList = new List<double>();
-            var TempTIC = run.Ms2Scans.GroupBy(x => x.RTsegment).Select(d => d.OrderBy(x => x.ScanStartTime).Select(g => g.TotalIonCurrent).ToList());
-            for (int i = 0; i < TempTIC.Count(); i++)
+            List<double> ticChange50List = new List<double>();
+            List<double> ticChangeIqrList = new List<double>();
+            var tempTic = run.Ms2Scans.GroupBy(x => x.RTsegment).Select(d => d.OrderBy(x => x.ScanStartTime).Select(g => g.TotalIonCurrent).ToList());
+            for (int i = 0; i < tempTic.Count(); i++)
             {
-                var Temp = TempTIC.ElementAt(i);
-                List<double> Templist = new List<double>();
-                for (int j = 1; j < Temp.Count(); j++)
-                {
-
-                    Templist.Add(Math.Abs(Temp.ElementAt(j) - Temp.ElementAt(j - 1)));
-                }
-                Templist.Sort();
-                TICchange50List.Add(Math.Truncate(Math.Round(Templist.Average())));
-                TICchangeIQRList.Add(Math.Truncate(Math.Round(InterQuartileRangeCalculator.CalcIQR(Templist))));
+                var temp = tempTic.ElementAt(i);
+                List<double> tempList = new List<double>();
+                for (int j = 1; j < temp.Count(); j++)
+                    tempList.Add(Math.Abs(temp.ElementAt(j) - temp.ElementAt(j - 1)));
+                tempList.Sort();
+                ticChange50List.Add(Math.Truncate(Math.Round(tempList.Average())));
+                ticChangeIqrList.Add(Math.Truncate(Math.Round(InterQuartileRangeCalculator.CalcIQR(tempList))));
             }
 
             //Calculations for peakprecision MS2:
@@ -158,33 +148,33 @@ namespace SwaMe
             //Calculations for peakprecision MS1:
             var mIMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakIntensity).Average();
             var mMMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakMz).Average();
-            List<double> Peakwidths = new List<double>();
-            List<double> PeakSymmetry = new List<double>();
-            List<double> PeakCapacity = new List<double>();
-            List<double> PeakPrecision = new List<double>();
-            List<double> MS1PeakPrecision = new List<double>();
-            List<int> MS1Density = new List<int>();
-            List<int> MS2Density = new List<int>();
+            List<double> peakWidths = new List<double>();
+            List<double> peakSymmetry = new List<double>();
+            List<double> peakCapacity = new List<double>();
+            List<double> peakPrecision = new List<double>();
+            List<double> ms1PeakPrecision = new List<double>();
+            List<int> ms1Density = new List<int>();
+            List<int> ms2Density = new List<int>();
             List<double> cycleTime = new List<double>();
-            List<double> MS1TICTotal = new List<double>();
-            List<double> MS2TICTotal = new List<double>();
+            List<double> ms1TicTotal = new List<double>();
+            List<double> Ms2TicTotal = new List<double>();
 
             for (int segment = 0; segment < division; segment++)
             {
-                List<double> peakwidthsTemp = new List<double>();
-                List<double> peaksymTemp = new List<double>();
+                List<double> peakWidthsTemp = new List<double>();
+                List<double> peakSymTemp = new List<double>();
                 List<double> fullWidthBaselinesTemp = new List<double>();
-                List<double> peakprecisionTemp = new List<double>();
+                List<double> peakPrecisionTemp = new List<double>();
                 foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
                 {
-                    for (int iii = 0; iii < basepeak.RTsegments.Count(); iii++)
+                    for (int i = 0; i < basepeak.RTsegments.Count(); i++)
                     {
-                        if (basepeak.RTsegments[iii] == segment)
+                        if (basepeak.RTsegments[i] == segment)
                         {
-                            peakwidthsTemp.Add(basepeak.FWHMs[iii]);
-                            peaksymTemp.Add(basepeak.Peaksyms[iii]);
-                            peakprecisionTemp.Add(basepeak.Intensities[iii] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
-                            fullWidthBaselinesTemp.Add(basepeak.FullWidthBaselines[iii]);
+                            peakWidthsTemp.Add(basepeak.FWHMs[i]);
+                            peakSymTemp.Add(basepeak.Peaksyms[i]);
+                            peakPrecisionTemp.Add(basepeak.Intensities[i] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
+                            fullWidthBaselinesTemp.Add(basepeak.FullWidthBaselines[i]);
                         }
                     }
                 }
@@ -192,68 +182,70 @@ namespace SwaMe
                 double lastScanStartTime = 0;
                 int firstCycle = 1000;
                 int lastCycle = 0;
-                double MS1TICTotalTemp = 0;
-                List<int> MS1DensityTemp = new List<int>();
-                List<double> MS1PeakprecisionTemp = new List<double>();
+                double ms1TicTotalTemp = 0;
+                List<int> ms1DensityTemp = new List<int>();
+                List<double> ms1PeakPrecisionTemp = new List<double>();
 
                 foreach (MzmlParser.Scan scan in run.Ms1Scans)
                 {
                     if (scan.RTsegment == segment)
                     {
 
-                        MS1PeakprecisionTemp.Add(scan.BasePeakIntensity / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / scan.BasePeakMz)));
+                        ms1PeakPrecisionTemp.Add(scan.BasePeakIntensity / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / scan.BasePeakMz)));
                         firstScanStartTime = Math.Min(firstScanStartTime, scan.ScanStartTime);
                         lastScanStartTime = Math.Max(lastScanStartTime, scan.ScanStartTime);
                         firstCycle = Math.Min(scan.Cycle, firstCycle);
                         lastCycle = Math.Max(scan.Cycle, lastCycle);
-                        MS1DensityTemp.Add(scan.Density);
-                        MS1TICTotalTemp += scan.TotalIonCurrent;
+                        ms1DensityTemp.Add(scan.Density);
+                        ms1TicTotalTemp += scan.TotalIonCurrent;
                     }
                 }
 
                 //To get scan speed for both ms1 and ms2 we have to also scan through ms2:
-                List<int> MS2DensityTemp = new List<int>();
-                double MS2TICTotalTemp = 0;
+                List<int> ms2DensityTemp = new List<int>();
+                double ms2TicTotalTemp = 0;
                 foreach (MzmlParser.Scan scan in run.Ms2Scans)
                 {
                     if (scan.RTsegment == segment)
                     {
                         firstCycle = Math.Min(scan.Cycle, firstCycle);
                         lastCycle = Math.Max(scan.Cycle, lastCycle);
-                        MS2DensityTemp.Add(scan.Density);
-                        MS2TICTotalTemp += scan.TotalIonCurrent;
+                        ms2DensityTemp.Add(scan.Density);
+                        ms2TicTotalTemp += scan.TotalIonCurrent;
                     }
                 }
 
-                cycleTime.Add((lastScanStartTime - firstScanStartTime)/(lastCycle - firstCycle));
-                if (peakwidthsTemp.Count > 0)
+                cycleTime.Add((lastScanStartTime - firstScanStartTime) / (lastCycle - firstCycle));
+                if (peakWidthsTemp.Count > 0)
                 {
-                    Peakwidths.Add(peakwidthsTemp.Average());
-                    PeakSymmetry.Add(peaksymTemp.Average());
-                    PeakCapacity.Add(RTsegment / fullWidthBaselinesTemp.Average());//PeakCapacity is calculated as per Dolan et al.,2009, PubMed 10536823);
-                    PeakPrecision.Add(peakprecisionTemp.Average());
+                    peakWidths.Add(peakWidthsTemp.Average());
+                    peakSymmetry.Add(peakSymTemp.Average());
+                    peakCapacity.Add(rtSegment / fullWidthBaselinesTemp.Average());//PeakCapacity is calculated as per Dolan et al.,2009, PubMed 10536823);
+                    peakPrecision.Add(peakPrecisionTemp.Average());
                 }
-                else {
-                    Peakwidths.Add(0);
-                    PeakSymmetry.Add(0);
-                    PeakCapacity.Add(0);
-                    PeakPrecision.Add(0);
-                }
-                if (MS1PeakprecisionTemp.Count > 0)
+                else
                 {
-                    MS1PeakPrecision.Add(MS1PeakprecisionTemp.Average());
-                    MS1Density.Add(Convert.ToInt32(Math.Round(MS1DensityTemp.Average(), 0)));
+                    peakWidths.Add(0);
+                    peakSymmetry.Add(0);
+                    peakCapacity.Add(0);
+                    peakPrecision.Add(0);
                 }
-                else {
-                    MS1PeakPrecision.Add(0);
-                    MS1Density.Add(0);
+                if (ms1PeakPrecisionTemp.Count > 0)
+                {
+                    ms1PeakPrecision.Add(ms1PeakPrecisionTemp.Average());
+                    ms1Density.Add(Convert.ToInt32(Math.Round(ms1DensityTemp.Average(), 0)));
                 }
-                MS2Density.Add(Convert.ToInt32(Math.Round(MS2DensityTemp.Average(), 0)));
-                MS1TICTotal.Add(Math.Truncate(Math.Ceiling(MS1TICTotalTemp)));
-                MS2TICTotal.Add(Math.Truncate(Math.Ceiling(MS2TICTotalTemp)));
+                else
+                {
+                    ms1PeakPrecision.Add(0);
+                    ms1Density.Add(0);
+                }
+                ms2Density.Add(Convert.ToInt32(Math.Round(ms2DensityTemp.Average(), 0)));
+                ms1TicTotal.Add(Math.Truncate(Math.Ceiling(ms1TicTotalTemp)));
+                Ms2TicTotal.Add(Math.Truncate(Math.Ceiling(ms2TicTotalTemp)));
             }
 
-            RTMetrics rtMetrics = new RTMetrics(MS1TICTotal, MS2TICTotal, cycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, PeakSymmetry, PeakCapacity, PeakPrecision, MS1PeakPrecision);
+            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, Ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, peakSymmetry, peakCapacity, peakPrecision, ms1PeakPrecision);
             return rtMetrics;
         }
     }
