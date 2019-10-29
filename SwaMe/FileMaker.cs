@@ -94,19 +94,19 @@ namespace SwaMe
                 streamWriter.Write("\t");
                 streamWriter.Write(rtMetrics.MS1PeakPrecision.ElementAt(segment).ToString());
                 streamWriter.Write("\t");
-                streamWriter.Write(rtMetrics.TICchange50List.ElementAt(segment));
+                streamWriter.Write(rtMetrics.TicChange50List.ElementAt(segment));
                 streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.TICchangeIQRList.ElementAt(segment));
+                streamWriter.Write(rtMetrics.TicChangeIqrList.ElementAt(segment));
                 streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.cycleTime.ElementAt(segment));
+                streamWriter.Write(rtMetrics.CycleTime.ElementAt(segment));
                 streamWriter.Write(" \t ");
                 streamWriter.Write(rtMetrics.MS2Density.ElementAt(segment));
                 streamWriter.Write(" \t ");
                 streamWriter.Write(rtMetrics.MS1Density.ElementAt(segment));
                 streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.MS1TICTotal.ElementAt(segment));
+                streamWriter.Write(rtMetrics.MS1TicTotal.ElementAt(segment));
                 streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.MS2TICTotal.ElementAt(segment));
+                streamWriter.Write(rtMetrics.MS2TicTotal.ElementAt(segment));
                 streamWriter.Write(" \t ");
             }
             streamWriter.Close();
@@ -199,13 +199,13 @@ namespace SwaMe
             qualityParameters[16] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: PeakSymmetry", unit = Count, value = rtMetrics.PeakSymmetry };
             qualityParameters[17] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS2PeakPrecision", unit = mZ, value = rtMetrics.PeakPrecision };
             qualityParameters[17] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS1PeakPrecision", unit = mZ, value = rtMetrics.MS1PeakPrecision };
-            qualityParameters[18] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: DeltaTICAverage", unit = Intensity, value = rtMetrics.TICchange50List };
-            qualityParameters[19] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: DeltaTICIQR", unit = Intensity, value = rtMetrics.TICchangeIQRList };
-            qualityParameters[20] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AveScanTime", unit = Second, value = rtMetrics.cycleTime };
+            qualityParameters[18] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: DeltaTICAverage", unit = Intensity, value = rtMetrics.TicChange50List };
+            qualityParameters[19] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: DeltaTICIQR", unit = Intensity, value = rtMetrics.TicChangeIqrList };
+            qualityParameters[20] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AveScanTime", unit = Second, value = rtMetrics.CycleTime };
             qualityParameters[21] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS2Density", unit = Count, value = rtMetrics.MS2Density };
             qualityParameters[22] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS1Density", unit = Count, value = rtMetrics.MS1Density };
-            qualityParameters[23] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS2TICTotal", unit = Count, value = rtMetrics.MS2TICTotal };
-            qualityParameters[24] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS1TICTotal", unit = Count, value = rtMetrics.MS1TICTotal };
+            qualityParameters[23] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS2TICTotal", unit = Count, value = rtMetrics.MS2TicTotal };
+            qualityParameters[24] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS1TICTotal", unit = Count, value = rtMetrics.MS1TicTotal };
 
             //Now for the other stuff
             JsonClasses.FileFormat fileFormat = new JsonClasses.FileFormat() { };
