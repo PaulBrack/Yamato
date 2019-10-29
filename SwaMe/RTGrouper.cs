@@ -45,9 +45,12 @@ namespace SwaMe
             double RTsegment = RTDuration / division;
             double[] RTsegs = new double[division];
 
+            double runStart = run.Ms2Scans.OrderBy(x => x.ScanStartTime).First().ScanStartTime;
+
             for (int i = 0; i < division; i++)
             {
-                RTsegs[i] = run.BasePeaks.First().BpkRTs[0] + RTsegment * i;
+
+                RTsegs[i] = runStart + RTsegment * i;
             }
 
             //dividing basepeaks into segments
@@ -81,6 +84,26 @@ namespace SwaMe
             foreach (MzmlParser.Scan scan in run.Ms2Scans)
             {
                 //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
+                //We assign to the segmentdivider below. So if >a and <b, it is assigned to segment a.
+                
+                    if (scan.ScanStartTime > RTsegs.Last())//If the scan is after the last segment divider, it falls into the last segment
+                    {
+                        scan.RTsegment=RTsegs.Count() - 1;
+                    }
+                    else if (RTsegs.Count() > 1 && scan.ScanStartTime < RTsegs[1])//If the scan is before the second segment divider it should fall in the first segment. (assuming that the user has selected to have more than one segment)
+                    {
+                        scan.RTsegment = 0;
+                    }
+                    else for (int segmentboundary = 2; segmentboundary < RTsegs.Count(); segmentboundary++)//If the scan is not in the first or last segment
+                        {
+                            if (scan.ScanStartTime > RTsegs[segmentboundary - 1] && scan.ScanStartTime < RTsegs[segmentboundary])// If the scan is larger than the previous boundary and smaller than this boundary, assign to the previous segment.
+                            {
+                                 scan.RTsegment =segmentboundary - 1;
+                            }
+
+                        }
+                
+
                 for (int segmentboundary = 1; segmentboundary < RTsegs.Count(); segmentboundary++)
                 {
                     if (scan.ScanStartTime > RTsegs.Last()) scan.RTsegment = RTsegs.Count()-1;
