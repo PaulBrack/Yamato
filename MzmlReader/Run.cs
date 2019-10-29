@@ -29,7 +29,7 @@ namespace MzmlParser
         public List<(double, double)> IsolationWindows { get; set; }
         public int MissingScans { get; set; }
         public String FilePropertiesAccession;
-        public List<IRTPeak> IRTPeaks { get; set; }
+        public ConcurrentBag<IRTPeak> IRTPeaks { get; set; }
         public ConcurrentBag<CandidateHit> IRTHits { get; set; }
         public AnalysisSettings AnalysisSettings { get; set; }
     }

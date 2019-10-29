@@ -277,7 +277,7 @@ namespace SwaMe
         public double CalcRTScore(int Count, Run run, SmoothedPeak sp)
         {
             double RTscore = 0;
-            if (Count > 0 && Count < run.IRTPeaks.Count() - 1 && run.IRTPeaks[Count - 1].RetentionTime < sp.RT)//if this is not the peaks for the first iRT peptide, we give the peak an RTscore based on whether it is sequential to the last iRT peptide or not
+            if (Count > 0 && Count < run.IRTPeaks.Count() - 1 && run.IRTPeaks.Max(x => x.RetentionTime) < sp.RT)//if this is not the peaks for the first iRT peptide, we give the peak an RTscore based on whether it is sequential to the last iRT peptide or not
                 RTscore = 1;
             else if (Count == 0 && sp.RT != 0)//if this is the first irtpeptide, we want to score its RT based on its proximity to the beginning of the run
                 RTscore = 1 / Math.Pow(sp.RT - 0.227, 2);//The power and times ten calculation was added to penalize a peptide greatly for occurring later in the RT. Due to our not wanting to hardcode any peptide standard RTs, we would like to keep the order that the peptides are presented. Therefore, the first peptide should rather occur too early than too late.

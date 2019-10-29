@@ -389,7 +389,16 @@ namespace MzmlParser
 
                 }
                 if (irtIntensities.Count >= run.AnalysisSettings.IrtMinPeptides)
-                    run.IRTHits.Add(new CandidateHit() { PeptideSequence = peptide.Sequence, Intensities = irtIntensities, RetentionTime = scan.Scan.ScanStartTime });
+                {
+                    run.IRTHits.Add(new CandidateHit()
+                    {
+                        PeptideSequence = peptide.Sequence,
+                        Intensities = irtIntensities,
+                        RetentionTime = scan.Scan.ScanStartTime,
+                        PrecursorTargetMz = peptide.AssociatedTransitions.First().PrecursorMz,
+                        ProductTargetMzs = peptide.AssociatedTransitions.Select(x => x.ProductMz).ToList()
+                    });
+                }
             }
         }
 
