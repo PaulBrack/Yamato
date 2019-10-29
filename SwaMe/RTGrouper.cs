@@ -44,7 +44,6 @@ namespace SwaMe
             double rtSegment = rtDuration / division;
             double[] rtSegs = new double[division];
 
-            double runStart = run.Ms2Scans.OrderBy(x => x.ScanStartTime).First().ScanStartTime;
 
             for (int i = 0; i < division; i++)
                 rtSegs[i] = runStart + rtSegment * i;

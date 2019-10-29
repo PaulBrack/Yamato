@@ -8,9 +8,9 @@ namespace SwaMe
     {
         public void GenerateMetrics(Run run, int division,  string inputFilePath, bool irt)
         {
-           
+
             //Acquire RTDuration: last minus first
-            double RTDuration = run.BasePeaks.Last().BpkRTs.Last() - run.BasePeaks.First().BpkRTs.First();
+            double RTDuration = run.LastScanTime - run.StartTime;
 
             //Interpolate, Smooth, create chromatogram and generate chromatogram metrics
             ChromatogramMetricGenerator chromatogramMetrics = new ChromatogramMetricGenerator();
