@@ -20,7 +20,7 @@ namespace SwaMe
                 chromatogramMetrics.GenerateiRTChromatogram(run);
 
             //Calculating the largestswath
-            double swathSizeDifference = CalcSwathSizeDiff(run);
+            double swathSizeDifference = run.Ms2Scans.Max(x => x.IsolationWindowUpperOffset - x.IsolationWindowLowerOffset);
 
             // This method will group the scans into swaths of the same number, return the number of swaths in a full cycle (maxswath) and call a FileMaker method to write out the metrics.
             SwathGrouper swathGrouper = new SwathGrouper { };
@@ -47,12 +47,7 @@ namespace SwaMe
             fileMaker.CreateAndSaveMzqc();
         }
 
-        private double CalcSwathSizeDiff(Run run)
-        {
-            return run.Ms2Scans.Select(s => s.IsolationWindowUpperOffset + s.IsolationWindowLowerOffset).OrderBy(x => x).Last();
-        }
-
-        private List<double> CalcCycleTime(Run run)
+       private List<double> CalcCycleTime(Run run)
         {
             return run.Ms2Scans.GroupBy(s => s.Cycle).Select(g => g.OrderByDescending(d => d.ScanStartTime)).Select(e => e.First().ScanStartTime - e.Last().ScanStartTime).ToList();
         }
