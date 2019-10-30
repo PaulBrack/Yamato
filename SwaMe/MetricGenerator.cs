@@ -49,7 +49,10 @@ namespace SwaMe
 
         private double CalcSwathSizeDiff(Run run)
         {
-            return run.Ms2Scans.Select(s => s.IsolationWindowUpperOffset + s.IsolationWindowLowerOffset).OrderBy(x => x).Last();
+            run.Ms2Scans.Select(s => s.IsolationWindowUpperOffset + s.IsolationWindowLowerOffset).OrderBy(x => x);
+            double max = run.Ms2Scans.Select(s => s.IsolationWindowUpperOffset + s.IsolationWindowLowerOffset).Last();
+            double min = run.Ms2Scans.Select(s => s.IsolationWindowUpperOffset + s.IsolationWindowLowerOffset).First();
+            return max - min;
         }
 
         private List<double> CalcCycleTime(Run run)

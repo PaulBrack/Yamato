@@ -104,9 +104,9 @@ namespace SwaMe
                 streamWriter.Write(" \t ");
                 streamWriter.Write(rtMetrics.MS1Density.ElementAt(segment));
                 streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.MS1TicTotal.ElementAt(segment));
-                streamWriter.Write(" \t ");
                 streamWriter.Write(rtMetrics.MS2TicTotal.ElementAt(segment));
+                streamWriter.Write(" \t ");
+                streamWriter.Write(rtMetrics.MS1TicTotal.ElementAt(segment));
                 streamWriter.Write(" \t ");
             }
             streamWriter.Close();

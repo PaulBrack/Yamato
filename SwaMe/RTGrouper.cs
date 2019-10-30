@@ -146,8 +146,9 @@ namespace SwaMe
             var meanMzOfAllBpks = run.BasePeaks.Select(x => x.Mz).Average();
 
             //Calculations for peakprecision MS1:
-            var mIMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakIntensity).Average();
-            var mMMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakMz).Average();
+            //double mIMS1Bpks;
+            //if (run.Ms1Scans.Count()>0) mIMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakIntensity).Average();
+            //var mMMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakMz).Average();
             List<double> peakWidths = new List<double>();
             List<double> peakSymmetry = new List<double>();
             List<double> peakCapacity = new List<double>();
@@ -206,6 +207,14 @@ namespace SwaMe
                 double ms2TicTotalTemp = 0;
                 foreach (MzmlParser.Scan scan in run.Ms2Scans)
                 {
+                    if (run.Ms1Scans.Count() < 1)
+                    {
+                        firstScanStartTime = Math.Min(firstScanStartTime, scan.ScanStartTime);
+                        lastScanStartTime = Math.Max(lastScanStartTime, scan.ScanStartTime);
+                        firstCycle = Math.Min(scan.Cycle, firstCycle);
+                        lastCycle = Math.Max(scan.Cycle, lastCycle);
+                    }
+
                     if (scan.RTsegment == segment)
                     {
                         firstCycle = Math.Min(scan.Cycle, firstCycle);

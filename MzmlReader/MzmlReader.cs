@@ -141,9 +141,16 @@ namespace MzmlParser
             //This has only been tested on Sciex converted data
             //
             //Paul Brack 2019/04/03
+
+            bool CycleInfoInID = false;
+
             if (run.SourceFileType.EndsWith("wiff", StringComparison.InvariantCultureIgnoreCase) || run.SourceFileType.ToUpper().EndsWith("scan", StringComparison.InvariantCultureIgnoreCase))
             {
                 scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
+                if (scan.Scan.Cycle != 0)//Some wiffs don't have that info so let's check
+                {
+                    CycleInfoInID = true;
+                }
             }
 
             bool cvParamsRead = false;
@@ -155,35 +162,9 @@ namespace MzmlParser
                     {
                         switch (reader.GetAttribute("accession"))
                         {
+
                             case "MS:1000511":
                                 scan.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
-                                if (run.SourceFileType.ToUpper().EndsWith("RAW"))
-                                {
-                                    if (scan.Scan.MsLevel == 1)
-                                    {
-                                        currentCycle++;
-                                        scan.Scan.Cycle = currentCycle;
-                                        MS1 = true;
-                                    }
-                                    //if there is ScanAndTempProperties ms1:
-                                    else if (MS1)
-                                    {
-                                        scan.Scan.Cycle = currentCycle;
-                                    }
-                                    //if there is no ms1:
-                                    else
-                                    {
-                                        if (previousTargetMz < scan.Scan.IsolationWindowTargetMz)
-                                        {
-                                            scan.Scan.Cycle = currentCycle;
-                                        }
-                                        else
-                                        {
-                                            currentCycle += currentCycle;
-                                            scan.Scan.Cycle = currentCycle;
-                                        }
-                                    }
-                                }
                                 break;
                             case "MS:1000285":
                                 scan.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
@@ -191,15 +172,17 @@ namespace MzmlParser
                             case "MS:1000016":
                                 scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
-                            case "MS:1000827":
-                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                break;
+                            
                             case "MS:1000829":
                                 scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000828":
                                 scan.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
+                            case "MS:1000827":
+                                scan.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                break;
+
                         }
                     }
                     else if (reader.LocalName == "binaryDataArray")
@@ -216,6 +199,37 @@ namespace MzmlParser
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                 {
+
+                    if (!CycleInfoInID)
+                    {
+                        if (scan.Scan.MsLevel == 1)
+                        {
+                            currentCycle++;
+                            scan.Scan.Cycle = currentCycle;
+                            MS1 = true;
+                        }
+                        //if there is ScanAndTempProperties ms1:
+                        else if (MS1)
+                        {
+                            scan.Scan.Cycle = currentCycle;
+                        }
+                        //if there is no ms1:
+                        else
+                        {
+                            if (previousTargetMz < scan.Scan.IsolationWindowTargetMz)
+                            {
+                                scan.Scan.Cycle = currentCycle;
+                            }
+                            else
+                            {
+                                currentCycle ++;
+                                scan.Scan.Cycle = currentCycle;
+                            }
+                        }
+                    }
+
+                    previousTargetMz = scan.Scan.IsolationWindowTargetMz;
+
                     if (ParseBinaryData)
                     {
                         if (Threading)
