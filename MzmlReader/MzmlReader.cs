@@ -53,6 +53,7 @@ namespace MzmlParser
 
             cde.Signal();
             cde.Wait();
+            cde.Reset(1);
             IrtPeptideMatcher.ChooseIrtPeptides(run);
 
             return run;
