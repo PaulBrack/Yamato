@@ -193,8 +193,6 @@ namespace SwaMe
                     {
 
                         ms1PeakPrecisionTemp.Add(scan.BasePeakIntensity / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / scan.BasePeakMz)));
-                        firstScanStartTime = Math.Min(firstScanStartTime, scan.ScanStartTime);
-                        lastScanStartTime = Math.Max(lastScanStartTime, scan.ScanStartTime);
                         firstCycle = Math.Min(scan.Cycle, firstCycle);
                         lastCycle = Math.Max(scan.Cycle, lastCycle);
                         ms1DensityTemp.Add(scan.Density);
@@ -203,26 +201,16 @@ namespace SwaMe
                 }
 
                 //To get scan speed for both ms1 and ms2 we have to also scan through ms2:
-                List<int> ms2DensityTemp = new List<int>();
-                double ms2TicTotalTemp = 0;
-                foreach (MzmlParser.Scan scan in run.Ms2Scans)
-                {
-                    if (run.Ms1Scans.Count() < 1)
-                    {
-                        firstScanStartTime = Math.Min(firstScanStartTime, scan.ScanStartTime);
-                        lastScanStartTime = Math.Max(lastScanStartTime, scan.ScanStartTime);
-                        firstCycle = Math.Min(scan.Cycle, firstCycle);
-                        lastCycle = Math.Max(scan.Cycle, lastCycle);
-                    }
+                
+                firstScanStartTime = Math.Min(run.Ms1Scans.Min(x => x.ScanStartTime), run.Ms2Scans.Min(x => x.ScanStartTime));
+                lastScanStartTime = Math.Max(run.Ms1Scans.Max(x => x.ScanStartTime), run.Ms2Scans.Max(x => x.ScanStartTime));
+                firstCycle = Math.Min(run.Ms1Scans.Min(x => x.Cycle), run.Ms2Scans.Min(x => x.Cycle));
+                lastCycle = Math.Max(run.Ms1Scans.Max(x => x.Cycle), run.Ms2Scans.Max(x => x.Cycle));
+                
 
-                    if (scan.RTsegment == segment)
-                    {
-                        firstCycle = Math.Min(scan.Cycle, firstCycle);
-                        lastCycle = Math.Max(scan.Cycle, lastCycle);
-                        ms2DensityTemp.Add(scan.Density);
-                        ms2TicTotalTemp += scan.TotalIonCurrent;
-                    }
-                }
+                List<int> ms2DensityTemp = run.Ms2Scans.Where(x=>x.RTsegment==segment).Select(x=>x.Density).ToList();
+                double ms2TicTotalTemp = run.Ms2Scans.Where(x => x.RTsegment == segment).Select(x=>x.TotalIonCurrent).Sum();
+               
 
                 cycleTime.Add((lastScanStartTime - firstScanStartTime) / (lastCycle - firstCycle));
                 if (peakWidthsTemp.Count > 0)
