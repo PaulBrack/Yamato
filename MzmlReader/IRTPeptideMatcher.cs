@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Concurrent;
 using System.Threading;
 using System;
+using LibraryParser;
 
 namespace MzmlParser
 {
@@ -18,6 +19,7 @@ namespace MzmlParser
                 chosenCandidates.Add(candidate);
             }
             run.IRTHits = chosenCandidates;
+            AddIrtSpectra(run);
         }
 
         private static void AddIrtSpectra(Run run)
@@ -27,6 +29,10 @@ namespace MzmlParser
                 cde.AddCount();
                 ThreadPool.QueueUserWorkItem(state => FindIrtSpectra(run, candidateHit));
             }
+            cde.Signal();
+            cde.Wait();
+            cde.Reset(1);
+
         }
 
         private static void FindIrtSpectra(Run run, CandidateHit candidateHit)
@@ -35,15 +41,21 @@ namespace MzmlParser
                                && candidateHit.PrecursorTargetMz > x.IsolationWindowLowerBoundary
                                && candidateHit.PrecursorTargetMz < x.IsolationWindowUpperBoundary);
 
+            var libraryPeptides = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Library.Peptide>().ToList();
+
             foreach (var matchingScan in matchingScans)
             {
                 foreach (double targetMz in candidateHit.ProductTargetMzs)
                 {
-                    var matchingSpectra = matchingScan.Spectrum.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance);
-                    if (matchingSpectra.Any())
+                    var matchingSpectrum = matchingScan.Spectrum.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
+                    if (matchingSpectrum.Any())
                     {
+                        var peptide = libraryPeptides.Where(x => x.Sequence == candidateHit.PeptideSequence).Single();
                         IRTPeak iRTPeak = new IRTPeak();
-                        //TODO - hydrate irtpeak
+                        iRTPeak.AssociatedTransitions = peptide.AssociatedTransitions;
+                        iRTPeak.BasePeak = new SpectrumPoint() { Intensity = (float)matchingScan.BasePeakIntensity, Mz = (float)matchingScan.BasePeakMz, RetentionTime = (float)matchingScan.ScanStartTime };
+                        
+
 
                         run.IRTPeaks.Add(iRTPeak);
                     }
