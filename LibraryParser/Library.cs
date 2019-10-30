@@ -33,6 +33,10 @@ namespace LibraryParser
             public double CollisionEnergy;
             public List<Transition> AssociatedTransitions;
             public List<string> AssociatedTransitionIds;
+
+            public Peptide() {
+                AssociatedTransitions = new List<Transition>();
+            }
         }
 
         public class Transition

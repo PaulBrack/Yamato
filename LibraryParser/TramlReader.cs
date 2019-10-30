@@ -172,6 +172,7 @@ namespace LibraryParser
             library.TransitionList.Add(transition.Id, transition);
             var correspondingPeptide = (Library.Peptide)(library.PeptideList[transition.PeptideId]);
             correspondingPeptide.AssociatedTransitionIds.Add(transition.Id);
+            correspondingPeptide.AssociatedTransitions.Add(transition);
         }
 
         public List<double> CollectTransitions(string path)
