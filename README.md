@@ -7,9 +7,6 @@ An optimised library to extract chromatograms and metadata from an MZML file. Us
 ## MzqcGenerator
 A C# library to serialise quality control metrics to MZQC.
 
-## IrtSearch
-A C# library to detect iRT peptides.
-
 ## LibraryParser
 A C# library to deserialise transisition libraries, including Thermo, Skyline and TraML formats.
 
