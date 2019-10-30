@@ -54,9 +54,6 @@ namespace MzmlParser
                         IRTPeak iRTPeak = new IRTPeak();
                         iRTPeak.AssociatedTransitions = peptide.AssociatedTransitions;
                         iRTPeak.BasePeak = new SpectrumPoint() { Intensity = (float)matchingScan.BasePeakIntensity, Mz = (float)matchingScan.BasePeakMz, RetentionTime = (float)matchingScan.ScanStartTime };
-                        
-
-
                         run.IRTPeaks.Add(iRTPeak);
                     }
                 }

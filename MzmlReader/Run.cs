@@ -14,6 +14,7 @@ namespace MzmlParser
             Chromatograms = new Chromatograms();
             BasePeaks = new ConcurrentBag<BasePeak>();
             IRTHits = new ConcurrentBag<CandidateHit>();
+            IRTPeaks = new ConcurrentBag<IRTPeak>();
         }
         public double StartTime { get; set; }
         public double LastScanTime { get; set; }
