@@ -6,7 +6,7 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division,  string inputFilePath, bool irt)
+        public void GenerateMetrics(Run run, int division,  string inputFilePath, bool irt, bool combine, bool lastFile)
         {
 
             //Acquire RTDuration: last minus first
@@ -45,6 +45,13 @@ namespace SwaMe
             fileMaker.MakeMetricsPerRTsegmentFile(rtMetrics);
             fileMaker.MakeMetricsPerSwathFile(swathMetrics, inputFilePath);
             fileMaker.CreateAndSaveMzqc();
+            if (combine && lastFile)
+            {
+                fileMaker.CombineMultipleFilesIntoSingleFile("iRTMetrics_*", "AllIRTMetrics.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile("MetricsBySwath_*", "AllMetricsBySwath.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile("RTDividedMetrics_*", "AllRTDividedMetrics.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile("undividedMetrics_*", "AllUndividedMetrics.tsv");
+             }
         }
 
        private List<double> CalcCycleTime(Run run)

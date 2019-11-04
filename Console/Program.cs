@@ -12,8 +12,6 @@ using System.Collections.Concurrent;
 
 namespace Yamato.Console
 {
-
-
     class Program
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
@@ -24,7 +22,7 @@ namespace Yamato.Console
             Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
                 UpdateLoggingLevels(options);
-
+                bool combine = options.Combine;
                 List<string> inputFiles = new List<string>();
 
                 if (options.LoadFromDirectory != null && options.LoadFromDirectory == true)//multiple files
@@ -46,6 +44,8 @@ namespace Yamato.Console
 
                 foreach (string inputFilePath in inputFiles)
                 {
+                    bool lastFile = false;//saving whether its the last file or not, so if we need to combine all the files in the end, we know when the end is.
+                    if (inputFilePath == inputFiles.Last()) lastFile = true;
                     logger.Info("Loading file: {0}", inputFilePath);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
@@ -86,7 +86,7 @@ namespace Yamato.Console
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, irt, analysisSettings);
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt);
+                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile);
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     logger.Info("Done!");
 
@@ -154,6 +154,9 @@ namespace Yamato.Console
 
         [Option("rttolerance", Required = false, HelpText = "RT tolerance")]
         public double RtTolerance { get; set; } = 2.5;
+
+        [Option('c', "combineFiles" ,Required = false, HelpText = "Combine files at the end?")]
+        public bool Combine { get; set; } = true;
     }
 }
 
