@@ -146,7 +146,7 @@ namespace SwaMe
         public void MakeiRTmetricsFile(Run run)
         {
 
-            StreamWriter streamWriter = new StreamWriter("iRTMetrics_" + inputFilePath + ".tsv");
+            StreamWriter streamWriter = new StreamWriter("iRTMetrics_"  +run.SourceFileName + ".tsv");
             streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t PeakSymmetry");
 
             foreach (IRTPeak peak in run.IRTPeaks)

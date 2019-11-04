@@ -74,138 +74,40 @@ namespace SwaMe
 
         public void GenerateiRTChromatogram(Run run)
         {
-            int Count = 0;
+            float[] starttimes;
+            float[] intensities;
+
             foreach (IRTPeak irtpeak in run.IRTPeaks)
             {
-                int length = 0;
-                double highestScore = 0;
-                int rank = 1;
-
-                irtpeak.PossPeaks = irtpeak.PossPeaks.OrderByDescending(x => x.BasePeak.Intensity).ToList();
-                foreach (PossiblePeak pPeak in irtpeak.PossPeaks)
+                float TotalFWHM = 0;
+                float Totalpeaksym = 0;
+                int count = 0;
+                foreach (var transition in irtpeak.AssociatedTransitions)
                 {
-
-                    Dotproduct dp = new Dotproduct();
-                    SmoothedPeak sp = new SmoothedPeak();
-                    List<double[]> transSmoothInt = new List<double[]>();
-                    int peakPosition = 0;
-                    for (int i = 0; i < pPeak.Alltransitions.Count() - 1; i++)
+                    starttimes = irtpeak.Spectrum.Where(x=>Math.Abs(x.Mz-transition.ProductMz)<run.AnalysisSettings.MassTolerance && Math.Abs(x.RetentionTime-irtpeak.RetentionTime)<run.AnalysisSettings.RtTolerance).Select(x => x.RetentionTime).ToArray();
+                    intensities = irtpeak.Spectrum.Where(x => Math.Abs(x.Mz - transition.ProductMz) < run.AnalysisSettings.MassTolerance).Select(x => x.Intensity).ToArray();
+                    CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
+                    cPF.SetChromatogram(starttimes, intensities);
+                    List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
+                    foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
                     {
-                        if (pPeak.Alltransitions[i].Count() != 0)
+                        TotalFWHM += crawPeak.Fwhm;
+                        if (crawPeak.Fvalue > 0)
                         {
-                            var transitionSpectrum = pPeak.Alltransitions[i];
-                            double[] intensities = transitionSpectrum.OrderBy(x => x.RetentionTime).Select(x => (double)x.Intensity).ToArray();
-                            double[] starttimes = transitionSpectrum.OrderBy(x => x.RetentionTime).Select(x => (double)x.RetentionTime).ToArray();
-                            length = intensities.Count();
-
-                            //if there are less than two datapoints we cannot calculate chromatogrammetrics:
-                            if (starttimes.Count() < 2)
-                                continue;
-
-                            double[,] intensitiesArray = new double[1, intensities.Length];
-
-                            for (int j = 0; j < intensities.Length; j++)
-                                intensitiesArray[0, j] = intensities[j];
-
-                            WaveletLibrary.Matrix dataMatrix = new WaveletLibrary.Matrix(intensitiesArray);
-
-                            var transform = new WaveletLibrary.WaveletTransform(new WaveletLibrary.HaarLift(), 1);
-                            dataMatrix = transform.DoForward(dataMatrix);
-
-                            double[] Smoothed = new double[intensities.Length];
-                            for (int j = 0; j < intensities.Length; j++)
-                                Smoothed[j] = dataMatrix.toArray[0, j];
-
-                            transSmoothInt.Add(Smoothed);
-
-                            if (i == 0)
-                                peakPosition = Array.IndexOf(intensities, intensities.Max());
-
-                            //Calculate all the parameters for dotproducts that need to be summed accross transitions:
-                            dp = CalcDotProductParameters(i, irtpeak, dp, intensities, peakPosition);
-                            //Collect the peak metrics for each transition, which will then be averaged out for all transitions accross a possible peak
-                            sp = ProducePeakMetrics(starttimes, intensities, irtpeak, sp);
+                            Totalpeaksym += crawPeak.Fwfpct / (crawPeak.Fvalue * 2);
                         }
-                        else
-                        {
-                            transSmoothInt.Add(null);//just to maintain the order in future analyses
-                        }
-
+                        else { Totalpeaksym += crawPeak.Fwfpct; }
+                        count++;
                     }
-
-                    sp.DotProduct = Math.Pow(dp.TiriPair, 2) / (dp.Tsquared * dp.Rsquared);
-                    double RTscore = CalcRTScore(Count, run, sp);
-                    double score = 0.4 * sp.DotProduct + 0.01 * pPeak.Alltransitions[0].Count() / (rank / 10) + 0.4 * RTscore; //ALgorithm changed so score penalises less for a lower rough peak area estimation (rank here is used as a substitute for intensity) and puts a higher value on dotproduct
-                    if (highestScore < score)
-                    {
-                        highestScore = score;
-                        irtpeak.RetentionTime = sp.RT;
-                        irtpeak.FWHM = sp.FWHMAllTransitions / irtpeak.AssociatedTransitions.Count();//average fwhm
-                        irtpeak.Peaksym = sp.PSAllTransitions / irtpeak.AssociatedTransitions.Count();
-                    }
-
-                    rank++;//Because we have ordered the possible peaks according to their intensities, this value corresponds to their intensity rank 
                 }
-                Count++;
+               
+                irtpeak.FWHM = TotalFWHM/count;//average fwhm
+                irtpeak.Peaksym = Totalpeaksym/count;//Because we have ordered the possible peaks according to their intensities, this value corresponds to their intensity rank 
+                
             }
         }
 
-        public double CalculateFWHM(double[] starttimes, double[] intensities, double maxIntens, int mIIndex, double baseline)
-        {
-            double halfMax = (maxIntens - baseline) / 2 + baseline;
-            double halfRT1 = 0;
-            double halfRT2 = 0;
-            for (int i = mIIndex; i > 0; i--)
-            {
-                if (intensities[i] < halfMax)
-                {
-                    halfRT1 = starttimes[i];
-                    break;
-                }
-                else if (i == 0 && starttimes[i] >= halfMax) { halfRT2 = starttimes[0]; break; }
-            }
-            for (int i = mIIndex; i < intensities.Length; i++)
-            {
-                if (intensities[i] < halfMax)
-                {
-                    halfRT2 = starttimes[i];
-                    break;
-                }
-                else if (i == mIIndex && starttimes[i] >= halfMax)
-                {
-                    halfRT2 = starttimes[intensities.Length - 1];
-                    break;
-                }
-            }
-            return halfRT2 - halfRT1;
-        }
-
-        public double CalculateFpctHM(double[] starttimes, double[] intensities, double maxIntens, int mIIndex, double baseline)
-        {
-            double fiveMax = (maxIntens - baseline) / 20 + baseline;
-            double fiveRT1 = 0;
-            double fiveRT2 = 0;
-            for (int i = mIIndex; i > 0; i--)
-            {
-                if (intensities[i] < fiveMax)
-                {
-                    fiveRT1 = starttimes[i];
-                    break;
-                }
-                else if (i == 0 && starttimes[i] >= fiveMax) { fiveRT2 = starttimes[0]; }
-            }
-
-            for (int i = mIIndex; i < intensities.Length; i++)
-            {
-                if (intensities[i] < fiveMax)
-                {
-                    fiveRT2 = starttimes[i];
-                    break;
-                }
-                else if (i == mIIndex && starttimes[i] >= fiveMax) { fiveRT2 = starttimes[intensities.Length - 1]; }
-            }
-            return fiveRT2 - fiveRT1;
-        }
+     
 
         private RTandInt Interpolate(double[] starttimes, double[] intensities)
         {
@@ -259,50 +161,6 @@ namespace SwaMe
         {
             public double[] starttimes;
             public double[] intensities;
-        }
-        public SmoothedPeak ProducePeakMetrics(double[] starttimes, double[] Smoothed, IRTPeak irtpeak, SmoothedPeak sp)
-        {
-            int mIIndex = Array.IndexOf(Smoothed, Smoothed.Max());
-            double height = Smoothed.Max();
-            double width = starttimes.Max() - starttimes.Min();
-            sp.peakArea = height * width / 2;
-            sp.RT = starttimes[mIIndex];
-            double baseline = Smoothed.Where(i => i > 0).DefaultIfEmpty(int.MinValue).Min();
-            sp.FWHMAllTransitions += CalculateFWHM(starttimes, Smoothed, Smoothed.Max(), mIIndex, baseline);
-            double tempFWfpt = CalculateFpctHM(starttimes, Smoothed, Smoothed.Max(), mIIndex, baseline);
-            double f = Math.Abs(irtpeak.RetentionTime - tempFWfpt);
-            sp.PSAllTransitions += tempFWfpt / (2 * f);
-            return sp;
-        }
-        public double CalcRTScore(int Count, Run run, SmoothedPeak sp)
-        {
-            double RTscore = 0;
-            if (Count > 0 && Count < run.IRTPeaks.Count() - 1 && run.IRTPeaks.Max(x => x.RetentionTime) < sp.RT)//if this is not the peaks for the first iRT peptide, we give the peak an RTscore based on whether it is sequential to the last iRT peptide or not
-                RTscore = 1;
-            else if (Count == 0 && sp.RT != 0)//if this is the first irtpeptide, we want to score its RT based on its proximity to the beginning of the run
-                RTscore = 1 / Math.Pow(sp.RT - 0.227, 2);//The power and times ten calculation was added to penalize a peptide greatly for occurring later in the RT. Due to our not wanting to hardcode any peptide standard RTs, we would like to keep the order that the peptides are presented. Therefore, the first peptide should rather occur too early than too late.
-            return RTscore;
-        }
-        public Dotproduct CalcDotProductParameters(int i, IRTPeak irtpeak, Dotproduct dp, double[] intensities, int peakPosition)
-        {
-            double Ri = irtpeak.AssociatedTransitions[i].ProductIonIntensity;
-            double Ti = 0;
-            if (intensities.Count() > i)
-            {
-                if (intensities.Count() > peakPosition)
-                {
-                    Ti = intensities[peakPosition];
-                }
-                else
-                {
-                    Ti = 0;
-                }
-            }
-            dp.TiriPair += Ti * Ri;
-            dp.Tsquared += Ti * Ti;
-            dp.Rsquared += Ri * Ri;
-            dp.Tisum += Ti;
-            return dp;
         }
     }
 }
