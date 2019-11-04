@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\CrawdadSharp\CrawdadSharp\CrawdadSharp.csproj" />
-    <ProjectReference Include="..\CWT\CWT.csproj" />
     <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
     <ProjectReference Include="..\MzmlReader\MzmlParser.csproj" />
     <ProjectReference Include="..\MzqcGenerator\MzqcGenerator.csproj" />
