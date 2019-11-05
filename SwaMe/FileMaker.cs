@@ -233,9 +233,25 @@ namespace SwaMe
             string mzQCFile = @"metrics_" + run.SourceFileName+ ".json";
             new MzqcGenerator.MzqcWriter().WriteMzqc(mzQCFile, metrics);
 
-          
+        }
 
-            
+        public void CombineMultipleFilesIntoSingleFile(string inputFileNamePattern, string outputFileName)
+        {
+            string[] inputFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), inputFileNamePattern);
+
+            StreamWriter combinedwriter = new StreamWriter(outputFileName);
+            int counter = 0;
+            foreach (var inputFile in inputFiles)
+            {
+                 var inputStream = File.ReadAllLines(inputFile);
+                 if (counter != 0) inputStream = inputStream.Skip(1).ToArray();
+                 foreach (string line in inputStream)
+                 {
+                     combinedwriter.WriteLine(line);
+                 }
+                 counter++;
+            }
+            combinedwriter.Close();
         }
     }
 }
