@@ -74,8 +74,8 @@ namespace SwaMe
 
         public void GenerateiRTChromatogram(Run run)
         {
-            float[] starttimes;
-            float[] intensities;
+            double[] starttimes;
+            double[] intensities;
 
             foreach (IRTPeak irtpeak in run.IRTPeaks)
             {

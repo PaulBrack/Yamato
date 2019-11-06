@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using MessagePack;
 
 namespace MzmlParser
 {
@@ -17,7 +19,25 @@ namespace MzmlParser
         public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
         public int Density { get; set; }
-        public List<SpectrumPoint> Spectrum { get; set; }
+
+        public string ScanId
+        {
+            get
+            {
+                return string.Format("MS{0}_{1}_{2}", MsLevel, IsolationWindowTargetMz, ScanStartTime);
+            }
+        }
+    }
+
+    [MessagePackObject]
+    public class Spectrum
+    {
+        [Key(0)]
+        public List<SpectrumPoint> SpectrumPoints
+        {
+            get;
+            set;
+        }
     }
 
     public class ScanAndTempProperties

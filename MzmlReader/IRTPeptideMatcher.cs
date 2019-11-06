@@ -4,6 +4,8 @@ using System.Threading;
 using System;
 using LibraryParser;
 using System.Collections.Generic;
+using MessagePack;
+using System.IO;
 
 namespace MzmlParser
 {
@@ -50,7 +52,8 @@ namespace MzmlParser
             {
                 foreach (double targetMz in candidateHit.ProductTargetMzs)
                 {
-                    var match = matchingScan.Spectrum.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
+                    var spectrum = MessagePackSerializer.Deserialize<Spectrum>(File.ReadAllBytes(matchingScan.ScanId));
+                    var match = spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
                     if(match.Any())
                     matchingSpectrum.Add(match.First());//In a scan only one point is taken for each transition
                 }

@@ -8,6 +8,7 @@ using Ionic.Zlib;
 using System.IO;
 using System.Collections.Generic;
 using LibraryParser;
+using MessagePack;
 
 namespace MzmlParser
 {
@@ -331,9 +332,11 @@ namespace MzmlParser
             }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
 
-            scan.Scan.Spectrum = spectrum;
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
+
+            
+
 
             scan.Scan.Density = spectrum.Count();
             scan.Scan.BasePeakIntensity = intensities.Max();
@@ -377,14 +380,14 @@ namespace MzmlParser
             else { basepeakIntensity = 0; }
             //Extract info for Basepeak chromatograms
 
-            if (irt)
-                FindIrtPeptideCandidates(scan, run, spectrum);
 
             if (threading)
                 cde.Signal();
+
+            File.WriteAllBytes(scan.Scan.ScanId, MessagePackSerializer.Serialize(spectrum));
         }
 
-        private static void FindIrtPeptideCandidates(ScanAndTempProperties scan, Run run, List<SpectrumPoint> spectrum)
+        private static void FindIrtPeptideCandidates(Scan scan, Run run)
         {
             foreach (Library.Peptide peptide in run.AnalysisSettings.IrtLibrary.PeptideList.Values)
             {
@@ -397,9 +400,10 @@ namespace MzmlParser
                     {
                         break;
                     }
-                    var spectrumPoints = spectrum.Where(x => x.Intensity > run.AnalysisSettings.IrtMinIntensity && Math.Abs(x.Mz - t.ProductMz) < run.AnalysisSettings.IrtMassTolerance);
+                    var spectrum = MessagePackSerializer.Deserialize<Spectrum>(File.ReadAllBytes(scan.ScanId));
+                    var spectrumPoints = spectrum.SpectrumPoints.Where(x => x.Intensity > run.AnalysisSettings.IrtMinIntensity && Math.Abs(x.Mz - t.ProductMz) < run.AnalysisSettings.IrtMassTolerance);
                     if (spectrumPoints.Any())
-                        irtIntensities.Add(spectrumPoints.Max(x => x.Intensity));
+                        irtIntensities.Add((float)spectrumPoints.Max(x => x.Intensity));
                     transitionsLeftToSearch--;
 
                 }
@@ -409,7 +413,7 @@ namespace MzmlParser
                     {
                         PeptideSequence = peptide.Sequence,
                         Intensities = irtIntensities,
-                        RetentionTime = scan.Scan.ScanStartTime,
+                        RetentionTime = scan.ScanStartTime,
                         PrecursorTargetMz = peptide.AssociatedTransitions.First().PrecursorMz,
                         ProductTargetMzs = peptide.AssociatedTransitions.Select(x => x.ProductMz).ToList()
                     });
@@ -423,6 +427,7 @@ namespace MzmlParser
             {
                 cde.AddCount();
                 ThreadPool.QueueUserWorkItem(state => FindBasePeaks(run, scan));
+                FindIrtPeptideCandidates(scan, run);
             }
         }
 
@@ -434,7 +439,13 @@ namespace MzmlParser
             {
                 var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
                 if (temp.Any())
-                    bp.Spectrum.Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
+                {
+                    var spectrum = MessagePackSerializer.Deserialize<Spectrum>(File.ReadAllBytes(scan.ScanId));
+                    bp.Spectrum.Add(spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
+
+                }
+
+
             }
             cde.Signal();
         }

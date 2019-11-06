@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="CenterSpace.NMath.Standard.Windows.X64" Version="7.0.0.47" />
     <PackageReference Include="DotNetZip" Version="1.13.3" />
+    <PackageReference Include="MessagePack" Version="1.8.74" />
    
     <PackageReference Include="NLog" Version="4.6.3" />
   </ItemGroup>

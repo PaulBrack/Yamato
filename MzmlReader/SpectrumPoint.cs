@@ -1,4 +1,7 @@
-﻿namespace MzmlParser
+﻿using MessagePack;
+using System;
+
+namespace MzmlParser
 {
     /// <summary>
     /// A point in the 2-dimensional LC-MS space of retention time and m/z, recording intensity at this coordinate.
@@ -14,15 +17,20 @@
     /// directly into memory now this has been changed. 
     /// 
     /// </remarks>
+    [MessagePackObject]
     public struct SpectrumPoint
     {
         /// <remarks>Depending on the use of this class, this may be raw retention time or iRT. Within MzmlParser, it's raw and in minutes.</remarks>
-        public float RetentionTime { get; set; }
+        [Key(0)]
+        public double RetentionTime { get; set; }
         /// <summary>
         /// Mass over charge, in Daltons.
         /// </summary>
-        public float Mz { get; set; }
-        public float Intensity { get; set; }
+        /// [Key(0)]
+        [Key(1)]
+        public double Mz { get; set; }
+        [Key(2)]
+        public double Intensity { get; set; }
 
         public override string ToString()
         {
