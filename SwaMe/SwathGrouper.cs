@@ -15,23 +15,23 @@ namespace SwaMe
             public int maxswath;
             public double totalTIC;
             public List<int> numOfSwathPerGroup;
-            public List<double> AveMzRange;
+            public List<double> AvgMzRange;
             public List<double> TICs;
             public List<double> swDensity50;
             public List<double> swDensityIQR;
-            public List<double> TICRatio;
+            public List<double> SwathProportionOfTotalTIC;
 
-            public SwathMetrics(int maxswath, double totalTIC, List<int> numOfSwathPerGroup, List<double> AveMzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
-            List<double> TICRatio)
+            public SwathMetrics(int maxswath, double totalTIC, List<int> numOfSwathPerGroup, List<double> AvgMzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
+            List<double> SwathProportionOfTotalTIC)
             {
                 this.maxswath = maxswath;
                 this.totalTIC = totalTIC;
                 this.numOfSwathPerGroup = numOfSwathPerGroup;
-                this.AveMzRange = AveMzRange;
+                this.AvgMzRange = AvgMzRange;
                 this.TICs = TICs;
                 this.swDensity50 = swDensity50;
                 this.swDensityIQR = swDensityIQR;
-                this.TICRatio = TICRatio;
+                this.SwathProportionOfTotalTIC = SwathProportionOfTotalTIC;
             }
         }
         public SwathMetrics GroupBySwath(MzmlParser.Run run)
@@ -57,13 +57,13 @@ namespace SwaMe
             //Loop through every swath of a certain swathNumber:
 
             List<int> numOfSwathPerGroup = new List<int>();
-            List<double> AveMzRange = new List<double>();
+            List<double> AvgMzRange = new List<double>();
             List<double> TICs = new List<double>();
             List<double> swDensity = new List<double>();
             List<double> swDensity50 = new List<double>();
             List<double> swDensityIQR = new List<double>();
             List<double> mzrange = new List<double>();
-            List<double> TICRatio = new List<double>();
+            List<double> SwathProportionOfTotalTIC = new List<double>();
 //Loop through all the swaths of the same number and add to
             for (int swathNumber = 0; swathNumber < swathBoundaries.Count(); swathNumber++)
             {
@@ -83,7 +83,7 @@ namespace SwaMe
                 }
 
                 numOfSwathPerGroup.Add(track);
-                AveMzRange.Add(mzrange.Average());
+                AvgMzRange.Add(mzrange.Average());
                 TICs.Add(TICthisSwath);
                 TICthisSwath = 0;
                 swDensity.Sort();
@@ -94,10 +94,10 @@ namespace SwaMe
 
             for (int num = 0; num < swathBoundaries.Count(); num++)
             {
-                TICRatio.Add((TICs[num] / totalTIC));
+                SwathProportionOfTotalTIC.Add((TICs[num] / totalTIC));
             }
 
-            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, AveMzRange, TICs, swDensity50, swDensityIQR, TICRatio);
+            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, AvgMzRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC);
             return swathMetrics;
         }
 

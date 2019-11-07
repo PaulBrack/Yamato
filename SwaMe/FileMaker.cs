@@ -46,7 +46,7 @@ namespace SwaMe
         {
             //tsv
             StreamWriter streamWriter = new StreamWriter("MetricsBySwath_"+ run.SourceFileName + ".tsv");
-            streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AveMzRange \t TICRatioOfSwath \t swDensityAverage \t swDensityIQR  \n");
+            streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR  \n");
 
             for (int i = 0; i < (swathMetrics.numOfSwathPerGroup.Count()-1); i++)
             {
@@ -57,9 +57,9 @@ namespace SwaMe
                 streamWriter.Write("\t");
                 streamWriter.Write(swathMetrics.numOfSwathPerGroup.ElementAt(i));
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.AveMzRange.ElementAt(i));
+                streamWriter.Write(swathMetrics.AvgMzRange.ElementAt(i));
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.TICRatio.ElementAt(i));
+                streamWriter.Write(swathMetrics.SwathProportionOfTotalTIC.ElementAt(i));
                 streamWriter.Write("\t");
                 streamWriter.Write(swathMetrics.swDensity50[i]);
                 streamWriter.Write("\t");
@@ -73,7 +73,7 @@ namespace SwaMe
         {
             string metricsPerRTSegmentFile = "RTDividedMetrics_"+ run.SourceFileName+ ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
-            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t PeakSymmetry \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAverage \t DeltaTICIQR \t AveCycleTime \t AveMS2Density \t AveMS1Density \t MS2TICTotal \t MS1TICTotal");
+            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t PeakSymmetry \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal");
 
             for (int segment = 0; segment < division; segment++)
             {
@@ -167,7 +167,7 @@ namespace SwaMe
             streamWriter.Close();
         }
 
-        public void CreateAndSaveMzqc()
+        public void CreateAndSAvgMzqc()
         {
             //Declare units:
             JsonClasses.Unit Count = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0000189", name = "count" };
@@ -190,8 +190,8 @@ namespace SwaMe
             qualityParameters[7] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: MS2DensityIQR", unit = Count, value = MS2DensityIQR };
             qualityParameters[8] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:4000059", name = "Quameter metric: MS1-Count", unit = Count, value = MS1Count };
             qualityParameters[9] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: scansPerSwathGroup", unit = Count, value = swathMetrics.numOfSwathPerGroup };
-            qualityParameters[10] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AveMzRange", unit = mZ, value = swathMetrics.AveMzRange };
-            qualityParameters[11] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: TICRatioOfSwath", unit = Ratio, value = swathMetrics.TICRatio };
+            qualityParameters[10] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AvgMzRange", unit = mZ, value = swathMetrics.AvgMzRange };
+            qualityParameters[11] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: SwathProportionOfTotalTIC", unit = Ratio, value = swathMetrics.SwathProportionOfTotalTIC };
             qualityParameters[12] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: swDensity50", unit = Count, value = swathMetrics.swDensity50 };
             qualityParameters[13] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: swDensityIQR", unit = Count, value = swathMetrics.swDensityIQR };
             qualityParameters[14] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: Peakwidths", unit = Second, value = rtMetrics.Peakwidths };
@@ -201,7 +201,7 @@ namespace SwaMe
             qualityParameters[17] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS1PeakPrecision", unit = mZ, value = rtMetrics.MS1PeakPrecision };
             qualityParameters[18] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: DeltaTICAverage", unit = Intensity, value = rtMetrics.TicChange50List };
             qualityParameters[19] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: DeltaTICIQR", unit = Intensity, value = rtMetrics.TicChangeIqrList };
-            qualityParameters[20] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AveScanTime", unit = Second, value = rtMetrics.CycleTime };
+            qualityParameters[20] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AvgScanTime", unit = Second, value = rtMetrics.CycleTime };
             qualityParameters[21] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS2Density", unit = Count, value = rtMetrics.MS2Density };
             qualityParameters[22] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS1Density", unit = Count, value = rtMetrics.MS1Density };
             qualityParameters[23] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS2TICTotal", unit = Count, value = rtMetrics.MS2TicTotal };
