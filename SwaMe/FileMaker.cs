@@ -23,8 +23,9 @@ namespace SwaMe
         private MzmlParser.Run run;
         private SwathGrouper.SwathMetrics swathMetrics;
         private RTGrouper.RTMetrics rtMetrics;
+        private string dateTime;
 
-        public FileMaker(int division, string inputFilePath, MzmlParser.Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, double cycleTimes50, double cycleTimesIQR, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count)
+        public FileMaker(int division, string inputFilePath, MzmlParser.Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, double cycleTimes50, double cycleTimesIQR, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
         {
             this.swathMetrics = swathMetrics;
             this.division = division;
@@ -40,12 +41,13 @@ namespace SwaMe
             this.MS2Density50 = MS2Density50;
             this.MS2DensityIQR = MS2DensityIQR;
             this.MS1Count = MS1Count;
+            this.dateTime = dateTime;
         }
 
         public void MakeMetricsPerSwathFile(SwathGrouper.SwathMetrics swathMetrics,string inputFile)
         {
             //tsv
-            StreamWriter streamWriter = new StreamWriter("MetricsBySwath_"+ run.SourceFileName + ".tsv");
+            StreamWriter streamWriter = new StreamWriter(dateTime +"_MetricsBySwath_" + run.SourceFileName + ".tsv");
             streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR  \n");
 
             for (int i = 0; i < (swathMetrics.numOfSwathPerGroup.Count()-1); i++)
@@ -71,7 +73,7 @@ namespace SwaMe
         }
         public void MakeMetricsPerRTsegmentFile(RTGrouper.RTMetrics rtMetrics)
         {
-            string metricsPerRTSegmentFile = "RTDividedMetrics_"+ run.SourceFileName+ ".tsv";
+            string metricsPerRTSegmentFile = dateTime+ "_RTDividedMetrics_" + run.SourceFileName+ ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
             streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal");
 
@@ -113,7 +115,7 @@ namespace SwaMe
         }
         public void MakeUndividedMetricsFile()
         {
-            string undividedFile = "undividedMetrics_" + run.SourceFileName + ".tsv";
+            string undividedFile = dateTime + "_undividedMetrics_" + run.SourceFileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(undividedFile);
             streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t CycleTimes50 \t CycleTimesIQR \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count");
             streamWriter.Write("\n");
@@ -146,7 +148,7 @@ namespace SwaMe
         public void MakeiRTmetricsFile(Run run)
         {
 
-            StreamWriter streamWriter = new StreamWriter("iRTMetrics_"  +run.SourceFileName + ".tsv");
+            StreamWriter streamWriter = new StreamWriter(dateTime  + "iRTMetrics_"  + run.SourceFileName +".tsv");
             streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor");
 
             foreach (IRTPeak peak in run.IRTPeaks)
