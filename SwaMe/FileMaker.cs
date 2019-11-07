@@ -73,7 +73,7 @@ namespace SwaMe
         {
             string metricsPerRTSegmentFile = "RTDividedMetrics_"+ run.SourceFileName+ ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
-            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t PeakSymmetry \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal");
+            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal");
 
             for (int segment = 0; segment < division; segment++)
             {
@@ -86,7 +86,7 @@ namespace SwaMe
                 streamWriter.Write(" \t ");
                 streamWriter.Write(rtMetrics.Peakwidths.ElementAt(segment).ToString());
                 streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.PeakSymmetry.ElementAt(segment).ToString());
+                streamWriter.Write(rtMetrics.TailingFactor.ElementAt(segment).ToString());
                 streamWriter.Write(" \t ");
                 streamWriter.Write(rtMetrics.PeakCapacity.ElementAt(segment).ToString());
                 streamWriter.Write(" \t ");
@@ -147,7 +147,7 @@ namespace SwaMe
         {
 
             StreamWriter streamWriter = new StreamWriter("iRTMetrics_"  +run.SourceFileName + ".tsv");
-            streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t PeakSymmetry");
+            streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor");
 
             foreach (IRTPeak peak in run.IRTPeaks)
             {
@@ -196,7 +196,7 @@ namespace SwaMe
             qualityParameters[13] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: swDensityIQR", unit = Count, value = swathMetrics.swDensityIQR };
             qualityParameters[14] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: Peakwidths", unit = Second, value = rtMetrics.Peakwidths };
             qualityParameters[15] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: PeakCapacity", unit = Count, value = rtMetrics.PeakCapacity };
-            qualityParameters[16] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: PeakSymmetry", unit = Count, value = rtMetrics.PeakSymmetry };
+            qualityParameters[16] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: TailingFactor", unit = Count, value = rtMetrics.TailingFactor };
             qualityParameters[17] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS2PeakPrecision", unit = mZ, value = rtMetrics.PeakPrecision };
             qualityParameters[17] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: MS1PeakPrecision", unit = mZ, value = rtMetrics.MS1PeakPrecision };
             qualityParameters[18] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: DeltaTICAverage", unit = Intensity, value = rtMetrics.TicChange50List };

@@ -9,7 +9,7 @@ namespace SwaMe
         public class RTMetrics
         {
             public List<double> Peakwidths;
-            public List<double> PeakSymmetry;
+            public List<double> TailingFactor;
             public List<double> PeakCapacity;
             public List<double> PeakPrecision;
             public List<double> MS1PeakPrecision;
@@ -21,10 +21,10 @@ namespace SwaMe
             public List<double> TicChange50List;
             public List<double> TicChangeIqrList;
 
-            public RTMetrics(List<double> MS1TICTotal, List<double> MS2TICTotal, List<double> cycleTime, List<double> TICchange50List, List<double> TICchangeIQRList, List<int> MS1Density, List<int> MS2Density, List<double> Peakwidths, List<double> PeakSymmetry, List<double> PeakCapacity, List<double> PeakPrecision, List<double> MS1PeakPrecision)
+            public RTMetrics(List<double> MS1TICTotal, List<double> MS2TICTotal, List<double> cycleTime, List<double> TICchange50List, List<double> TICchangeIQRList, List<int> MS1Density, List<int> MS2Density, List<double> Peakwidths, List<double> TailingFactor, List<double> PeakCapacity, List<double> PeakPrecision, List<double> MS1PeakPrecision)
             {
                 this.Peakwidths = Peakwidths;
-                this.PeakSymmetry = PeakSymmetry;
+                this.TailingFactor = TailingFactor;
                 this.PeakCapacity = PeakCapacity;
                 this.PeakPrecision = PeakPrecision;
                 this.MS1PeakPrecision = MS1PeakPrecision;
@@ -150,7 +150,7 @@ namespace SwaMe
             //if (run.Ms1Scans.Count()>0) mIMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakIntensity).Average();
             //var mMMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakMz).Average();
             List<double> peakWidths = new List<double>();
-            List<double> peakSymmetry = new List<double>();
+            List<double> TailingFactor = new List<double>();
             List<double> peakCapacity = new List<double>();
             List<double> peakPrecision = new List<double>();
             List<double> ms1PeakPrecision = new List<double>();
@@ -216,14 +216,14 @@ namespace SwaMe
                 if (peakWidthsTemp.Count > 0)
                 {
                     peakWidths.Add(peakWidthsTemp.Average());
-                    peakSymmetry.Add(peakSymTemp.Average());
+                    TailingFactor.Add(peakSymTemp.Average());
                     peakCapacity.Add(rtSegment / fullWidthBaselinesTemp.Average());//PeakCapacity is calculated as per Dolan et al.,2009, PubMed 10536823);
                     peakPrecision.Add(peakPrecisionTemp.Average());
                 }
                 else
                 {
                     peakWidths.Add(0);
-                    peakSymmetry.Add(0);
+                    TailingFactor.Add(0);
                     peakCapacity.Add(0);
                     peakPrecision.Add(0);
                 }
@@ -242,7 +242,7 @@ namespace SwaMe
                 Ms2TicTotal.Add(Math.Truncate(Math.Ceiling(ms2TicTotalTemp)));
             }
 
-            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, Ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, peakSymmetry, peakCapacity, peakPrecision, ms1PeakPrecision);
+            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, Ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, TailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision);
             return rtMetrics;
         }
     }
