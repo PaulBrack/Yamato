@@ -57,7 +57,7 @@ namespace SwaMe
                 streamWriter.Write("\t");
                 streamWriter.Write(swathMetrics.numOfSwathPerGroup.ElementAt(i));
                 streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.AvgMzRange.ElementAt(i));
+                streamWriter.Write(swathMetrics.mzRange.ElementAt(i));
                 streamWriter.Write("\t");
                 streamWriter.Write(swathMetrics.SwathProportionOfTotalTIC.ElementAt(i));
                 streamWriter.Write("\t");
@@ -167,7 +167,7 @@ namespace SwaMe
             streamWriter.Close();
         }
 
-        public void CreateAndSAvgMzqc()
+        public void CreateAndSaveMzqc()
         {
             //Declare units:
             JsonClasses.Unit Count = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0000189", name = "count" };
@@ -190,7 +190,7 @@ namespace SwaMe
             qualityParameters[7] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: MS2DensityIQR", unit = Count, value = MS2DensityIQR };
             qualityParameters[8] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:4000059", name = "Quameter metric: MS1-Count", unit = Count, value = MS1Count };
             qualityParameters[9] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: scansPerSwathGroup", unit = Count, value = swathMetrics.numOfSwathPerGroup };
-            qualityParameters[10] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AvgMzRange", unit = mZ, value = swathMetrics.AvgMzRange };
+            qualityParameters[10] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: AvgMzRange", unit = mZ, value = swathMetrics.mzRange };
             qualityParameters[11] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: SwathProportionOfTotalTIC", unit = Ratio, value = swathMetrics.SwathProportionOfTotalTIC };
             qualityParameters[12] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: swDensity50", unit = Count, value = swathMetrics.swDensity50 };
             qualityParameters[13] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXXX", name = "SwaMe metric: swDensityIQR", unit = Count, value = swathMetrics.swDensityIQR };

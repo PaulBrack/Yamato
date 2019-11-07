@@ -15,19 +15,19 @@ namespace SwaMe
             public int maxswath;
             public double totalTIC;
             public List<int> numOfSwathPerGroup;
-            public List<double> AvgMzRange;
+            public List<double> mzRange;
             public List<double> TICs;
             public List<double> swDensity50;
             public List<double> swDensityIQR;
             public List<double> SwathProportionOfTotalTIC;
 
-            public SwathMetrics(int maxswath, double totalTIC, List<int> numOfSwathPerGroup, List<double> AvgMzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
+            public SwathMetrics(int maxswath, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
             List<double> SwathProportionOfTotalTIC)
             {
                 this.maxswath = maxswath;
                 this.totalTIC = totalTIC;
                 this.numOfSwathPerGroup = numOfSwathPerGroup;
-                this.AvgMzRange = AvgMzRange;
+                this.mzRange = mzRange;
                 this.TICs = TICs;
                 this.swDensity50 = swDensity50;
                 this.swDensityIQR = swDensityIQR;
@@ -57,12 +57,12 @@ namespace SwaMe
             //Loop through every swath of a certain swathNumber:
 
             List<int> numOfSwathPerGroup = new List<int>();
-            List<double> AvgMzRange = new List<double>();
             List<double> TICs = new List<double>();
             List<double> swDensity = new List<double>();
             List<double> swDensity50 = new List<double>();
             List<double> swDensityIQR = new List<double>();
-            List<double> mzrange = new List<double>();
+            List<double> mzTargetRange = new List<double>();
+            List<double> medianMzTargetRange = new List<double>();
             List<double> SwathProportionOfTotalTIC = new List<double>();
 //Loop through all the swaths of the same number and add to
             for (int swathNumber = 0; swathNumber < swathBoundaries.Count(); swathNumber++)
@@ -71,19 +71,18 @@ namespace SwaMe
 
                 double TICthisSwath = 0;
 
-                var result333 = run.Ms2Scans.OrderBy(s => s.ScanStartTime)
+                var orderedMS2Scans = run.Ms2Scans.OrderBy(s => s.ScanStartTime)
                     .Where(x => x.MsLevel == 2 && x.IsolationWindowTargetMz == swathBoundaries[swathNumber]);
-                foreach (var scan in result333)
+                foreach (var scan in orderedMS2Scans)
                 {
-
-                    mzrange.Add(scan.IsolationWindowUpperOffset + scan.IsolationWindowLowerOffset);
+                    mzTargetRange.Add(scan.IsolationWindowUpperOffset + scan.IsolationWindowLowerOffset);
                     TICthisSwath = TICthisSwath + scan.TotalIonCurrent;
                     swDensity.Add(scan.Density);
                     track++;
                 }
-
+                mzTargetRange.Sort();
+                medianMzTargetRange.Add(mzTargetRange.ElementAt(mzTargetRange.Count/2));
                 numOfSwathPerGroup.Add(track);
-                AvgMzRange.Add(mzrange.Average());
                 TICs.Add(TICthisSwath);
                 TICthisSwath = 0;
                 swDensity.Sort();
@@ -97,7 +96,7 @@ namespace SwaMe
                 SwathProportionOfTotalTIC.Add((TICs[num] / totalTIC));
             }
 
-            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, AvgMzRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC);
+            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC);
             return swathMetrics;
         }
 
