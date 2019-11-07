@@ -23,7 +23,7 @@ namespace Yamato.Console
             {
                 UpdateLoggingLevels(options);
                 bool combine = options.Combine;
-                string date = DateTime.Now.ToString("yyyy-MM-dd");
+                string dateTime = DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss");
                 List<string> inputFiles = new List<string>();
 
                 if (options.LoadFromDirectory != null && options.LoadFromDirectory == true)//multiple files
@@ -87,7 +87,7 @@ namespace Yamato.Console
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, irt, analysisSettings);
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
-                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, date);
+                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
                     logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     logger.Info("Done!");
 
