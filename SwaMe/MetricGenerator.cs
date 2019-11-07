@@ -6,7 +6,7 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        public void GenerateMetrics(Run run, int division,  string inputFilePath, bool irt, bool combine, bool lastFile)
+        public void GenerateMetrics(Run run, int division,  string inputFilePath, bool irt, bool combine, bool lastFile, string date)
         {
 
             //Acquire RTDuration: last minus first
@@ -35,7 +35,7 @@ namespace SwaMe
             //Create IQR so you can calculate IQR:            
             RTGrouper rtGrouper = new RTGrouper { };
             RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
-            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count());
+            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count(), date);
             fileMaker.MakeUndividedMetricsFile();
             if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
             {
@@ -47,10 +47,10 @@ namespace SwaMe
             fileMaker.CreateAndSaveMzqc();
             if (combine && lastFile)
             {
-                fileMaker.CombineMultipleFilesIntoSingleFile("iRTMetrics_*", "AllIRTMetrics.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile("MetricsBySwath_*", "AllMetricsBySwath.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile("RTDividedMetrics_*", "AllRTDividedMetrics.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile("undividedMetrics_*", "AllUndividedMetrics.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile("iRTMetrics_*", date + "AllIRTMetrics.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile("MetricsBySwath_*", date + "AllMetricsBySwath.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile("RTDividedMetrics_*", date + "AllRTDividedMetrics.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile("undividedMetrics_*", date + "AllUndividedMetrics.tsv");
              }
         }
 
