@@ -20,9 +20,10 @@ namespace SwaMe
             public List<double> swDensity50;
             public List<double> swDensityIQR;
             public List<double> SwathProportionOfTotalTIC;
+            public List<double> SwathProportionPredictedSingleChargeAvg;
 
             public SwathMetrics(int maxswath, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
-            List<double> SwathProportionOfTotalTIC)
+            List<double> SwathProportionOfTotalTIC, List<double> SwathProportionPredictedSingleChargeAvg)
             {
                 this.maxswath = maxswath;
                 this.totalTIC = totalTIC;
@@ -32,6 +33,7 @@ namespace SwaMe
                 this.swDensity50 = swDensity50;
                 this.swDensityIQR = swDensityIQR;
                 this.SwathProportionOfTotalTIC = SwathProportionOfTotalTIC;
+                this.SwathProportionPredictedSingleChargeAvg = SwathProportionPredictedSingleChargeAvg;
             }
         }
         public SwathMetrics GroupBySwath(MzmlParser.Run run)
@@ -64,6 +66,9 @@ namespace SwaMe
             List<double> mzTargetRange = new List<double>();
             List<double> medianMzTargetRange = new List<double>();
             List<double> SwathProportionOfTotalTIC = new List<double>();
+            List<double> TotalSwathProportionPredictedSingleCharge = new List<double>();
+            List<double> SwathProportionPredictedSingleChargeAvg = new List<double>();
+
 //Loop through all the swaths of the same number and add to
             for (int swathNumber = 0; swathNumber < swathBoundaries.Count(); swathNumber++)
             {
@@ -78,6 +83,7 @@ namespace SwaMe
                     mzTargetRange.Add(scan.IsolationWindowUpperOffset + scan.IsolationWindowLowerOffset);
                     TICthisSwath = TICthisSwath + scan.TotalIonCurrent;
                     swDensity.Add(scan.Density);
+                    TotalSwathProportionPredictedSingleCharge.Add(scan.proportionChargeStateOne); //The chargestate one's we pick up is where there is a match for M+1. Therefore we need to double it to add the M.
                     track++;
                 }
                 mzTargetRange.Sort();
@@ -85,6 +91,8 @@ namespace SwaMe
                 numOfSwathPerGroup.Add(track);
                 TICs.Add(TICthisSwath);
                 TICthisSwath = 0;
+                SwathProportionPredictedSingleChargeAvg.Add(TotalSwathProportionPredictedSingleCharge.Average());
+                TotalSwathProportionPredictedSingleCharge.Clear();
                 swDensity.Sort();
                 swDensity50.Add(Math.Truncate(Math.Ceiling(swDensity.Average())));
                 swDensityIQR.Add(Math.Truncate(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity))));
@@ -96,7 +104,7 @@ namespace SwaMe
                 SwathProportionOfTotalTIC.Add((TICs[num] / totalTIC));
             }
 
-            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC);
+            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
             return swathMetrics;
         }
 

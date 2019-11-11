@@ -331,6 +331,48 @@ namespace MzmlParser
             }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint() { Intensity = x, Mz = mzs[i], RetentionTime = (float)scan.Scan.ScanStartTime }).ToList();
 
+
+            //Predicted singly charged proportion:
+
+            //The theory is that an M and M+1 pair are singly charged so we are very simply just looking for  occurences where two ions are 1 mz apart (+-massTolerance)
+
+            //We therefore create an array cusums that accumulates the difference between ions, so for every ion we calculate the distance between that ion
+            //and the previous and add that to each of the previous ions' cusum of differences. If the cusum of an ion overshoots 1 +massTolerance, we stop adding to it, if it reaches our mark we count it and stop adding to it
+
+            List<int> indexes = new List<int>();
+            float[] cusums = new float[mzs.Length];
+            int movingPoint = 0;
+            double minimum = 1 - run.AnalysisSettings.MassTolerance;
+            double maximum = 1 + run.AnalysisSettings.MassTolerance;
+
+            for (int i = 1; i < mzs.Length; i++)
+            {
+                float distance = mzs[i] - mzs[i - 1];
+                bool matchedWithLower = false;
+                for (int ii = movingPoint; ii < i; ii++)
+                {
+                    cusums[ii] += distance;
+                    if (cusums[ii] < minimum) continue;
+                    else if (cusums[ii] > minimum && cusums[ii] < maximum)
+                    {
+                        if (!matchedWithLower)//This is to try and minimise false positives where for example if you have an array: 351.14, 351.15, 352.14 all three get chosen.
+                        {
+                            indexes.Add(i);
+                            indexes.Add(movingPoint);
+                        }
+                        movingPoint +=1;
+                        matchedWithLower = true;
+                        continue;
+                    }
+                    else if (cusums[ii] > maximum) { movingPoint += 1; }
+                }
+
+            }
+            int distinct = indexes.Distinct().Count();
+            int len = mzs.Length;
+            scan.Scan.proportionChargeStateOne = (double)distinct/(double)len;
+
+            
             scan.Scan.Spectrum = spectrum;
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;

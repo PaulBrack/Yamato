@@ -48,7 +48,7 @@ namespace SwaMe
         {
             //tsv
             StreamWriter streamWriter = new StreamWriter(dateTime +"_MetricsBySwath_" + run.SourceFileName + ".tsv");
-            streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR  \n");
+            streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
 
             for (int i = 0; i < (swathMetrics.numOfSwathPerGroup.Count()-1); i++)
             {
@@ -66,6 +66,8 @@ namespace SwaMe
                 streamWriter.Write(swathMetrics.swDensity50[i]);
                 streamWriter.Write("\t");
                 streamWriter.Write(swathMetrics.swDensityIQR[i]);
+                streamWriter.Write("\t");
+                streamWriter.Write(swathMetrics.SwathProportionPredictedSingleChargeAvg.ElementAt(i));
                 streamWriter.Write("\n");
             }
             streamWriter.Close();

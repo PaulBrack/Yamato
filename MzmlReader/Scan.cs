@@ -18,6 +18,7 @@ namespace MzmlParser
         public int RTsegment { get; set; }
         public int Density { get; set; }
         public List<SpectrumPoint> Spectrum { get; set; }
+        public double proportionChargeStateOne { get; set; }
     }
 
     public class ScanAndTempProperties
