@@ -342,8 +342,8 @@ namespace MzmlParser
             List<int> indexes = new List<int>();
             float[] cusums = new float[mzs.Length];
             int movingPoint = 0;
-            double minimum = 1 - run.AnalysisSettings.MassTolerance;
-            double maximum = 1 + run.AnalysisSettings.MassTolerance;
+            double minimum = 1 - 0.001;
+            double maximum = 1 + 0.001;
 
             for (int i = 1; i < mzs.Length; i++)
             {
