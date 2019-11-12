@@ -50,11 +50,10 @@ namespace SwaMe
             StreamWriter streamWriter = new StreamWriter(dateTime +"_MetricsBySwath_" + run.SourceFileName + ".tsv");
             streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
 
-            for (int i = 0; i < (swathMetrics.numOfSwathPerGroup.Count()-1); i++)
+            for (int i = 0; i < swathMetrics.maxswath; i++)
             {
                 streamWriter.Write(run.SourceFileName);
                 streamWriter.Write("\t");
-                streamWriter.Write("Swathnumber");
                 streamWriter.Write(i + 1);
                 streamWriter.Write("\t");
                 streamWriter.Write(swathMetrics.numOfSwathPerGroup.ElementAt(i));
