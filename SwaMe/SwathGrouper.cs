@@ -43,13 +43,13 @@ namespace SwaMe
             foreach (var e in result)
             {
                 if (e.Count > maxswath)
-                    maxswath = e.Count-1;
+                    maxswath = e.Count;
             }
 
             //Create list of target isolationwindows to serve as swathnumber
             List<double> swathBoundaries = new List<double>();
             swathBoundaries = run.Ms2Scans.Select(x => x.IsolationWindowTargetMz).Distinct().ToList();
-
+            swathBoundaries.Sort();
             double totalTIC = 0;
             foreach (var scan in run.Ms2Scans)
             {
