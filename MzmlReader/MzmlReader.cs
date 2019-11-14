@@ -171,6 +171,8 @@ namespace MzmlParser
                                 break;
                             case "MS:1000016":
                                 scan.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                run.StartTime = Math.Min(run.StartTime, scan.Scan.ScanStartTime);
+                                run.LastScanTime = Math.Max(run.LastScanTime, scan.Scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
                                 break;
                             
                             case "MS:1000829":
@@ -470,8 +472,6 @@ namespace MzmlParser
 
         private static void FindBasePeaks(Run run, Scan scan)
         {
-            run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
-            run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
             foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= run.AnalysisSettings.MassTolerance))
             {
                 var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
