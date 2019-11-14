@@ -74,7 +74,7 @@ namespace SwaMe
             {
                 //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
                 //We assign to the segmentdivider below. So if >a and <b, it is assigned to segment a.
-
+                
                 if (scan.ScanStartTime > rtSegs.Last())//If the scan is after the last segment divider, it falls into the last segment
                     scan.RTsegment = rtSegs.Count() - 1;
                 else if (rtSegs.Count() > 1 && scan.ScanStartTime < rtSegs[1])//If the scan is before the second segment divider it should fall in the first segment. (assuming that the user has selected to have more than one segment)
@@ -84,45 +84,20 @@ namespace SwaMe
                         if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])// If the scan is larger than the previous boundary and smaller than this boundary, assign to the previous segment.
                             scan.RTsegment = segmentboundary - 1;
                     }
-
-
-                for (int segmentboundary = 1; segmentboundary < rtSegs.Count(); segmentboundary++)
-                {
-                    if (scan.ScanStartTime > rtSegs.Last())
-                        scan.RTsegment = rtSegs.Count() - 1;
-                    else if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])
-                    {
-                        scan.RTsegment = segmentboundary - 1;
-                        break;
-                    }
-                    else if (scan.ScanStartTime > rtSegs[segmentboundary] && segmentboundary == rtSegs.Count())
-                    {
-                        scan.RTsegment = segmentboundary + 1;
-                        break;
-                    }
-                }
             }
 
             //dividing ms1scans into segments of RT
             foreach (MzmlParser.Scan scan in run.Ms1Scans)
             {
-                //Check to see in which RTsegment this basepeak is:
-                for (int segmentboundary = 1; segmentboundary < rtSegs.Count(); segmentboundary++)
-                {
-                    if (scan.ScanStartTime > rtSegs.Last())
-                        scan.RTsegment = rtSegs.Count() - 1;
-                    else if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])
+                if (scan.ScanStartTime > rtSegs.Last())//If the scan is after the last segment divider, it falls into the last segment
+                    scan.RTsegment = rtSegs.Count() - 1;
+                else if (rtSegs.Count() > 1 && scan.ScanStartTime < rtSegs[1])//If the scan is before the second segment divider it should fall in the first segment. (assuming that the user has selected to have more than one segment)
+                    scan.RTsegment = 0;
+                else for (int segmentboundary = 2; segmentboundary < rtSegs.Count(); segmentboundary++)//If the scan is not in the first or last segment
                     {
-                        scan.RTsegment = segmentboundary - 1;
-                        break;
+                        if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])// If the scan is larger than the previous boundary and smaller than this boundary, assign to the previous segment.
+                            scan.RTsegment = segmentboundary - 1;
                     }
-                    else if (scan.ScanStartTime > rtSegs[segmentboundary] && segmentboundary == rtSegs.Count())
-                    {
-                        scan.RTsegment = segmentboundary + 1;
-                        break;
-                    }
-
-                }
             }
 
             //Retrieve TICChange metrics and divide into rtsegs
@@ -230,7 +205,7 @@ namespace SwaMe
                 if (ms1PeakPrecisionTemp.Count > 0)
                 {
                     ms1PeakPrecision.Add(ms1PeakPrecisionTemp.Average());
-                    ms1Density.Add(Convert.ToInt32(Math.Round(ms1DensityTemp.Average(), 0)));
+                    ms1Density.Add(Convert.ToInt32(Math.Ceiling(ms1DensityTemp.Average())));
                 }
                 else
                 {
@@ -238,8 +213,8 @@ namespace SwaMe
                     ms1Density.Add(0);
                 }
                 ms2Density.Add(Convert.ToInt32(Math.Round(ms2DensityTemp.Average(), 0)));
-                ms1TicTotal.Add(Math.Truncate(Math.Ceiling(ms1TicTotalTemp)));
-                Ms2TicTotal.Add(Math.Truncate(Math.Ceiling(ms2TicTotalTemp)));
+                ms1TicTotal.Add(ms1TicTotalTemp);
+                Ms2TicTotal.Add(ms2TicTotalTemp);
             }
 
             RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, Ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, TailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision);
