@@ -25,7 +25,7 @@ namespace SwaMe
         private RTGrouper.RTMetrics rtMetrics;
         private string dateTime;
 
-        public FileMaker(int division, string inputFilePath, MzmlParser.Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, double cycleTimes50, double cycleTimesIQR, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
+        public FileMaker(int division, string inputFilePath, MzmlParser.Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
         {
             this.swathMetrics = swathMetrics;
             this.division = division;
@@ -35,8 +35,6 @@ namespace SwaMe
             this.RTDuration = RTDuration;
             this.swathSizeDifference = swathSizeDifference;
             this.MS2Count = MS2Count;
-            this.cycleTimes50 = cycleTimes50;
-            this.cycleTimesIQR = cycleTimesIQR;
             this.totalMS2IonCount = totalMS2IonCount;
             this.MS2Density50 = MS2Density50;
             this.MS2DensityIQR = MS2DensityIQR;
@@ -118,7 +116,7 @@ namespace SwaMe
         {
             string undividedFile = dateTime + "_undividedMetrics_" + run.SourceFileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(undividedFile);
-            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t CycleTimes50 \t CycleTimesIQR \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count");
+            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count");
             streamWriter.Write("\n");
             streamWriter.Write(run.SourceFileName);
             streamWriter.Write("\t");
@@ -131,10 +129,6 @@ namespace SwaMe
             streamWriter.Write(MS2Count);
             streamWriter.Write("\t");
             streamWriter.Write(swathMetrics.maxswath);
-            streamWriter.Write("\t");
-            streamWriter.Write(cycleTimes50);
-            streamWriter.Write("\t");
-            streamWriter.Write(cycleTimesIQR);
             streamWriter.Write("\t");
             streamWriter.Write(totalMS2IonCount);
             streamWriter.Write("\t");
@@ -186,8 +180,6 @@ namespace SwaMe
             qualityParameters[1] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: swathSizeDifference", unit = mZ, value = swathSizeDifference };
             qualityParameters[2] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:4000060", name = "Quameter metric: MS2-Count", unit = Count, value = MS2Count };
             qualityParameters[3] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: NumOfSwaths", unit = Count, value = swathMetrics.maxswath };
-            qualityParameters[4] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: CycleTimes50", unit = Hertz, value = cycleTimes50 };
-            qualityParameters[5] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: CycleTimesIQR", unit = Hertz, value = cycleTimesIQR };
             qualityParameters[6] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: TotalMS2IonCount", unit = Count, value = totalMS2IonCount };
             qualityParameters[6] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: MS2Density50", unit = Count, value = MS2Density50 };
             qualityParameters[7] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: MS2DensityIQR", unit = Count, value = MS2DensityIQR };
