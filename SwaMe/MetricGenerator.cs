@@ -26,16 +26,13 @@ namespace SwaMe
             SwathGrouper swathGrouper = new SwathGrouper { };
             SwathGrouper.SwathMetrics swathMetrics = swathGrouper.GroupBySwath(run);
 
-            //Retrieving cycletimesmetrics
-            List<double> CycleTimes = CalcCycleTime(run);
-            CycleTimes.Sort();
             //Retrieving Density metrics
             var Density = run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
 
             //Create IQR so you can calculate IQR:            
             RTGrouper rtGrouper = new RTGrouper { };
             RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
-            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), CycleTimes.ElementAt(CycleTimes.Count() / 2), InterQuartileRangeCalculator.CalcIQR(CycleTimes), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count(), date);
+            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count(), date);
             fileMaker.MakeUndividedMetricsFile();
             if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
             {
@@ -52,11 +49,6 @@ namespace SwaMe
                 fileMaker.CombineMultipleFilesIntoSingleFile("RTDividedMetrics_*", date + "AllRTDividedMetrics.tsv");
                 fileMaker.CombineMultipleFilesIntoSingleFile("undividedMetrics_*", date + "AllUndividedMetrics.tsv");
              }
-        }
-
-       private List<double> CalcCycleTime(Run run)
-        {
-            return run.Ms2Scans.GroupBy(s => s.Cycle).Select(g => g.OrderByDescending(d => d.ScanStartTime)).Select(e => e.First().ScanStartTime - e.Last().ScanStartTime).ToList();
         }
     }
 }
