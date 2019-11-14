@@ -40,14 +40,14 @@ namespace SwaMe
             }
             
             fileMaker.MakeMetricsPerRTsegmentFile(rtMetrics);
-            fileMaker.MakeMetricsPerSwathFile(swathMetrics, inputFilePath);
+            fileMaker.MakeMetricsPerSwathFile(swathMetrics);
             fileMaker.CreateAndSaveMzqc();
             if (combine && lastFile)
             {
-                fileMaker.CombineMultipleFilesIntoSingleFile("iRTMetrics_*", date + "AllIRTMetrics.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile("MetricsBySwath_*", date + "AllMetricsBySwath.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile("RTDividedMetrics_*", date + "AllRTDividedMetrics.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile("undividedMetrics_*", date + "AllUndividedMetrics.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*", date + "AllIRTMetrics.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*", date + "AllMetricsBySwath.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", date + "AllRTDividedMetrics.tsv");
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", date + "AllUndividedMetrics.tsv");
              }
         }
     }

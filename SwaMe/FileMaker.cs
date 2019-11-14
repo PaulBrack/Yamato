@@ -1,9 +1,11 @@
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MzmlParser;
 using MzqcGenerator;
+using NLog;
 
 namespace SwaMe
 {
@@ -14,18 +16,19 @@ namespace SwaMe
         private int MS2DensityIQR;
         private int MS1Count;
         private int MS2Count;
-        private double cycleTimes50;
-        private double cycleTimesIQR;
         private int totalMS2IonCount;
         private string inputFilePath;
         private double RTDuration;
         private double swathSizeDifference;
-        private MzmlParser.Run run;
+        private Run run;
         private SwathGrouper.SwathMetrics swathMetrics;
         private RTGrouper.RTMetrics rtMetrics;
         private string dateTime;
 
-        public FileMaker(int division, string inputFilePath, MzmlParser.Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
+
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        public FileMaker(int division, string inputFilePath, Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
         {
             this.swathMetrics = swathMetrics;
             this.division = division;
@@ -42,126 +45,88 @@ namespace SwaMe
             this.dateTime = dateTime;
         }
 
-        public void MakeMetricsPerSwathFile(SwathGrouper.SwathMetrics swathMetrics,string inputFile)
+        public void MakeMetricsPerSwathFile(SwathGrouper.SwathMetrics swathMetrics)
         {
             //tsv
-            StreamWriter streamWriter = new StreamWriter(dateTime +"_MetricsBySwath_" + run.SourceFileName + ".tsv");
+            string swathFileName = dateTime + "_MetricsBySwath_" + run.SourceFileName + ".tsv";
+            StreamWriter streamWriter = new StreamWriter(swathFileName);
             streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
 
             for (int i = 0; i < swathMetrics.maxswath; i++)
             {
-                streamWriter.Write(run.SourceFileName);
-                streamWriter.Write("\t");
-                streamWriter.Write(i + 1);
-                streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.numOfSwathPerGroup.ElementAt(i));
-                streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.mzRange.ElementAt(i));
-                streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.SwathProportionOfTotalTIC.ElementAt(i));
-                streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.swDensity50[i]);
-                streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.swDensityIQR[i]);
-                streamWriter.Write("\t");
-                streamWriter.Write(swathMetrics.SwathProportionPredictedSingleChargeAvg.ElementAt(i));
+                string[] phraseToWrite = { run.SourceFileName, Convert.ToString(i + 1), Convert.ToString(swathMetrics.numOfSwathPerGroup.ElementAt(i)),
+                    Convert.ToString(swathMetrics.mzRange.ElementAt(i)), Convert.ToString(swathMetrics.SwathProportionOfTotalTIC.ElementAt(i)),
+                    Convert.ToString(swathMetrics.swDensity50[i]), Convert.ToString(swathMetrics.swDensityIQR[i]),
+                    Convert.ToString(swathMetrics.SwathProportionPredictedSingleChargeAvg.ElementAt(i)) };
+
+                streamWriter.Write(string.Join("\t", phraseToWrite));
                 streamWriter.Write("\n");
             }
             streamWriter.Close();
-
+            CheckColumnNumber(swathFileName, 8);
         }
         public void MakeMetricsPerRTsegmentFile(RTGrouper.RTMetrics rtMetrics)
         {
             string metricsPerRTSegmentFile = dateTime+ "_RTDividedMetrics_" + run.SourceFileName+ ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
-            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal");
+            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal \n");
 
             for (int segment = 0; segment < division; segment++)
             {
                 //write streamWriter
+                string[] phraseToWrite = { run.SourceFileName, Convert.ToString(segment), Convert.ToString(rtMetrics.Peakwidths.ElementAt(segment)),
+                    Convert.ToString(rtMetrics.TailingFactor.ElementAt(segment)), Convert.ToString(rtMetrics.PeakCapacity.ElementAt(segment)),
+                    Convert.ToString(rtMetrics.PeakPrecision.ElementAt(segment)), Convert.ToString(rtMetrics.MS1PeakPrecision.ElementAt(segment)),
+                    Convert.ToString(rtMetrics.TicChange50List.ElementAt(segment)), Convert.ToString(rtMetrics.TicChangeIqrList.ElementAt(segment)),
+                    Convert.ToString(rtMetrics.CycleTime.ElementAt(segment)), Convert.ToString(rtMetrics.MS2Density.ElementAt(segment)),
+                    Convert.ToString(rtMetrics.MS1Density.ElementAt(segment)),Convert.ToString(rtMetrics.MS2TicTotal.ElementAt(segment)),
+                    Convert.ToString(rtMetrics.MS1TicTotal.ElementAt(segment))};
+
+                streamWriter.Write(string.Join("\t", phraseToWrite)); 
                 streamWriter.Write("\n");
-                streamWriter.Write(run.SourceFileName);
-                streamWriter.Write("\t");
-                streamWriter.Write("RTsegment");
-                streamWriter.Write(segment);
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.Peakwidths.ElementAt(segment).ToString());
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.TailingFactor.ElementAt(segment).ToString());
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.PeakCapacity.ElementAt(segment).ToString());
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.PeakPrecision.ElementAt(segment).ToString());
-                streamWriter.Write("\t");
-                streamWriter.Write(rtMetrics.MS1PeakPrecision.ElementAt(segment).ToString());
-                streamWriter.Write("\t");
-                streamWriter.Write(rtMetrics.TicChange50List.ElementAt(segment));
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.TicChangeIqrList.ElementAt(segment));
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.CycleTime.ElementAt(segment));
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.MS2Density.ElementAt(segment));
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.MS1Density.ElementAt(segment));
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.MS2TicTotal.ElementAt(segment));
-                streamWriter.Write(" \t ");
-                streamWriter.Write(rtMetrics.MS1TicTotal.ElementAt(segment));
-                streamWriter.Write(" \t ");
+
             }
             streamWriter.Close();
+            CheckColumnNumber(metricsPerRTSegmentFile, 14);
         }
         public void MakeUndividedMetricsFile()
         {
             string undividedFile = dateTime + "_undividedMetrics_" + run.SourceFileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(undividedFile);
-            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count");
-            streamWriter.Write("\n");
-            streamWriter.Write(run.SourceFileName);
-            streamWriter.Write("\t");
-            streamWriter.Write(run.MissingScans);
-            streamWriter.Write("\t");
-            streamWriter.Write(RTDuration);
-            streamWriter.Write("\t");
-            streamWriter.Write(swathSizeDifference);
-            streamWriter.Write("\t");
-            streamWriter.Write(MS2Count);
-            streamWriter.Write("\t");
-            streamWriter.Write(swathMetrics.maxswath);
-            streamWriter.Write("\t");
-            streamWriter.Write(totalMS2IonCount);
-            streamWriter.Write("\t");
-            streamWriter.Write(MS2Density50);
-            streamWriter.Write("\t");
-            streamWriter.Write(MS2DensityIQR);
-            streamWriter.Write("\t");
-            streamWriter.Write(MS1Count);
+            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count \n");
+
+            //write streamWriter
+            string[] phraseToWrite = { run.SourceFileName, Convert.ToString(run.MissingScans), Convert.ToString(RTDuration),
+                    Convert.ToString(swathSizeDifference), Convert.ToString(MS2Count),
+                    Convert.ToString(swathMetrics.maxswath), Convert.ToString(totalMS2IonCount),
+                    Convert.ToString(MS2Density50), Convert.ToString(MS2DensityIQR),
+                    Convert.ToString(MS1Count)};
+
+            streamWriter.Write(string.Join("\t", phraseToWrite));
             streamWriter.Close();
+            CheckColumnNumber(undividedFile, 10);
         }
 
         public void MakeiRTmetricsFile(Run run)
         {
+            string filename = dateTime + "_iRTMetrics_" + run.SourceFileName + ".tsv";
+            StreamWriter streamWriter = new StreamWriter(filename);
+            streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor \n");
 
-            StreamWriter streamWriter = new StreamWriter(dateTime  + "iRTMetrics_"  + run.SourceFileName +".tsv");
-            streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor");
+            
 
             foreach (IRTPeak peak in run.IRTPeaks)
             {
+
                 //write streamWriter
+                string[] phraseToWrite = { run.SourceFileName, Convert.ToString(peak.Mz), Convert.ToString(peak.RetentionTime),
+                    Convert.ToString(peak.FWHM), Convert.ToString(peak.Peaksym)};
+
+                streamWriter.Write(string.Join("\t", phraseToWrite));
                 streamWriter.Write("\n");
-                streamWriter.Write(run.SourceFileName);
-                streamWriter.Write("\t");
-                streamWriter.Write(peak.Mz.ToString());
-                streamWriter.Write(" \t ");
-                streamWriter.Write(peak.RetentionTime.ToString());
-                streamWriter.Write(" \t ");
-                streamWriter.Write(peak.FWHM.ToString());
-                streamWriter.Write(" \t ");
-                streamWriter.Write(peak.Peaksym.ToString());
-                streamWriter.Write(" \t ");
             }
             streamWriter.Close();
+            CheckColumnNumber(filename, 5);
         }
 
         public void CreateAndSaveMzqc()
@@ -248,6 +213,17 @@ namespace SwaMe
             }
             combinedwriter.Close();
         }
+
+        public void CheckColumnNumber(string inputFile, int desiredColumnNumbers)
+        {
+            string[] lines = File.ReadAllLines(inputFile);
+            string[] items = lines[0].Split('\t');
+            if (items.Count() != desiredColumnNumbers)
+            {
+                logger.Error(inputFile + "does not appear to contain all the desired columns.");
+            }
+        }
+
     }
 }
 
