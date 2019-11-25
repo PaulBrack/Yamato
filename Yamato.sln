@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.852
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzmlParser", "MzmlReader\MzmlParser.csproj", "{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CWT", "CWT\CWT.csproj", "{95473CB6-E1A1-4E5A-96E4-D33E5332B037}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawdadSharp", "..\CrawdadSharp\CrawdadSharp\CrawdadSharp.csproj", "{BAFB0E3D-8370-46FD-9CD5-804A4F7DC316}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryParser.Test", "LibraryParser.Test\LibraryParser.Test.csproj", "{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{BAFB0E3D-8370-46FD-9CD5-804A4F7DC316}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAFB0E3D-8370-46FD-9CD5-804A4F7DC316}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAFB0E3D-8370-46FD-9CD5-804A4F7DC316}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
