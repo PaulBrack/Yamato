@@ -103,7 +103,7 @@ namespace SwaMe
             //Retrieve TICChange metrics and divide into rtsegs
             List<double> ticChange50List = new List<double>();
             List<double> ticChangeIqrList = new List<double>();
-            var tempTic = run.Ms2Scans.GroupBy(x => x.RTsegment).Select(d => d.OrderBy(x => x.ScanStartTime).Select(g => g.TotalIonCurrent).ToList());
+            var tempTic = run.Ms2Scans.OrderBy(x => x.ScanStartTime).GroupBy(x => x.RTsegment).Select(d => d.Select(g => g.TotalIonCurrent).ToList());
             for (int i = 0; i < tempTic.Count(); i++)
             {
                 var temp = tempTic.ElementAt(i);
