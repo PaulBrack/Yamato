@@ -154,10 +154,10 @@ namespace SwaMe
                         }
                     }
                 }
-                double firstScanStartTime = 1000;
-                double lastScanStartTime = 0;
-                int firstCycle = 1000;
-                int lastCycle = 0;
+
+                List<double> firstScansOfCycle = new List<double>();
+                List<double> lastScansOfCycle = new List<double>();
+                List<double> difference = new List<double>();
                 double ms1TicTotalTemp = 0;
                 List<int> ms1DensityTemp = new List<int>();
                 List<double> ms1PeakPrecisionTemp = new List<double>();
@@ -168,26 +168,30 @@ namespace SwaMe
                     {
 
                         ms1PeakPrecisionTemp.Add(scan.BasePeakIntensity / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / scan.BasePeakMz)));
-                        firstCycle = Math.Min(scan.Cycle, firstCycle);
-                        lastCycle = Math.Max(scan.Cycle, lastCycle);
                         ms1DensityTemp.Add(scan.Density);
                         ms1TicTotalTemp += scan.TotalIonCurrent;
                     }
                 }
-
+               
                 //To get scan speed for both ms1 and ms2 we have to also scan through ms2:
-                
-                firstScanStartTime = Math.Min(run.Ms1Scans.Min(x => x.ScanStartTime), run.Ms2Scans.Min(x => x.ScanStartTime));
-                lastScanStartTime = Math.Max(run.Ms1Scans.Max(x => x.ScanStartTime), run.Ms2Scans.Max(x => x.ScanStartTime));
-                firstCycle = Math.Min(run.Ms1Scans.Min(x => x.Cycle), run.Ms2Scans.Min(x => x.Cycle));
-                lastCycle = Math.Max(run.Ms1Scans.Max(x => x.Cycle), run.Ms2Scans.Max(x => x.Cycle));
-                
-
+                if (run.Ms1Scans.Count() > 1)
+                {
+                    lastScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment==segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
+                    firstScansOfCycle = run.Ms1Scans.Where(x => x.RTsegment == segment).Select(y => y.ScanStartTime).ToList();
+                }
+                else
+                {
+                    lastScansOfCycle= run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
+                    firstScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Min(y => y.ScanStartTime)).ToList();
+                }
+                for (int i = 0; i < lastScansOfCycle.Count(); i++)
+                {
+                    difference.Add(lastScansOfCycle[i] - firstScansOfCycle[i]);
+                }
+                cycleTime.Add(difference.Average()*60);
                 List<int> ms2DensityTemp = run.Ms2Scans.Where(x=>x.RTsegment==segment).Select(x=>x.Density).ToList();
                 double ms2TicTotalTemp = run.Ms2Scans.Where(x => x.RTsegment == segment).Select(x=>x.TotalIonCurrent).Sum();
-               
 
-                cycleTime.Add((lastScanStartTime - firstScanStartTime) / (lastCycle - firstCycle));
                 if (peakWidthsTemp.Count > 0)
                 {
                     peakWidths.Add(peakWidthsTemp.Average());
