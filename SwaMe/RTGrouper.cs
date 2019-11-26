@@ -162,7 +162,7 @@ namespace SwaMe
                 List<int> ms1DensityTemp = new List<int>();
                 List<double> ms1PeakPrecisionTemp = new List<double>();
 
-                foreach (MzmlParser.Scan scan in run.Ms1Scans)
+                foreach (MzmlParser.Scan scan in run.Ms1Scans.OrderBy(x=>x.ScanStartTime))
                 {
                     if (scan.RTsegment == segment)
                     {
