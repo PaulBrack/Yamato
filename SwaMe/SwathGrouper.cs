@@ -38,18 +38,10 @@ namespace SwaMe
         }
         public SwathMetrics GroupBySwath(MzmlParser.Run run)
         {
-            int maxswath = 0;
-            var result = run.Ms2Scans.GroupBy(s => s.Cycle).Select(g => new { Count = g.Count() });
-            foreach (var e in result)
-            {
-                if (e.Count > maxswath)
-                    maxswath = e.Count;
-            }
-
+            
             //Create list of target isolationwindows to serve as swathnumber
             List<double> swathBoundaries = new List<double>();
-            swathBoundaries = run.Ms2Scans.Select(x => x.IsolationWindowTargetMz).Distinct().ToList();
-            swathBoundaries.Sort();
+            swathBoundaries = run.Ms2Scans.OrderBy(y=>y.ScanStartTime).Select(x => x.IsolationWindowTargetMz).Distinct().ToList();
             double totalTIC = 0;
             foreach (var scan in run.Ms2Scans)
             {
@@ -104,7 +96,7 @@ namespace SwaMe
                 SwathProportionOfTotalTIC.Add((TICs[num] / totalTIC));
             }
 
-            SwathMetrics swathMetrics = new SwathMetrics(maxswath, totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
+            SwathMetrics swathMetrics = new SwathMetrics(swathBoundaries.Count(), totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
             return swathMetrics;
         }
 
