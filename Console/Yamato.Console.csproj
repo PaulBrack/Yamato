@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CenterSpace.NMath.Standard.Windows.X64" Version="7.0.0.47" />
+    
     <PackageReference Include="CommandLineParser" Version="2.6.0" />
     <PackageReference Include="MathNet.Numerics" Version="4.8.1" />
     <PackageReference Include="NLog" Version="4.6.7" />
