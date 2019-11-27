@@ -74,7 +74,7 @@ namespace SwaMe
             for (int segment = 0; segment < division; segment++)
             {
                 //write streamWriter
-                string[] phraseToWrite = { run.SourceFileName, Convert.ToString(segment), Convert.ToString(rtMetrics.Peakwidths.ElementAt(segment)),
+                string[] phraseToWrite = { run.SourceFileName, Convert.ToString(segment+1), Convert.ToString(rtMetrics.Peakwidths.ElementAt(segment)),
                     Convert.ToString(rtMetrics.TailingFactor.ElementAt(segment)), Convert.ToString(rtMetrics.PeakCapacity.ElementAt(segment)),
                     Convert.ToString(rtMetrics.PeakPrecision.ElementAt(segment)), Convert.ToString(rtMetrics.MS1PeakPrecision.ElementAt(segment)),
                     Convert.ToString(rtMetrics.TicChange50List.ElementAt(segment)), Convert.ToString(rtMetrics.TicChangeIqrList.ElementAt(segment)),
