@@ -50,11 +50,11 @@ namespace SwaMe
             //tsv
             string swathFileName = dateTime + "_MetricsBySwath_" + run.SourceFileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(swathFileName);
-            streamWriter.Write("Filename \t swathNumber \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
+            streamWriter.Write("Filename \t swathNumber \t targetMz \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
 
-            for (int i = 0; i < swathMetrics.maxswath; i++)
+            for (int i = 0; i < swathMetrics.swathBoundaries.Count(); i++)
             {
-                string[] phraseToWrite = { run.SourceFileName, Convert.ToString(i + 1), Convert.ToString(swathMetrics.numOfSwathPerGroup.ElementAt(i)),
+                string[] phraseToWrite = { run.SourceFileName, Convert.ToString(i + 1), Convert.ToString(swathMetrics.swathBoundaries[i]), Convert.ToString(swathMetrics.numOfSwathPerGroup.ElementAt(i)),
                     Convert.ToString(swathMetrics.mzRange.ElementAt(i)), Convert.ToString(swathMetrics.SwathProportionOfTotalTIC.ElementAt(i)),
                     Convert.ToString(swathMetrics.swDensity50[i]), Convert.ToString(swathMetrics.swDensityIQR[i]),
                     Convert.ToString(swathMetrics.SwathProportionPredictedSingleChargeAvg.ElementAt(i)) };
@@ -98,7 +98,7 @@ namespace SwaMe
             //write streamWriter
             string[] phraseToWrite = { run.SourceFileName, Convert.ToString(run.MissingScans), Convert.ToString(RTDuration),
                     Convert.ToString(swathSizeDifference), Convert.ToString(MS2Count),
-                    Convert.ToString(swathMetrics.maxswath), Convert.ToString(totalMS2IonCount),
+                    Convert.ToString(swathMetrics.swathBoundaries.Count()), Convert.ToString(totalMS2IonCount),
                     Convert.ToString(MS2Density50), Convert.ToString(MS2DensityIQR),
                     Convert.ToString(MS1Count)};
 
@@ -144,8 +144,9 @@ namespace SwaMe
             qualityParameters[0] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:4000053", name = "Quameter metric: RT-Duration", unit = Second, value = RTDuration };
             qualityParameters[1] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: swathSizeDifference", unit = mZ, value = swathSizeDifference };
             qualityParameters[2] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:4000060", name = "Quameter metric: MS2-Count", unit = Count, value = MS2Count };
-            qualityParameters[3] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: NumOfSwaths", unit = Count, value = swathMetrics.maxswath };
-            qualityParameters[6] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: TotalMS2IonCount", unit = Count, value = totalMS2IonCount };
+            qualityParameters[3] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: NumOfSwaths", unit = Count, value = swathMetrics.swathBoundaries.Count() };
+            qualityParameters[4] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: Target mz", unit = mZ, value = swathMetrics.swathBoundaries };
+            qualityParameters[5] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: TotalMS2IonCount", unit = Count, value = totalMS2IonCount };
             qualityParameters[6] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: MS2Density50", unit = Count, value = MS2Density50 };
             qualityParameters[7] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:XXXXXXX", name = "SwaMe metric: MS2DensityIQR", unit = Count, value = MS2DensityIQR };
             qualityParameters[8] = new JsonClasses.QualityParameters() { cvRef = "QC", accession = "QC:4000059", name = "Quameter metric: MS1-Count", unit = Count, value = MS1Count };
