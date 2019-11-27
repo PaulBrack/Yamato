@@ -172,19 +172,21 @@ namespace SwaMe
                         ms1TicTotalTemp += scan.TotalIonCurrent;
                     }
                 }
-               
+                int minNumberMS1Or2 = 0;
                 //To get scan speed for both ms1 and ms2 we have to also scan through ms2:
                 if (run.Ms1Scans.Count() > 1)
                 {
                     lastScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment==segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
                     firstScansOfCycle = run.Ms1Scans.Where(x => x.RTsegment == segment).Select(y => y.ScanStartTime).ToList();
+                    
                 }
                 else
                 {
                     lastScansOfCycle= run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
                     firstScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Min(y => y.ScanStartTime)).ToList();
                 }
-                for (int i = 0; i < lastScansOfCycle.Count(); i++)
+                minNumberMS1Or2 = Math.Min(lastScansOfCycle.Count(), firstScansOfCycle.Count());
+                for (int i = 0; i < minNumberMS1Or2; i++)
                 {
                     difference.Add(lastScansOfCycle[i] - firstScansOfCycle[i]);
                 }

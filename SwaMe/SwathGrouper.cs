@@ -12,7 +12,7 @@ namespace SwaMe
         //It returns the number of swaths present in a full cycle.
         public class SwathMetrics
         {
-            public int maxswath;
+            public List<double> swathBoundaries;
             public double totalTIC;
             public List<int> numOfSwathPerGroup;
             public List<double> mzRange;
@@ -22,10 +22,10 @@ namespace SwaMe
             public List<double> SwathProportionOfTotalTIC;
             public List<double> SwathProportionPredictedSingleChargeAvg;
 
-            public SwathMetrics(int maxswath, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
+            public SwathMetrics(List<double> swathBoundaries, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
             List<double> SwathProportionOfTotalTIC, List<double> SwathProportionPredictedSingleChargeAvg)
             {
-                this.maxswath = maxswath;
+                this.swathBoundaries = swathBoundaries;
                 this.totalTIC = totalTIC;
                 this.numOfSwathPerGroup = numOfSwathPerGroup;
                 this.mzRange = mzRange;
@@ -93,10 +93,10 @@ namespace SwaMe
 
             for (int num = 0; num < swathBoundaries.Count(); num++)
             {
-                SwathProportionOfTotalTIC.Add((TICs[num] / totalTIC));
+                SwathProportionOfTotalTIC.Add(TICs[num] / totalTIC);
             }
 
-            SwathMetrics swathMetrics = new SwathMetrics(swathBoundaries.Count(), totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
+            SwathMetrics swathMetrics = new SwathMetrics(swathBoundaries, totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
             return swathMetrics;
         }
 
