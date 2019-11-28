@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzqcGenerator", "MzqcGenera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CWT", "CWT\CWT.csproj", "{95473CB6-E1A1-4E5A-96E4-D33E5332B037}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawdadSharp", "..\CrawdadSharp\CrawdadSharp\CrawdadSharp.csproj", "{BAFB0E3D-8370-46FD-9CD5-804A4F7DC316}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawdadSharp", "CrawdadSharp\CrawdadSharp\CrawdadSharp.csproj", "{BAFB0E3D-8370-46FD-9CD5-804A4F7DC316}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryParser.Test", "LibraryParser.Test\LibraryParser.Test.csproj", "{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}"
 EndProject
