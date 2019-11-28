@@ -1,3 +1,3 @@
 [submodule "CrawdadSharp"]
 	path = CrawdadSharp
-	url = git@github.com:marinaPauw/CrawdadSharp.git
+	url = https://github.com/marinaPauw/CrawdadSharp.git
