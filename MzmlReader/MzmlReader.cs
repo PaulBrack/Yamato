@@ -1,27 +1,23 @@
 using System;
 using System.Linq;
-using System.Threading;
 using System.Collections.Generic;
 using LibraryParser;
 
 namespace MzmlParser
 {
-
     public class MzmlReader : GenericMzmlReader<Run, Scan>
     {
-        public MzmlReader()
-        {
-            ExtractBasePeaks = true;
-        }
-
-        public bool ExtractBasePeaks { get; set; }
+        public bool ExtractBasePeaks { get; set; } = true;
 
         public Run LoadMzml(string path, AnalysisSettings analysisSettings)
         {
-            Run run = new Run() { AnalysisSettings = analysisSettings };
-            run.MissingScans = 0;
-            run.StartTime = 100;
-            run.LastScanTime = 0;
+            Run run = new Run()
+            {
+                AnalysisSettings = analysisSettings,
+                MissingScans = 0,
+                StartTime = 100,
+                LastScanTime = 0
+            };
 
             ReadMzml(path, run);
 

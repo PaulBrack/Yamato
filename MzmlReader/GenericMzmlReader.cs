@@ -12,17 +12,11 @@ namespace MzmlParser
         where TRun : IGenericRun<TScan>, new()
         where TScan : IGenericScan, new()
     {
-        public GenericMzmlReader()
-        {
-            ParseBinaryData = true;
-            Threading = true;
-        }
-
-        public bool ParseBinaryData { get; set; }
-        public bool Threading { get; set; }
+        public bool ParseBinaryData { get; set; } = true;
+        public bool Threading { get; set; } = true;
 
         private int currentCycle = 0;
-        bool MS1 = false;
+        bool hasAtLeastOneMS1 = false;
         private double previousTargetMz = 0;
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -174,10 +168,10 @@ namespace MzmlParser
                         {
                             currentCycle++;
                             scan.Scan.Cycle = currentCycle;
-                            MS1 = true;
+                            hasAtLeastOneMS1 = true;
                         }
                         //if there is ScanAndTempProperties ms1:
-                        else if (MS1)
+                        else if (hasAtLeastOneMS1)
                         {
                             scan.Scan.Cycle = currentCycle;
                         }
@@ -250,7 +244,6 @@ namespace MzmlParser
                     {
                         base64 = reader.ReadElementContentAsString();
                     }
-
                 }
                 if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "binaryDataArray")
                 {
@@ -273,7 +266,6 @@ namespace MzmlParser
 
         private void ParseBase64Data(ScanAndTempProperties scan, TRun run)
         {
-
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
 
