@@ -9,7 +9,7 @@ namespace MzmlParser
         void ICouldRunCodeInParallel.Submit(WaitCallback callback)
         {
             cde.AddCount(1);
-            ThreadPool.QueueUserWorkItem(callback);
+            ThreadPool.QueueUserWorkItem(state => { callback(state); cde.Signal(); });
         }
 
         void ICouldRunCodeInParallel.WaitForAll()
