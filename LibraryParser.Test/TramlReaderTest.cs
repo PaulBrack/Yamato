@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections;
+using System.IO;
 using static LibraryParser.Library;
 
 namespace LibraryParser.Test
@@ -10,9 +11,9 @@ namespace LibraryParser.Test
         private static Library library;
 
         [ClassInitialize]
-        public static void Initialize(TestContext t)
+        public static void Initialize()
         {
-            library = new TraMLReader().LoadLibrary(@"libraries\metformin_assayLibrary050.traML");
+            library = new TraMLReader().LoadLibrary(Path.Combine("libraries", "metformin_assayLibrary050.traML"));
         }
 
         [TestMethod]
