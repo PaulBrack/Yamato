@@ -1955,6 +1955,11 @@ namespace MatrixLibrary
             try { return (bool)(this == (Matrix)obj); }
             catch { return false; }
         }
+
+        public override int GetHashCode()
+        {
+            return in_Mat.GetHashCode();
+        }
         #endregion
 
         #region "Print Matrix"
