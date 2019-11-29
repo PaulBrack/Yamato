@@ -11,7 +11,7 @@ namespace LibraryParser.Test
         private static Library library;
 
         [ClassInitialize]
-        public static void Initialize()
+        public static void Initialize(TestContext t)
         {
             library = new TraMLReader().LoadLibrary(Path.Combine("libraries", "metformin_assayLibrary050.traML"));
         }
