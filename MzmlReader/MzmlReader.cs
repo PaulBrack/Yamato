@@ -43,6 +43,8 @@ namespace MzmlParser
                 double mz = scan.BasePeakMz;
 
                 // TODO: BEWARE: There is a race condition here, as the check-and-add is not atomic.
+                // TODO: We could reduce the chance of the race by using Any() rather than Count() here, as that will quit on first match and hence be faster.
+                // TODO: We could eliminate the race completely by wrapping the check down to the add in a lock - need to be careful about the matched arm.
                 if (run.BasePeaks.Count(x => Math.Abs(x.Mz - mz) < run.AnalysisSettings.MassTolerance) < 1)//If a basepeak with this mz doesn't exist yet add it
                 {
                     BasePeak bp = new BasePeak(mz, scan.ScanStartTime, scan.BasePeakIntensity);
