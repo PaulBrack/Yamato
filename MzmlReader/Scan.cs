@@ -2,7 +2,7 @@
 
 namespace MzmlParser
 {
-    public class Scan
+    public class Scan : IGenericScan
     {
         public int Cycle { get; set; }
         public int? MsLevel { get; set; }
@@ -17,23 +17,7 @@ namespace MzmlParser
         public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
         public int Density { get; set; }
-        public List<SpectrumPoint> Spectrum { get; set; }
-        public double proportionChargeStateOne { get; set; }
-    }
-
-    public class ScanAndTempProperties
-    {
-        public ScanAndTempProperties()
-        {
-            Scan = new Scan();
-        }
-
-        public Scan Scan { get; set; }
-        public string Base64IntensityArray { get; set; }
-        public string Base64MzArray { get; set; }
-        public bool IntensityZlibCompressed { get; set; }
-        public bool MzZlibCompressed { get; set; }
-        public int IntensityBitLength { get; set; }
-        public int MzBitLength { get; set; }
+        public IList<SpectrumPoint> Spectrum { get; set; }
+        public double ProportionChargeStateOne { get; set; }
     }
 }

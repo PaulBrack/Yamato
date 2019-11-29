@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using LibraryParser;
 
 namespace MzmlParser
 {
-    public class Run
+    public class Run : IGenericRun<Scan>
     {
         public Run()
         {
@@ -18,18 +17,18 @@ namespace MzmlParser
         }
         public double StartTime { get; set; }
         public double LastScanTime { get; set; }
-        public String SourceFileType { get; set; }
-        public String SourceFileName { get; set; }
-        public String SourceFilePath { get; set; }
-        public String SourceFileChecksum { get; set; }
-        public String CompletionTime { get; set; }
-        public List<Scan> Ms1Scans { get; set; }
+        public string SourceFileType { get; set; }
+        public string SourceFileName { get; set; }
+        public string SourceFilePath { get; set; }
+        public string SourceFileChecksum { get; set; }
+        public string CompletionTime { get; set; }
+        public IList<Scan> Ms1Scans { get; set; }
         public ConcurrentBag<Scan> Ms2Scans { get; set; }
         public ConcurrentBag<BasePeak> BasePeaks { get; set; }
         public Chromatograms Chromatograms { get; set; }
-        public List<(double, double)> IsolationWindows { get; set; }
+        public IList<(double, double)> IsolationWindows { get; set; }
         public int MissingScans { get; set; }
-        public String FilePropertiesAccession;
+        public string FilePropertiesAccession { get; set; }
         public ConcurrentBag<IRTPeak> IRTPeaks { get; set; }
         public ConcurrentBag<CandidateHit> IRTHits { get; set; }
         public AnalysisSettings AnalysisSettings { get; set; }
@@ -42,6 +41,7 @@ namespace MzmlParser
         public List<(double, double)> Ms1Bpc { get; set; }
         public List<(double, double)> Ms2Bpc { get; set; }
     }
+
     public class AnalysisSettings
     {
         public double MassTolerance { get; set; }

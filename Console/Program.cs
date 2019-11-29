@@ -84,7 +84,7 @@ namespace Yamato.Console
                         TraMLReader traMLReader = new TraMLReader();
                         analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
                     }
-                    MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, irt, analysisSettings);
+                    Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
