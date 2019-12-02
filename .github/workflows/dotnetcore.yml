@@ -24,6 +24,6 @@ jobs:
     - name: Publish binaries back to Github
       uses: actions/upload-artifact@master
       with:
-        name: webapp
-        path: bin/Release/netcoreapp2.2/publish
+        name: release
+        path: bin
     
