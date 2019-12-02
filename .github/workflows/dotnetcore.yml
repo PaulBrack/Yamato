@@ -21,5 +21,9 @@ jobs:
       run: dotnet test LibraryParser.Test/LibraryParser.Test.csproj --configuration Release
     - name: Publish binaries
       run: dotnet publish --self-contained true -p:UseAppHost=true -r linux-x64
-
+    - name: Publish binaries back to Github
+      uses: actions/upload-artifact@master
+      with:
+        name: webapp
+        path: bin/Release/netcoreapp2.2/publish
     
