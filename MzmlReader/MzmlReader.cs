@@ -146,7 +146,7 @@ namespace MzmlParser
 
             if (run.SourceFileType.EndsWith("wiff", StringComparison.InvariantCultureIgnoreCase) || run.SourceFileType.ToUpper().EndsWith("scan", StringComparison.InvariantCultureIgnoreCase))
             {
-                scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').Single(x => x.Contains("cycle")).Split('=').Last());
+                scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle")).Split('=').Last());
                 if (scan.Scan.Cycle != 0)//Some wiffs don't have that info so let's check
                 {
                     CycleInfoInID = true;
