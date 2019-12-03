@@ -17,4 +17,10 @@
     <ProjectReference Include="..\MzmlParser\MzmlParser.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="mzmls\test.mzml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
