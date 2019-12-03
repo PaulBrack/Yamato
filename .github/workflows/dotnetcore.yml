@@ -19,6 +19,8 @@ jobs:
       run: dotnet build --configuration Release
     - name: Test LibraryParser
       run: dotnet test LibraryParser.Test/LibraryParser.Test.csproj --configuration Release
+    - name: Test MzmlParser
+      run: dotnet test MzmlParser.Test/MzmlParser.Test.csproj --configuration Release
     - name: Publish binaries
       run: dotnet publish --self-contained true -p:UseAppHost=true -r linux-x64
     - name: Publish binaries back to Github
