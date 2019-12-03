@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzmlParser", "MzmlReader\MzmlParser.csproj", "{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzmlParser", "MzmlParser\MzmlParser.csproj", "{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prognosticator", "Prognosticator\Prognosticator.csproj", "{38B33794-85A8-401C-B5CE-FE547F2B5A4F}"
 EndProject
@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CWT", "CWT\CWT.csproj", "{9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawdadSharp", "CrawdadSharp\CrawdadSharp\CrawdadSharp.csproj", "{BAFB0E3D-8370-46FD-9CD5-804A4F7DC316}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryParser.Test", "LibraryParser.Test\LibraryParser.Test.csproj", "{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryParser.Test", "LibraryParser.Test\LibraryParser.Test.csproj", "{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MzmlParser.Test", "MzmlParser.Test\MzmlParser.Test.csproj", "{CFF778E0-84F4-4865-9F7A-AB39039A95CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFF778E0-84F4-4865-9F7A-AB39039A95CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFF778E0-84F4-4865-9F7A-AB39039A95CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFF778E0-84F4-4865-9F7A-AB39039A95CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFF778E0-84F4-4865-9F7A-AB39039A95CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
