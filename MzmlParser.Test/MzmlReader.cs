@@ -115,16 +115,16 @@ namespace MzmlParser.Test
         [TestMethod]
         public void IsolationWindowUpperBoundaryReadCorrectly()
         {
-            Assert.AreEqual(406.5, run.Ms2Scans.First().IsolationWindowLowerBoundary);
-            Assert.AreEqual(750.5, run.Ms2Scans.Last().IsolationWindowLowerBoundary);
+            Assert.AreEqual(406.5, run.Ms2Scans.First().IsolationWindowUpperBoundary);
+            Assert.AreEqual(750.5, run.Ms2Scans.Last().IsolationWindowUpperBoundary);
            
         }
 
         [TestMethod]
         public void IsolationWindowLowerBoundaryReadCorrectly()
         {
-            Assert.AreEqual(399.5, run.Ms2Scans.First().IsolationWindowUpperBoundary);
-            Assert.AreEqual(743.5, run.Ms2Scans.Last().IsolationWindowUpperBoundary);
+            Assert.AreEqual(399.5, run.Ms2Scans.First().IsolationWindowLowerBoundary);
+            Assert.AreEqual(743.5, run.Ms2Scans.Last().IsolationWindowLowerBoundary);
         }
 
 
