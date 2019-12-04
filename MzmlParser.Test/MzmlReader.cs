@@ -49,5 +49,19 @@ namespace MzmlParser.Test
         {
             Assert.AreEqual(0.033183333333, run.LastScanTime);
         }
+
+        [TestMethod]
+        public void SourceFileTypeReadCorrectly()
+        {
+            Assert.AreEqual("WIFF", run.SourceFileType);
+        }
+
+        [TestMethod]
+        public void SourceFileNameReadCorrectly()
+        {
+            Assert.AreEqual("SWATH_OC_244_1.wiff", run.SourceFileName);
+        }
+
+
     }
 }
