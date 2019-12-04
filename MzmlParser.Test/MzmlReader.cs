@@ -78,10 +78,10 @@ namespace MzmlParser.Test
         [TestMethod]
         public void CycleNumberReadCorrectly()
         {
-            Assert.AreEqual(run.Ms1Scans[0].Cycle, 1);
-            Assert.AreEqual(run.Ms2Scans.First().Cycle, 1);
-            Assert.AreEqual(run.Ms2Scans.ToList()[99].Cycle, 1);
-            Assert.AreEqual(run.Ms2Scans.ToList()[100].Cycle, 2);
+            Assert.AreEqual(1, run.Ms1Scans.First().Cycle);
+            Assert.AreEqual(1, run.Ms2Scans.First().Cycle);
+            Assert.AreEqual(1, run.Ms2Scans.ToList()[99].Cycle);
+            Assert.AreEqual(2, run.Ms2Scans.ToList()[100].Cycle);
         }
 
 
