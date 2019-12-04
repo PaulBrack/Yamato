@@ -27,9 +27,15 @@ namespace MzmlParser.Test
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void CorrectNumberOfMs1ScansAreLoaded()
         {
-            Assert.AreEqual(1, 1);
+            Assert.AreEqual(run.Ms1Scans.Count, 2);
+        }
+
+        [TestMethod]
+        public void CorrectNumberOfMs2ScansAreLoaded()
+        {
+            Assert.AreEqual(run.Ms2Scans.Count, 146);
         }
     }
 }
