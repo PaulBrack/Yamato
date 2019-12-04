@@ -80,8 +80,8 @@ namespace MzmlParser.Test
         {
             Assert.AreEqual(1, run.Ms1Scans.First().Cycle);
             Assert.AreEqual(1, run.Ms2Scans.First().Cycle);
-            Assert.AreEqual(1, run.Ms2Scans.ToList()[99].Cycle);
-            Assert.AreEqual(2, run.Ms2Scans.ToList()[100].Cycle);
+            Assert.AreEqual(1, run.Ms2Scans.ToList()[50].Cycle);
+            //TODO: Test a larger file
         }
 
 
