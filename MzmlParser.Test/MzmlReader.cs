@@ -90,5 +90,42 @@ namespace MzmlParser.Test
             Assert.AreEqual(false, run.Ms1Scans.Any(x => x.MsLevel != 1));
             Assert.AreEqual(false, run.Ms2Scans.Any(x => x.MsLevel != 2));
         }
+
+        [TestMethod]
+        public void IsolationWindowTargetMzReadCorrectly()
+        {
+            Assert.AreEqual(403, run.Ms2Scans.First().IsolationWindowTargetMz);
+            Assert.AreEqual(747, run.Ms2Scans.Last().IsolationWindowTargetMz);
+        }
+
+        [TestMethod]
+        public void IsolationWindowUpperOffestReadCorrectly()
+        {
+            Assert.AreEqual(3.5, run.Ms2Scans.First().IsolationWindowUpperOffset);
+            Assert.AreEqual(3.5, run.Ms2Scans.Last().IsolationWindowUpperOffset);
+        }
+
+        [TestMethod]
+        public void IsolationWindowLowerOffestReadCorrectly()
+        {
+            Assert.AreEqual(3.5, run.Ms2Scans.First().IsolationWindowLowerOffset);
+            Assert.AreEqual(3.5, run.Ms2Scans.Last().IsolationWindowLowerOffset);
+        }
+
+        [TestMethod]
+        public void IsolationWindowUpperBoundaryReadCorrectly()
+        {
+            Assert.AreEqual(399.5, run.Ms2Scans.First().IsolationWindowUpperBoundary);
+            Assert.AreEqual(743.5, run.Ms2Scans.Last().IsolationWindowUpperBoundary);
+        }
+
+        [TestMethod]
+        public void IsolationWindowLowerBoundaryReadCorrectly()
+        {
+            Assert.AreEqual(406.5, run.Ms2Scans.First().IsolationWindowLowerBoundary);
+            Assert.AreEqual(750.5, run.Ms2Scans.Last().IsolationWindowLowerBoundary);
+        }
+
+
     }
 }
