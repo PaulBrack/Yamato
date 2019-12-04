@@ -84,6 +84,11 @@ namespace MzmlParser.Test
             //TODO: Test a larger file
         }
 
-
+        [TestMethod]
+        public void MsLevelReadCorrectly()
+        {
+            Assert.AreEqual(false, run.Ms1Scans.Any(x => x.MsLevel != 1));
+            Assert.AreEqual(false, run.Ms2Scans.Any(x => x.MsLevel != 2));
+        }
     }
 }
