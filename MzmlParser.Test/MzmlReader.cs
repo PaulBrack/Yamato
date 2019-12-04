@@ -29,13 +29,13 @@ namespace MzmlParser.Test
         [TestMethod]
         public void CorrectNumberOfMs1ScansAreLoaded()
         {
-            Assert.AreEqual(run.Ms1Scans.Count, 2);
+            Assert.AreEqual(1, run.Ms1Scans.Count);
         }
 
         [TestMethod]
         public void CorrectNumberOfMs2ScansAreLoaded()
         {
-            Assert.AreEqual(run.Ms2Scans.Count, 146);
+            Assert.AreEqual(65, run.Ms2Scans.Count);
         }
     }
 }
