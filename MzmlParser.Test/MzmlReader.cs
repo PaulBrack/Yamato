@@ -37,5 +37,17 @@ namespace MzmlParser.Test
         {
             Assert.AreEqual(65, run.Ms2Scans.Count);
         }
+
+        [TestMethod]
+        public void StartTimeReadCorrectly()
+        {
+            Assert.AreEqual(0.0046, run.StartTime);
+        }
+
+        [TestMethod]
+        public void EndTimeReadCorrectly()
+        {
+            Assert.AreEqual(0.033183333333, run.LastScanTime);
+        }
     }
 }
