@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using System.Linq;
 
 namespace MzmlParser.Test
 {
@@ -67,6 +68,22 @@ namespace MzmlParser.Test
         {
             Assert.AreEqual("4cd26cdeb97116d5d4f62a575642383e8d6709d4", run.SourceFileChecksum);
         }
+
+        [TestMethod]
+        public void SourceFileLocationReadCorrectly()
+        {
+            Assert.AreEqual(@"file://C:\wiffs", run.SourceFilePath);
+        }
+
+        [TestMethod]
+        public void CycleNumberReadCorrectly()
+        {
+            Assert.AreEqual(run.Ms1Scans[0].Cycle, 1);
+            Assert.AreEqual(run.Ms2Scans.First().Cycle, 1);
+            Assert.AreEqual(run.Ms2Scans.ToList()[99].Cycle, 1);
+            Assert.AreEqual(run.Ms2Scans.ToList()[100].Cycle, 2);
+        }
+
 
     }
 }
