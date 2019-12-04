@@ -53,7 +53,7 @@ namespace MzmlParser.Test
         [TestMethod]
         public void SourceFileTypeReadCorrectly()
         {
-            Assert.AreEqual("WIFF", run.SourceFileType);
+            Assert.AreEqual(".wiff", run.SourceFileType);
         }
 
         [TestMethod]
@@ -62,6 +62,11 @@ namespace MzmlParser.Test
             Assert.AreEqual("SWATH_OC_244_1.wiff", run.SourceFileName);
         }
 
+        [TestMethod]
+        public void SourceFileChecksumReadCorrectly()
+        {
+            Assert.AreEqual("4cd26cdeb97116d5d4f62a575642383e8d6709d4", run.SourceFileChecksum);
+        }
 
     }
 }

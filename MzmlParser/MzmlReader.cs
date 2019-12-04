@@ -97,11 +97,7 @@ namespace MzmlParser
         public void ReadSourceFileMetaData(XmlReader reader, Run run)
         {
             bool cvParamsRead = false;
-            run.SourceFileName = Path.GetFileNameWithoutExtension(reader.GetAttribute("name"));
-            if (run.SourceFileName.ToLower().EndsWith(".wiff"))//in a .wiff.scan file you need to remove both extensions
-            {
-                run.SourceFileName = Path.GetFileNameWithoutExtension(run.SourceFileName);
-            }
+            run.SourceFileName = Path.GetFileName(reader.GetAttribute("name"));
             run.SourceFileType = Path.GetExtension(reader.GetAttribute("name"));
             run.SourceFilePath = reader.GetAttribute("location");
 
