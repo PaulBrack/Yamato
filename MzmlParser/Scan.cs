@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using ProtoBuf;
+using System.Collections.Generic;
+using System.IO;
 
 namespace MzmlParser
 {
     public class Scan
     {
+        public string Base64IntensityArray { get; set; }
+
         public int Cycle { get; set; }
         public int? MsLevel { get; set; }
         public double BasePeakIntensity { get; set; }
@@ -17,8 +21,46 @@ namespace MzmlParser
         public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
         public int Density { get; set; }
-        public List<SpectrumPoint> Spectrum { get; set; }
+
+        public string ScanId
+        {
+            get
+            {
+                return MsLevel + "_" + Cycle + "_" + IsolationWindowTargetMz;
+
+
+
+            }
+        }
+        public Spectrum Spectrum
+        {
+            get
+            {
+                using (var file = File.Create(@"c:\temp\" + ScanId))
+                {
+                    return (Spectrum)Serializer.Deserialize(typeof(Spectrum), file);
+                }
+            }
+            set
+            {
+                using (var file = File.Create(@"c:\temp\" + ScanId))
+                {
+                    Serializer.Serialize(file, value);
+                }
+            }
+        }
         public double proportionChargeStateOne { get; set; }
+    }
+
+
+
+    [ProtoContract]
+    public class Spectrum
+    {
+        [ProtoMember(1)]
+        public virtual IList<SpectrumPoint> SpectrumPoints { get; set; }
+
+
     }
 
     public class ScanAndTempProperties
