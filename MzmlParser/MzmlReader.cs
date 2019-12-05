@@ -170,7 +170,7 @@ namespace MzmlParser
                                 run.StartTime = Math.Min(run.StartTime, scan.Scan.ScanStartTime);
                                 run.LastScanTime = Math.Max(run.LastScanTime, scan.Scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
                                 break;
-                            
+
                             case "MS:1000829":
                                 scan.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
@@ -220,7 +220,7 @@ namespace MzmlParser
                             }
                             else
                             {
-                                currentCycle ++;
+                                currentCycle++;
                                 scan.Scan.Cycle = currentCycle;
                             }
                         }
@@ -233,6 +233,9 @@ namespace MzmlParser
                         if (Threading)
                         {
                             cde.AddCount();
+                            while (cde.CurrentCount > 2000)
+                                Thread.Sleep(1000);
+
                             ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, irt));
                         }
                         else
@@ -317,6 +320,8 @@ namespace MzmlParser
         private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, bool irt)
         {
 
+
+
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
 
@@ -358,7 +363,7 @@ namespace MzmlParser
                             indexes.Add(i);
                             indexes.Add(movingPoint);
                         }
-                        movingPoint +=1;
+                        movingPoint += 1;
                         matchedWithLower = true;
                         continue;
                     }
@@ -368,10 +373,10 @@ namespace MzmlParser
             }
             int distinct = indexes.Distinct().Count();
             int len = mzs.Length;
-            scan.Scan.proportionChargeStateOne = (double)distinct/(double)len;
+            scan.Scan.proportionChargeStateOne = (double)distinct / (double)len;
 
-            
-            scan.Scan.Spectrum = spectrum;
+
+            scan.Scan.Spectrum = new Spectrum() { SpectrumPoints = spectrum };
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
 
@@ -472,7 +477,7 @@ namespace MzmlParser
             {
                 var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
                 if (temp.Any())
-                    bp.Spectrum.Add(scan.Spectrum.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
+                    bp.Spectrum.Add(scan.Spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
             }
             cde.Signal();
         }
