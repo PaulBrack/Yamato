@@ -1,4 +1,5 @@
 ﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -21,35 +22,39 @@ namespace MzmlParser
         public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
         public int Density { get; set; }
-
         public string ScanId
         {
             get
             {
-                return MsLevel + "_" + Cycle + "_" + IsolationWindowTargetMz;
+                return String.Format("{0}_{1}_{2}", MsLevel, Cycle, IsolationWindowTargetMz);
+            }
+        }
 
-
-
+        private string tempFileName
+        {
+            get
+            {
+                return Path.Combine(Path.GetTempPath(), String.Format("{0}.tempscan", ScanId));
             }
         }
         public Spectrum Spectrum
         {
             get
             {
-                using (var file = File.Create(@"c:\temp\" + ScanId))
+                using (var file = File.Create(tempFileName))
                 {
                     return (Spectrum)Serializer.Deserialize(typeof(Spectrum), file);
                 }
             }
             set
             {
-                using (var file = File.Create(@"c:\temp\" + ScanId))
+                using (var file = File.Create(tempFileName))
                 {
                     Serializer.Serialize(file, value);
                 }
             }
         }
-        public double proportionChargeStateOne { get; set; }
+        public double ProportionChargeStateOne { get; set; }
     }
 
 
@@ -59,8 +64,6 @@ namespace MzmlParser
     {
         [ProtoMember(1)]
         public virtual IList<SpectrumPoint> SpectrumPoints { get; set; }
-
-
     }
 
     public class ScanAndTempProperties
