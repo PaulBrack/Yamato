@@ -41,7 +41,7 @@ namespace MzmlParser
             var matchingScans = run.Ms2Scans.Where(x => Math.Abs(x.ScanStartTime - candidateHit.RetentionTime) < run.AnalysisSettings.RtTolerance/*
                                && candidateHit.PrecursorTargetMz > x.IsolationWindowLowerBoundary
                                && candidateHit.PrecursorTargetMz < x.IsolationWindowUpperBoundary*/);
-           
+
             var libraryPeptides = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Library.Peptide>().ToList();
             List<SpectrumPoint> matchingSpectrum = new List<SpectrumPoint>();
             Library.Peptide peptide = new Library.Peptide();
@@ -51,8 +51,8 @@ namespace MzmlParser
                 foreach (double targetMz in candidateHit.ProductTargetMzs)
                 {
                     var match = matchingScan.Spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
-                    if(match.Any())
-                    matchingSpectrum.Add(match.First());//In a scan only one point is taken for each transition
+                    if (match.Any())
+                        matchingSpectrum.Add(match.First());//In a scan only one point is taken for each transition
                 }
             }
             if (matchingSpectrum.Any())

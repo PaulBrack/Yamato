@@ -8,7 +8,6 @@ namespace MzmlParser
     public class Scan
     {
         public string Base64IntensityArray { get; set; }
-
         public int Cycle { get; set; }
         public int? MsLevel { get; set; }
         public double BasePeakIntensity { get; set; }
@@ -56,8 +55,6 @@ namespace MzmlParser
         }
         public double ProportionChargeStateOne { get; set; }
     }
-
-
 
     [ProtoContract]
     public class Spectrum
