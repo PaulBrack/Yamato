@@ -75,7 +75,7 @@ namespace SwaMe
                     mzTargetRange.Add(scan.IsolationWindowUpperOffset + scan.IsolationWindowLowerOffset);
                     TICthisSwath = TICthisSwath + scan.TotalIonCurrent;
                     swDensity.Add(scan.Density);
-                    TotalSwathProportionPredictedSingleCharge.Add(scan.proportionChargeStateOne); //The chargestate one's we pick up is where there is a match for M+1. Therefore we need to double it to add the M.
+                    TotalSwathProportionPredictedSingleCharge.Add(scan.ProportionChargeStateOne); //The chargestate one's we pick up is where there is a match for M+1. Therefore we need to double it to add the M.
                     track++;
                 }
                 mzTargetRange.Sort();

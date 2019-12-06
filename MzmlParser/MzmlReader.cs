@@ -373,7 +373,7 @@ namespace MzmlParser
             }
             int distinct = indexes.Distinct().Count();
             int len = mzs.Length;
-            scan.Scan.proportionChargeStateOne = (double)distinct / (double)len;
+            scan.Scan.ProportionChargeStateOne = (double)distinct / (double)len;
 
 
             scan.Scan.Spectrum = new Spectrum() { SpectrumPoints = spectrum };
