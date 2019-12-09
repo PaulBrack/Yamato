@@ -7,10 +7,10 @@ using NLog;
 
 namespace SwaMe
 {
-    class ChromatogramMetricGenerator
+    public class ChromatogramMetricGenerator
     {
-
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        public double[] intensities;
+        public double[] starttimes;
 
         public void GenerateChromatogram(Run run)
         {
@@ -21,8 +21,8 @@ namespace SwaMe
                 for (int yyy = 0; yyy < basepeak.BpkRTs.Count(); yyy++)
                 {
                     //change these two arrays to be only the spectra surrounding that bpkrt:
-                    double[] intensities = basepeak.Spectrum.Where(x => Math.Abs(x.RetentionTime - basepeak.BpkRTs[yyy]) < run.AnalysisSettings.RtTolerance).Select(x => (double)x.Intensity).ToArray();
-                    double[] starttimes = basepeak.Spectrum.Where(x => Math.Abs(x.RetentionTime - basepeak.BpkRTs[yyy]) < run.AnalysisSettings.RtTolerance).Select(x => (double)x.RetentionTime).ToArray();
+                    intensities = basepeak.Spectrum.Where(x => Math.Abs(x.RetentionTime - basepeak.BpkRTs[yyy]) < run.AnalysisSettings.RtTolerance).Select(x => (double)x.Intensity).ToArray();
+                    starttimes = basepeak.Spectrum.Where(x => Math.Abs(x.RetentionTime - basepeak.BpkRTs[yyy]) < run.AnalysisSettings.RtTolerance).Select(x => (double)x.RetentionTime).ToArray();
                     if (intensities.Count() > 1)
                     {
                         RTandInt inter = new RTandInt();
@@ -74,8 +74,6 @@ namespace SwaMe
 
         public void GenerateiRTChromatogram(Run run)
         {
-            float[] starttimes;
-            float[] intensities;
 
             foreach (IRTPeak irtpeak in run.IRTPeaks)
             {
@@ -84,8 +82,8 @@ namespace SwaMe
                 int count = 0;
                 foreach (var transition in irtpeak.AssociatedTransitions)
                 {
-                    starttimes = irtpeak.Spectrum.Where(x=>Math.Abs(x.Mz-transition.ProductMz)<run.AnalysisSettings.MassTolerance && Math.Abs(x.RetentionTime-irtpeak.RetentionTime)<run.AnalysisSettings.RtTolerance).Select(x => x.RetentionTime).ToArray();
-                    intensities = irtpeak.Spectrum.Where(x => Math.Abs(x.Mz - transition.ProductMz) < run.AnalysisSettings.MassTolerance).Select(x => x.Intensity).ToArray();
+                    starttimes = irtpeak.Spectrum.Where(x=>Math.Abs(x.Mz-transition.ProductMz)<run.AnalysisSettings.MassTolerance && Math.Abs(x.RetentionTime-irtpeak.RetentionTime)<run.AnalysisSettings.RtTolerance).Select(x => (double)x.RetentionTime).ToArray();
+                    intensities = irtpeak.Spectrum.Where(x => Math.Abs(x.Mz - transition.ProductMz) < run.AnalysisSettings.MassTolerance).Select(x => (double)x.Intensity).ToArray();
                     CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
                     cPF.SetChromatogram(starttimes, intensities);
                     List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
