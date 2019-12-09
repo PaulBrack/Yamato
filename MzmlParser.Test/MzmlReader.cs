@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -54,19 +55,20 @@ namespace MzmlParser.Test
         [TestMethod]
         public void SourceFileTypeReadCorrectly()
         {
-            Assert.AreEqual(".wiff", run.SourceFileType);
+            Assert.IsTrue(Enumerable.Contains(run.SourceFileTypes, ".scan"));
         }
 
         [TestMethod]
         public void SourceFileNameReadCorrectly()
         {
-            Assert.AreEqual("SWATH_OC_244_1.wiff", run.SourceFileName);
+            Assert.IsTrue(Enumerable.Contains(run.SourceFileNames, "SWATH_OC_244_1.wiff")&& Enumerable.Contains(run.SourceFileNames, "SWATH_OC_244_1.wiff.scan"));
         }
 
         [TestMethod]
         public void SourceFileChecksumReadCorrectly()
         {
-            Assert.AreEqual("4cd26cdeb97116d5d4f62a575642383e8d6709d4", run.SourceFileChecksum);
+            Assert.IsTrue(Enumerable.Contains(run.SourceFileChecksums, "b0e7fb43b8c828c51d715b21934d0e925844199e")&& Enumerable.Contains(run.SourceFileChecksums, "4cd26cdeb97116d5d4f62a575642383e8d6709d4"));
+
         }
 
         [TestMethod]
