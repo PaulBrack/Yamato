@@ -15,13 +15,16 @@ namespace MzmlParser
             BasePeaks = new ConcurrentBag<BasePeak>();
             IRTHits = new ConcurrentBag<CandidateHit>();
             IRTPeaks = new ConcurrentBag<IRTPeak>();
+            SourceFileTypes = new List<String>();
+            SourceFileNames = new List<String>();
+            SourceFileChecksums = new List<String>();
         }
         public double StartTime { get; set; }
         public double LastScanTime { get; set; }
-        public String SourceFileType { get; set; }
-        public String SourceFileName { get; set; }
+        public List<String> SourceFileTypes { get; set; }
+        public List<String> SourceFileNames { get; set; }
         public String SourceFilePath { get; set; }
-        public String SourceFileChecksum { get; set; }
+        public List<String> SourceFileChecksums { get; set; }
         public String CompletionTime { get; set; }
         public List<Scan> Ms1Scans { get; set; }
         public ConcurrentBag<Scan> Ms2Scans { get; set; }

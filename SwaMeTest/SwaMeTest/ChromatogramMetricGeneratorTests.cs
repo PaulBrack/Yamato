@@ -48,7 +48,7 @@ namespace SwaMe.Test
             };
             var basePeak1 = new BasePeak(150,2.5,150)
             {
-                BpkRTs = new List<double>() { 2.5, 2.58 },
+                BpkRTs = new List<double>() { 2.5 },
                 Spectrum = new List<SpectrumPoint>() { spectrumpoint1, spectrumpoint2 }
             };
             var emptyBasePeak = new BasePeak(1, 1, 1)
@@ -92,6 +92,19 @@ namespace SwaMe.Test
         {
             double[] correctST = { };
             Assert.IsTrue(Enumerable.SequenceEqual(correctST, emptyCMG.starttimes));
+        }
+
+        [TestMethod]
+        public void  basepeakFWHMsCorrectIfOneBasePeak()
+        {
+            var correctFWHM = 50.666656494140625; 
+            Assert.AreEqual(correctFWHM, basepeak1Run.BasePeaks.ElementAt(0).FWHMs.ElementAt(0));
+        }
+        [TestMethod]
+        public void basepeakFWHMsZeroIfBasePeakSpectrumEmpty()
+        {
+            var correctFWHM =0;
+            Assert.AreEqual(correctFWHM, emptyBasePeakRun.BasePeaks.ElementAt(0).FWHMs.ElementAt(0));
         }
     }
 }

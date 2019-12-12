@@ -97,8 +97,8 @@ namespace MzmlParser
         public void ReadSourceFileMetaData(XmlReader reader, Run run)
         {
             bool cvParamsRead = false;
-            run.SourceFileName = Path.GetFileName(reader.GetAttribute("name"));
-            run.SourceFileType = Path.GetExtension(reader.GetAttribute("name"));
+            run.SourceFileNames.Add(Path.GetFileName(reader.GetAttribute("name")));
+            run.SourceFileTypes.Add(Path.GetExtension(reader.GetAttribute("name")));
             run.SourceFilePath = reader.GetAttribute("location");
 
             while (reader.Read() && !cvParamsRead)
@@ -110,7 +110,7 @@ namespace MzmlParser
                         switch (reader.GetAttribute("accession"))
                         {
                             case "MS:1000569":
-                                run.SourceFileChecksum = reader.GetAttribute("value");
+                                run.SourceFileChecksums.Add(reader.GetAttribute("value"));
                                 run.FilePropertiesAccession = "MS:1000569";
                                 break;
                             case "MS:1000747"://Optional for the conversion process, but included in mzQC
@@ -140,7 +140,7 @@ namespace MzmlParser
 
             bool CycleInfoInID = false;
 
-            if (run.SourceFileType.EndsWith("wiff", StringComparison.InvariantCultureIgnoreCase) || run.SourceFileType.ToUpper().EndsWith("scan", StringComparison.InvariantCultureIgnoreCase))
+            if (run.SourceFileTypes[0].EndsWith("wiff", StringComparison.InvariantCultureIgnoreCase) || run.SourceFileTypes[0].ToUpper().EndsWith("scan", StringComparison.InvariantCultureIgnoreCase))
             {
                 scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle")).Split('=').Last());
                 if (scan.Scan.Cycle != 0)//Some wiffs don't have that info so let's check
