@@ -233,8 +233,11 @@ namespace MzmlParser
                         if (Threading)
                         {
                             cde.AddCount();
-                            while (cde.CurrentCount > 2000)
-                                Thread.Sleep(1000);
+                            if (run.AnalysisSettings.CacheSpectraToDisk) //this option exists largely to restrict RAM use, so don't let queue get too big
+                            {
+                                while (cde.CurrentCount > 2000)
+                                    Thread.Sleep(1000);
+                            }
 
                             ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, irt));
                         }
@@ -477,7 +480,11 @@ namespace MzmlParser
             {
                 var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
                 if (temp.Any())
-                    bp.Spectrum.Add(scan.Spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First());
+                {
+                    var matching = scan.Spectrum.SpectrumPoints.DefaultIfEmpty(null).Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First();
+                    if(matching != null)
+                        bp.Spectrum.Add(matching);
+                }
             }
             cde.Signal();
         }

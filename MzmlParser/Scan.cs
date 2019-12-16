@@ -49,9 +49,10 @@ namespace MzmlParser
             {
                 if (CacheSpectra)
                 {
-                    using (var file = File.Create(TempFileName))
+                    using (var file = File.OpenRead(TempFileName))
                     {
-                        return (Spectrum)Serializer.Deserialize(typeof(Spectrum), file);
+                        var x = (Spectrum)Serializer.Deserialize(typeof(Spectrum), file);
+                        return x;
                     }
                 }
                 else

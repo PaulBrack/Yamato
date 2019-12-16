@@ -157,11 +157,11 @@ namespace Yamato.Console
         [Option("rttolerance", Required = false, HelpText = "RT tolerance")]
         public double RtTolerance { get; set; } = 2.5;
 
-        [Option('c', "combineFiles" ,Required = false, HelpText = "Combine files at the end?")]
+        [Option('c', "combineFiles", Required = false, HelpText = "Combine files at the end?")]
         public bool Combine { get; set; } = true;
 
-        [Option("cacheSpectraToDisk", Required = false, HelpText = "Cache spectra on read")]
-        public bool Cache { get; set; } = true;
+        [Option('z', "cacheSpectraToDisk", Required = false, HelpText = "Cache spectra on read")]
+        public bool Cache { get; set; } = false;
     }
 }
 
