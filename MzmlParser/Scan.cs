@@ -1,9 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using ProtoBuf;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace MzmlParser
 {
     public class Scan
     {
+
+        public Scan(bool CacheSpectraToDisk) { CacheSpectra = CacheSpectraToDisk; }
+        public bool CacheSpectra { get; set; }
+        public string Base64IntensityArray { get; set; }
         public int Cycle { get; set; }
         public int? MsLevel { get; set; }
         public double BasePeakIntensity { get; set; }
@@ -17,15 +24,70 @@ namespace MzmlParser
         public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
         public int Density { get; set; }
-        public List<SpectrumPoint> Spectrum { get; set; }
-        public double proportionChargeStateOne { get; set; }
+        public double ProportionChargeStateOne { get; set; }
+
+        private Spectrum m_Spectrum;
+
+        public string ScanId
+        {
+            get
+            {
+                return String.Format("{0}_{1}_{2}", MsLevel, Cycle, IsolationWindowTargetMz);
+            }
+        }
+
+        private string TempFileName
+        {
+            get
+            {
+                return Path.Combine(Path.GetTempPath(), String.Format("Yamato_{0}.tempscan", ScanId));
+            }
+        }
+        public Spectrum Spectrum
+        {
+            get
+            {
+                if (CacheSpectra)
+                {
+                    using (var file = File.Create(TempFileName))
+                    {
+                        return (Spectrum)Serializer.Deserialize(typeof(Spectrum), file);
+                    }
+                }
+                else
+                {
+                    return m_Spectrum;
+                }
+			}
+            set
+            {
+                if (CacheSpectra)
+                {
+                    using (var file = File.Create(TempFileName))
+                    {
+                        Serializer.Serialize(file, value);
+                    }
+                }
+                else
+                {
+                    m_Spectrum = value;
+                }
+            }
+        }
+    }
+
+    [ProtoContract]
+    public class Spectrum
+    {
+        [ProtoMember(1)]
+        public virtual IList<SpectrumPoint> SpectrumPoints { get; set; }
     }
 
     public class ScanAndTempProperties
     {
-        public ScanAndTempProperties()
+        public ScanAndTempProperties(bool cacheSpectra)
         {
-            Scan = new Scan();
+            Scan = new Scan(cacheSpectra);
         }
 
         public Scan Scan { get; set; }

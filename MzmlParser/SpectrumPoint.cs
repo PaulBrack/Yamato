@@ -1,4 +1,6 @@
-﻿namespace MzmlParser
+﻿using ProtoBuf;
+
+namespace MzmlParser
 {
     /// <summary>
     /// A point in the 2-dimensional LC-MS space of retention time and m/z, recording intensity at this coordinate.
@@ -14,14 +16,23 @@
     /// directly into memory now this has been changed. 
     /// 
     /// </remarks>
-    public struct SpectrumPoint
+    /// 
+
+   [ProtoContract]
+    public class SpectrumPoint
     {
         /// <remarks>Depending on the use of this class, this may be raw retention time or iRT. Within MzmlParser, it's raw and in minutes.</remarks>
+      
+            [ProtoMember(1)]
         public float RetentionTime { get; set; }
         /// <summary>
         /// Mass over charge, in Daltons.
         /// </summary>
+
+        [ProtoMember(2)]
         public float Mz { get; set; }
+
+        [ProtoMember(3)]
         public float Intensity { get; set; }
 
         public override string ToString()

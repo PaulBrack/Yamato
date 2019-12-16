@@ -75,7 +75,8 @@ namespace Yamato.Console
                         RtTolerance = options.RtTolerance,
                         IrtMinIntensity = options.IrtMinIntensity,
                         IrtMinPeptides = options.IrtMinPeptides,
-                        IrtMassTolerance = options.IrtMassTolerance
+                        IrtMassTolerance = options.IrtMassTolerance,
+                        CacheSpectraToDisk = options.Cache
                     };
 
                     if (!String.IsNullOrEmpty(options.IRTFile))
@@ -158,6 +159,9 @@ namespace Yamato.Console
 
         [Option('c', "combineFiles" ,Required = false, HelpText = "Combine files at the end?")]
         public bool Combine { get; set; } = true;
+
+        [Option("cacheSpectraToDisk", Required = false, HelpText = "Cache spectra on read")]
+        public bool Cache { get; set; } = true;
     }
 }
 
