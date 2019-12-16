@@ -128,7 +128,7 @@ namespace MzmlParser
 
         public void ReadSpectrum(XmlReader reader, Run run, bool irt)
         {
-            ScanAndTempProperties scan = new ScanAndTempProperties();
+            ScanAndTempProperties scan = new ScanAndTempProperties(run.AnalysisSettings.CacheSpectraToDisk);
 
             //The cycle number is within a kvp string in the following format: "sample=1 period=1 cycle=1 experiment=1"
             //
