@@ -7,6 +7,7 @@ namespace MzmlParser
 {
     public class Scan
     {
+
         public Scan(bool CacheSpectraToDisk) { CacheSpectra = CacheSpectraToDisk; }
         public bool CacheSpectra { get; set; }
         public string Base64IntensityArray { get; set; }
@@ -23,10 +24,10 @@ namespace MzmlParser
         public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
         public int Density { get; set; }
-
         public double ProportionChargeStateOne { get; set; }
 
         private Spectrum m_Spectrum;
+
         public string ScanId
         {
             get
@@ -57,7 +58,7 @@ namespace MzmlParser
                 {
                     return m_Spectrum;
                 }
-            }
+			}
             set
             {
                 if (CacheSpectra)
