@@ -106,6 +106,30 @@ namespace SwaMe.Test
             var correctFWHM =0;
             Assert.AreEqual(correctFWHM, emptyBasePeakRun.BasePeaks.ElementAt(0).FWHMs.ElementAt(0));
         }
+        [TestMethod]
+        public void basepeakPeakSymsCorrectIfOneBasePeak()
+        {
+            var correctPeakSym = 0.50498342514038086;
+            Assert.AreEqual(correctPeakSym, basepeak1Run.BasePeaks.ElementAt(0).Peaksyms.ElementAt(0));
+        }
+        [TestMethod]
+        public void basepeakPeaksymsZeroIfBasePeakSpectrumEmpty()
+        {
+            var correctPeakSym = 0;
+            Assert.AreEqual(correctPeakSym, emptyBasePeakRun.BasePeaks.ElementAt(0).Peaksyms.ElementAt(0));
+        }
+        [TestMethod]
+        public void basepeakFullWidthAtBaselineCorrectIfOneBasePeak()
+        {
+            var correctFullWidthAtBaseline =  96.266693115234375;
+            Assert.AreEqual(correctFullWidthAtBaseline, basepeak1Run.BasePeaks.ElementAt(0).FullWidthBaselines.ElementAt(0));
+        }
+        [TestMethod]
+        public void basepeakFullWidthAtBaselineZeroIfBasePeakSpectrumEmpty()
+        {
+            var correctFullWidthAtBaseline = 0;
+            Assert.AreEqual(correctFullWidthAtBaseline, emptyBasePeakRun.BasePeaks.ElementAt(0).FullWidthBaselines.ElementAt(0));
+        }
     }
 }
 
