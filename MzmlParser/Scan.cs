@@ -96,6 +96,12 @@ namespace MzmlParser
                 }
             }
         }
+
+        public int SpectrumXmlBase64Line { get; set; }
+
+        public int SpectrumXmlBase64LinePos { get; set; }
+
+        public int SpectrumXmlBase64Length { get; set; }
     }
 
     [ProtoContract]

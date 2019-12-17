@@ -21,6 +21,8 @@ namespace MzmlParser
             Threading = true;
         }
 
+        public static IXmlLineInfo Xli;
+
         public bool ExtractBasePeaks { get; set; }
         public bool ParseBinaryData { get; set; }
         public bool Threading { get; set; }
@@ -63,6 +65,7 @@ namespace MzmlParser
         {
             using (XmlReader reader = XmlReader.Create(path))
             {
+                Xli = (IXmlLineInfo)reader;
                 while (reader.Read())
                 {
                     if (reader.IsStartElement())
@@ -73,6 +76,7 @@ namespace MzmlParser
                                 ReadSourceFileMetaData(reader, run);
                                 break;
                             case "spectrum":
+
                                 ReadSpectrum(reader, run, irt);
                                 break;
                             case "referenceableParamGroup":
@@ -288,7 +292,11 @@ namespace MzmlParser
                     }
                     else if (reader.LocalName == "binary")
                     {
-                        base64 = reader.ReadElementContentAsString();
+                        reader.ReadStartElement();
+                        scan.Scan.SpectrumXmlBase64Line = Xli.LineNumber;
+                        scan.Scan.SpectrumXmlBase64LinePos = Xli.LinePosition;
+                        base64 = reader.ReadContentAsString();
+                        scan.Scan.SpectrumXmlBase64Length = base64.Length; 
                     }
 
                 }
