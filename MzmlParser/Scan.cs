@@ -18,8 +18,8 @@ namespace MzmlParser
         public double TotalIonCurrent { get; set; }
         public double ScanStartTime { get; set; }
         public double IsolationWindowTargetMz { get; set; }
-        public double IsolationWindowUpperOffset { get; set; }
-        public double IsolationWindowLowerOffset { get; set; }
+        public double IsolationWindowUpperOffset { get; set; } = 100000;
+        public double IsolationWindowLowerOffset { get; set; } = 100000;
         public double IsolationWindowUpperBoundary { get; set; }
         public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }

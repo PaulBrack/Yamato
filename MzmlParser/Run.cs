@@ -19,8 +19,8 @@ namespace MzmlParser
             SourceFileNames = new List<String>();
             SourceFileChecksums = new List<String>();
         }
-        public double StartTime { get; set; }
-        public double LastScanTime { get; set; }
+        public double StartTime { get; set; } = 0;
+        public double LastScanTime { get; set; } = 1000000;
         public List<String> SourceFileTypes { get; set; }
         public List<String> SourceFileNames { get; set; }
         public String SourceFilePath { get; set; }

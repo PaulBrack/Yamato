@@ -8,7 +8,7 @@ using System;
 namespace SwaMe.Test
 {
     [TestClass]
-    public class MetricGeneratorTest
+    public class ChromatogramMetricGeneratorTest
     {
         private static Run emptyBasePeakRun;
         private static Run basepeak1Run;

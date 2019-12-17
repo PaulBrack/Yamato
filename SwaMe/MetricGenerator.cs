@@ -1,16 +1,29 @@
 using MzmlParser;
 using System.Collections.Generic;
 using System.Linq;
+using NLog;
 
 namespace SwaMe
 {
     public class MetricGenerator
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger(); 
+        public double RTDuration;
+        public double swathSizeDifference;
+        public List<int> Density;
         public void GenerateMetrics(Run run, int division,  string inputFilePath, bool irt, bool combine, bool lastFile, string date)
         {
+            if (run.LastScanTime != 0 && run.StartTime != 1000000)
+            {
+                //Acquire RTDuration: last minus first
+                RTDuration = run.LastScanTime - run.StartTime;
+            }
+            else 
+            {
+                logger.Error("StartTime {0} or lastScanTime {0} for the run is null. RTDuration is therefore zero", run.StartTime, run.LastScanTime);
+                RTDuration = 0;
+            }
 
-            //Acquire RTDuration: last minus first
-            double RTDuration = run.LastScanTime - run.StartTime;
 
             //Interpolate, Smooth, create chromatogram and generate chromatogram metrics
             ChromatogramMetricGenerator chromatogramMetrics = new ChromatogramMetricGenerator();
@@ -20,16 +33,24 @@ namespace SwaMe
                 chromatogramMetrics.GenerateiRTChromatogram(run);
 
             //Calculating the largestswath
-            double swathSizeDifference = run.Ms2Scans.Max(x => x.IsolationWindowUpperOffset - x.IsolationWindowLowerOffset);
+            if (run.Ms2Scans.Max(x => x.IsolationWindowUpperOffset) == 100000 || run.Ms2Scans.Max(x => x.IsolationWindowLowerOffset) == 100000)
+            {
+                logger.Error(("IsolationWindowUpperOffset {0} or IsolationWindowLowerOffset {0} for the one of the scans has not been changed from default value. swathSizeDifference is therefore zero", run.Ms2Scans.Max(x => x.IsolationWindowUpperOffset), run.Ms2Scans.Max(x => x.IsolationWindowLowerOffset)));
+                swathSizeDifference = 0;
+            }
+            else
+            {
+                swathSizeDifference = run.Ms2Scans.Max(x => x.IsolationWindowUpperOffset + x.IsolationWindowLowerOffset) - run.Ms2Scans.Min(x => x.IsolationWindowUpperOffset + x.IsolationWindowLowerOffset);
+            }
 
             // This method will group the scans into swaths of the same number, return the number of swaths in a full cycle (maxswath) and call a FileMaker method to write out the metrics.
             SwathGrouper swathGrouper = new SwathGrouper { };
             SwathGrouper.SwathMetrics swathMetrics = swathGrouper.GroupBySwath(run);
 
             //Retrieving Density metrics
-            var Density = run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
+            Density = run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
 
-            //Create IQR so you can calculate IQR:            
+                    
             RTGrouper rtGrouper = new RTGrouper { };
             RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
             FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count(), date);
