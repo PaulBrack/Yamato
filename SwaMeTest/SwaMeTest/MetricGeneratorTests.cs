@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -17,9 +16,10 @@ namespace SwaMe.Test
         [TestInitialize]
         public void Initialize()
         {
+            ///<summary>The Metric Generator is the main tree from which the other metric calculatingfunction groups are run. 
+            ///Therefore most tests will not be run here, but in the function branches RTGrouper/SWATHGrouper etc. There are however a few
+            ///functions that are run here and they are also tested here.</summary>
 
-            
-            
             Scan ms2scan1 = new Scan(false)
             {
                 IsolationWindowLowerOffset = 1,
@@ -121,30 +121,45 @@ namespace SwaMe.Test
             mG = new MetricGenerator();
 
         }
+        /// <remarks>
+        /// This test tests if the RTDuration is correctly calculated, provided that the scan that was fed contained the information necessary to calculate RTDuration, namely last and first scantimes.
+        /// </remarks>
         [TestMethod]
         public void RTDurationCorrectIfcontainsLastAndFirstScanTimes() 
         {
             mG.GenerateMetrics(contains5ms2scansRun, 1, "", false, false, false, "");
             Assert.AreEqual(mG.RTDuration, 67.5);
         }
+        /// <remarks>
+        /// Here we test the scenario that, in the event that the last and first scan times were not able to be recorded, the RTDuration is set to zero.
+        /// </remarks>
         [TestMethod]
         public void RTDurationZeroIfMissingLastScanTimeOrFirstScanTime()
         {
             mG.GenerateMetrics(emptyms2scansRun, 1, "", false, false, false, "");
             Assert.AreEqual(mG.RTDuration, 0);
         }
+        /// <remarks>
+        /// Here we test that the difference between the highest swath mz range (loweroffset + upperoffset) and the lowest swath mz range is calculated correctly.
+        /// </remarks>
         [TestMethod]
         public void swathSizeDifferenceCorrectIfOffsetsNotDefault()
         {
             mG.GenerateMetrics(contains5ms2scansRun, 1, "", false, false, false, "");
             Assert.AreEqual(mG.swathSizeDifference, 8);
         }
+        /// <remarks>
+        /// Here we test the scenario that, in the event that there were no swathsizes recorded in the run, the swathsize difference is set to zero.
+        /// </remarks>
         [TestMethod]
         public void swathSizeDifferenceZeroIfOffsetsAreDefault()
         {
             mG.GenerateMetrics(emptyms2scansRun, 1, "", false, false, false, "");
             Assert.AreEqual(mG.swathSizeDifference, 0);
         }
+        /// <remarks>
+        /// Here we test that the list of the densities (total number of ions detected per scan) for ms2scans is calculated correctly.
+        /// </remarks>
         [TestMethod]
         public void DensityCorrect()
         {
