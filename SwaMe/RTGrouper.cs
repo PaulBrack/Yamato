@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NLog;
 
 namespace SwaMe
 {
-    class RTGrouper
+    public class RTGrouper
     {
+
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+        public double[] rtSegs;
         public class RTMetrics
         {
+
             public List<double> Peakwidths;
             public List<double> TailingFactor;
             public List<double> PeakCapacity;
@@ -20,6 +25,10 @@ namespace SwaMe
             public List<double> MS2TicTotal;
             public List<double> TicChange50List;
             public List<double> TicChangeIqrList;
+
+            public RTMetrics()//This is just to be used in the unittests
+            {
+            }
 
             public RTMetrics(List<double> MS1TICTotal, List<double> MS2TICTotal, List<double> cycleTime, List<double> TICchange50List, List<double> TICchangeIQRList, List<int> MS1Density, List<int> MS2Density, List<double> Peakwidths, List<double> TailingFactor, List<double> PeakCapacity, List<double> PeakPrecision, List<double> MS1PeakPrecision)
             {
@@ -42,7 +51,7 @@ namespace SwaMe
         public RTMetrics DivideByRT(MzmlParser.Run run, int division, double rtDuration)
         {
             double rtSegment = rtDuration / division;
-            double[] rtSegs = new double[division];
+            rtSegs = new double[division];
 
 
             for (int i = 0; i < division; i++)
@@ -112,7 +121,15 @@ namespace SwaMe
                     tempList.Add(Math.Abs(temp.ElementAt(j) - temp.ElementAt(j - 1)));
                 tempList.Sort();
                 ticChange50List.Add(Math.Truncate(Math.Round(tempList.Average())));
-                ticChangeIqrList.Add(Math.Truncate(Math.Round(InterQuartileRangeCalculator.CalcIQR(tempList))));
+                if (tempList.Count() > 4)
+                {
+                    ticChangeIqrList.Add(Math.Truncate(Math.Round(InterQuartileRangeCalculator.CalcIQR(tempList))));
+                }
+                else 
+                {
+                    logger.Error("There are only {0} MS2Scans in this segment, which is too few to calculate the IQR of the TIC Change. This value has been set to zero.", tempTic.Count());
+                    ticChangeIqrList.Add(0);
+                }
             }
 
             //Calculations for peakprecision MS2:

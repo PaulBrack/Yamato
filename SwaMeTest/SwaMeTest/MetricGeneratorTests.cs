@@ -20,11 +20,11 @@ namespace SwaMe.Test
             ///Therefore most tests will not be run here, but in the function branches RTGrouper/SWATHGrouper etc. There are however a few
             ///functions that are run here and they are also tested here.</summary>
 
-            Scan ms2scan1 = new Scan(false, 1, 1, 0, 2, 2);
-            Scan ms2scan2 = new Scan(false, 1, 1, 0, 2, 2, 1);
-            Scan ms2scan3 = new Scan(false, 5, 5, 0, 2, 4, 1);
-            Scan ms2scan4 = new Scan(false, 1, 1, 0, 2, 4);
-            Scan ms2scan5 = new Scan(false, 1, 1, 0, 2, 5);
+            Scan ms2scan1 = new Scan(false, 1, 1, 0, 2, 2, 1, 1000);
+            Scan ms2scan2 = new Scan(false, 1, 1, 0, 2, 2, 1, 5000);
+            Scan ms2scan3 = new Scan(false, 5, 5, 0, 2, 4, 1, 1000);
+            Scan ms2scan4 = new Scan(false, 1, 1, 0, 2, 4, 2, 51000);
+            Scan ms2scan5 = new Scan(false, 1, 1, 0, 2, 5, 2, 1000);
             Scan ms2scan6 = new Scan(false)
             {
                 ScanStartTime = 0,
