@@ -20,7 +20,7 @@ namespace SwaMe.Test
 
             
             
-            Scan ms2scan1 = new Scan
+            Scan ms2scan1 = new Scan(false)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowUpperOffset = 1,
@@ -29,7 +29,7 @@ namespace SwaMe.Test
                 Density = 2
             };
 
-            Scan ms2scan2 = new Scan
+            Scan ms2scan2 = new Scan(false)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowUpperOffset = 1,
@@ -38,7 +38,7 @@ namespace SwaMe.Test
                 MsLevel = 2,
                 Density = 2
             };
-            Scan ms2scan3 = new Scan
+            Scan ms2scan3 = new Scan(false)
             {
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,
@@ -47,7 +47,7 @@ namespace SwaMe.Test
                 MsLevel = 2,
                 Density = 4
             };
-            Scan ms2scan4 = new Scan
+            Scan ms2scan4 = new Scan(false)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowUpperOffset = 1,
@@ -55,7 +55,7 @@ namespace SwaMe.Test
                 MsLevel = 2,
                 Density = 4
             };
-            Scan ms2scan5 = new Scan
+            Scan ms2scan5 = new Scan(false)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowUpperOffset = 1,
@@ -63,7 +63,7 @@ namespace SwaMe.Test
                 MsLevel = 2,
                 Density = 5
             };
-            Scan ms2scan6 = new Scan
+            Scan ms2scan6 = new Scan(false)
             {
                 ScanStartTime = 0,
                 MsLevel = 2,
