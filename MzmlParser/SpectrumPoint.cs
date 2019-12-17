@@ -18,12 +18,18 @@ namespace MzmlParser
     /// </remarks>
     /// 
 
-   [ProtoContract]
+    [ProtoContract]
     public class SpectrumPoint
     {
+        public SpectrumPoint(float intensity, float mz, float retentionTime)
+        {
+            this.Intensity = intensity;
+            this.Mz = mz;
+            this.RetentionTime = retentionTime;
+        }
         /// <remarks>Depending on the use of this class, this may be raw retention time or iRT. Within MzmlParser, it's raw and in minutes.</remarks>
-      
-            [ProtoMember(1)]
+
+        [ProtoMember(1)]
         public float RetentionTime { get; set; }
         /// <summary>
         /// Mass over charge, in Daltons.

@@ -9,9 +9,9 @@ namespace SwaMe.Test
     [TestClass]
     public class MetricGeneratorTests
     {
-        private static Run emptyms2scansRun;
-        private static Run contains5ms2scansRun;
-        private static MetricGenerator mG;
+        private static Run Emptyms2scansRun;
+        private static Run Contains5ms2ScansRun;
+        private static MetricGenerator MetricGenerator;
 
         [TestInitialize]
         public void Initialize()
@@ -20,49 +20,11 @@ namespace SwaMe.Test
             ///Therefore most tests will not be run here, but in the function branches RTGrouper/SWATHGrouper etc. There are however a few
             ///functions that are run here and they are also tested here.</summary>
 
-            Scan ms2scan1 = new Scan(false)
-            {
-                IsolationWindowLowerOffset = 1,
-                IsolationWindowUpperOffset = 1,
-                ScanStartTime = 0,
-                MsLevel = 2,
-                Density = 2
-            };
-
-            Scan ms2scan2 = new Scan(false)
-            {
-                IsolationWindowLowerOffset = 1,
-                IsolationWindowUpperOffset = 1,
-                ScanStartTime = 0,
-                RTsegment = 1,
-                MsLevel = 2,
-                Density = 2
-            };
-            Scan ms2scan3 = new Scan(false)
-            {
-                IsolationWindowLowerOffset = 5,
-                IsolationWindowUpperOffset = 5,
-                ScanStartTime = 0,
-                RTsegment = 1,
-                MsLevel = 2,
-                Density = 4
-            };
-            Scan ms2scan4 = new Scan(false)
-            {
-                IsolationWindowLowerOffset = 1,
-                IsolationWindowUpperOffset = 1,
-                ScanStartTime = 0,
-                MsLevel = 2,
-                Density = 4
-            };
-            Scan ms2scan5 = new Scan(false)
-            {
-                IsolationWindowLowerOffset = 1,
-                IsolationWindowUpperOffset = 1,
-                ScanStartTime = 0,
-                MsLevel = 2,
-                Density = 5
-            };
+            Scan ms2scan1 = new Scan(false, 1, 1, 0, 2, 2);
+            Scan ms2scan2 = new Scan(false, 1, 1, 0, 2, 2, 1);
+            Scan ms2scan3 = new Scan(false, 5, 5, 0, 2, 4, 1);
+            Scan ms2scan4 = new Scan(false, 1, 1, 0, 2, 4);
+            Scan ms2scan5 = new Scan(false, 1, 1, 0, 2, 5);
             Scan ms2scan6 = new Scan(false)
             {
                 ScanStartTime = 0,
@@ -70,24 +32,15 @@ namespace SwaMe.Test
                 Density = 5
             };
 
-            var spectrumpoint1 = new SpectrumPoint()
-            {
-                Intensity = 2000,
-                Mz = 150,
-                RetentionTime = 2.58F
-            };
-            var spectrumpoint2 = new SpectrumPoint()
-            {
-                Intensity = 3000,
-                Mz = 150.01F,
-                RetentionTime = 3.00F
-            };
+            var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
+            var spectrumpoint2 = new SpectrumPoint(3000, 150.1F, 3.00F);
+
             var basePeak1 = new BasePeak(150, 2.5, 150)
             {
                 BpkRTs = new List<double>() { 2.5 },
                 Spectrum = new List<SpectrumPoint>() { spectrumpoint1, spectrumpoint2 }
             };
-            contains5ms2scansRun = new Run
+            Contains5ms2ScansRun = new Run
             {
                 AnalysisSettings = new AnalysisSettings
                 {
@@ -98,12 +51,12 @@ namespace SwaMe.Test
                 StartTime = 2.5
             };
 
-            
-            contains5ms2scansRun.BasePeaks.Add(basePeak1);
-            contains5ms2scansRun.SourceFileNames.Add( " ");
-            contains5ms2scansRun.SourceFileChecksums.Add(" ");
 
-            emptyms2scansRun = new Run
+            Contains5ms2ScansRun.BasePeaks.Add(basePeak1);
+            Contains5ms2ScansRun.SourceFileNames.Add(" ");
+            Contains5ms2ScansRun.SourceFileChecksums.Add(" ");
+
+            Emptyms2scansRun = new Run
             {
                 AnalysisSettings = new AnalysisSettings
                 {
@@ -113,59 +66,59 @@ namespace SwaMe.Test
                 LastScanTime = 0,
                 StartTime = 1000000
             };
-            
-            emptyms2scansRun.BasePeaks.Add(basePeak1);
-            emptyms2scansRun.SourceFileNames.Add(" ");
-            emptyms2scansRun.SourceFileChecksums.Add(" ");
 
-            mG = new MetricGenerator();
+            Emptyms2scansRun.BasePeaks.Add(basePeak1);
+            Emptyms2scansRun.SourceFileNames.Add(" ");
+            Emptyms2scansRun.SourceFileChecksums.Add(" ");
+
+            MetricGenerator = new MetricGenerator();
 
         }
         /// <remarks>
-        /// This test tests if the RTDuration is correctly calculated, provided that the scan that was fed contained the information necessary to calculate RTDuration, namely last and first scantimes.
+        /// RTDuration is correctly calculated, provided that the scan that was fed contained last and first scantimes.
         /// </remarks>
         [TestMethod]
-        public void RTDurationCorrectIfcontainsLastAndFirstScanTimes() 
+        public void RTDurationCorrectIfcontainsLastAndFirstScanTimes()
         {
-            mG.GenerateMetrics(contains5ms2scansRun, 1, "", false, false, false, "");
-            Assert.AreEqual(mG.RTDuration, 67.5);
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "", false, false, false, "");
+            Assert.AreEqual(MetricGenerator.RTDuration, 67.5);
         }
         /// <remarks>
-        /// Here we test the scenario that, in the event that the last and first scan times were not able to be recorded, the RTDuration is set to zero.
+        /// In the event that the last and first scan times were not able to be recorded, the RTDuration should be set to zero.
         /// </remarks>
         [TestMethod]
         public void RTDurationZeroIfMissingLastScanTimeOrFirstScanTime()
         {
-            mG.GenerateMetrics(emptyms2scansRun, 1, "", false, false, false, "");
-            Assert.AreEqual(mG.RTDuration, 0);
+            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, "", false, false, false, "");
+            Assert.AreEqual(MetricGenerator.RTDuration, 0);
         }
         /// <remarks>
-        /// Here we test that the difference between the highest swath mz range (loweroffset + upperoffset) and the lowest swath mz range is calculated correctly.
+        /// The difference between the highest swath mz range (loweroffset + upperoffset) and the lowest swath mz range is calculated correctly.
         /// </remarks>
         [TestMethod]
         public void swathSizeDifferenceCorrectIfOffsetsNotDefault()
         {
-            mG.GenerateMetrics(contains5ms2scansRun, 1, "", false, false, false, "");
-            Assert.AreEqual(mG.swathSizeDifference, 8);
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "", false, false, false, "");
+            Assert.AreEqual(MetricGenerator.swathSizeDifference, 8);
         }
         /// <remarks>
-        /// Here we test the scenario that, in the event that there were no swathsizes recorded in the run, the swathsize difference is set to zero.
+        /// In the event that there were no swathsizes recorded in the run, the swathsize difference is set to zero.
         /// </remarks>
         [TestMethod]
         public void swathSizeDifferenceZeroIfOffsetsAreDefault()
         {
-            mG.GenerateMetrics(emptyms2scansRun, 1, "", false, false, false, "");
-            Assert.AreEqual(mG.swathSizeDifference, 0);
+            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, "", false, false, false, "");
+            Assert.AreEqual(MetricGenerator.swathSizeDifference, 0);
         }
         /// <remarks>
-        /// Here we test that the list of the densities (total number of ions detected per scan) for ms2scans is calculated correctly.
+        /// The list of the densities (total number of ions detected per scan) for ms2scans is calculated correctly.
         /// </remarks>
         [TestMethod]
         public void DensityCorrect()
         {
-            mG.GenerateMetrics(contains5ms2scansRun, 1, "", false, false, false, "");
-            List<int>correctDensity = new List<int>(){2,2,4,4,5 };
-            Assert.IsTrue(Enumerable.SequenceEqual(mG.Density, correctDensity));
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "", false, false, false, "");
+            List<int> correctDensity = new List<int>() { 2, 2, 4, 4, 5 };
+            Assert.IsTrue(Enumerable.SequenceEqual(MetricGenerator.Density, correctDensity));
         }
 
     }
