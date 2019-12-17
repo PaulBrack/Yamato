@@ -11,6 +11,8 @@ namespace SwaMe
     {
         public double[] intensities;
         public double[] starttimes;
+        CrawdadSharp.CrawdadPeakFinder cPF;
+        List<CrawdadSharp.CrawdadPeak> crawPeaks;
 
         public void GenerateChromatogram(Run run)
         {
@@ -30,9 +32,9 @@ namespace SwaMe
                         starttimes = inter.starttimes;
                         intensities = inter.intensities;
                     }
-                    CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
+                    cPF = new CrawdadSharp.CrawdadPeakFinder();
                     cPF.SetChromatogram(starttimes, intensities);
-                    List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
+                    crawPeaks = cPF.CalcPeaks();
                     double totalFwhm = 0;
                     double totalPeakSym = 0;
                     double totalBaseWidth = 0;
@@ -84,9 +86,9 @@ namespace SwaMe
                 {
                     starttimes = irtpeak.Spectrum.Where(x=>Math.Abs(x.Mz-transition.ProductMz)<run.AnalysisSettings.MassTolerance && Math.Abs(x.RetentionTime-irtpeak.RetentionTime)<run.AnalysisSettings.RtTolerance).Select(x => (double)x.RetentionTime).ToArray();
                     intensities = irtpeak.Spectrum.Where(x => Math.Abs(x.Mz - transition.ProductMz) < run.AnalysisSettings.MassTolerance).Select(x => (double)x.Intensity).ToArray();
-                    CrawdadSharp.CrawdadPeakFinder cPF = new CrawdadSharp.CrawdadPeakFinder();
+                    cPF = new CrawdadSharp.CrawdadPeakFinder();
                     cPF.SetChromatogram(starttimes, intensities);
-                    List<CrawdadSharp.CrawdadPeak> crawPeaks = cPF.CalcPeaks();
+                    crawPeaks = cPF.CalcPeaks();
                     foreach (CrawdadSharp.CrawdadPeak crawPeak in crawPeaks)
                     {
                         TotalFWHM += crawPeak.Fwhm;
