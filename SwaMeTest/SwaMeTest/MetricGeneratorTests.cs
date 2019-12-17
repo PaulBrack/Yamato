@@ -33,7 +33,7 @@ namespace SwaMe.Test
             };
 
             var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
-            var spectrumpoint2 = new SpectrumPoint(3000, 150.1F, 3.00F);
+            var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
 
             var basePeak1 = new BasePeak(150, 2.5, 150)
             {

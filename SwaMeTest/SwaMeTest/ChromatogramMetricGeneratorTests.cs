@@ -34,18 +34,9 @@ namespace SwaMe.Test
                 }
             };
 
-            var spectrumpoint1 = new SpectrumPoint()
-            {
-                Intensity = 2000,
-                Mz = 150,
-                RetentionTime = 2.58F
-            };
-            var spectrumpoint2 = new SpectrumPoint()
-            {
-                Intensity = 3000,
-                Mz = 150.01F,
-                RetentionTime = 3.00F
-            };
+            var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
+            var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
+
             var basePeak1 = new BasePeak(150,2.5,150)
             {
                 BpkRTs = new List<double>() { 2.5 },
