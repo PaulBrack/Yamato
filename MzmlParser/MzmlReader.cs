@@ -85,15 +85,6 @@ namespace MzmlParser
             }
         }
 
-
-        public void AddInfoToBasePeaks(Run run, QuickScan qs)
-        {
-            float[] intensities = ExtractFloatArray(qs.Base64IntensityArray, qs.IntensityZlibCompressed, qs.IntensityBitLength);
-            float[] mzs = ExtractFloatArray(qs.Base64MzArray, qs.MzZlibCompressed, qs.MzBitLength);
-
-
-        }
-
         public void ReadSourceFileMetaData(XmlReader reader, Run run)
         {
             bool cvParamsRead = false;
