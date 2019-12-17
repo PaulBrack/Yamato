@@ -8,8 +8,29 @@ namespace MzmlParser
     public class Scan
     {
 
-        public Scan(bool CacheSpectraToDisk) { CacheSpectra = CacheSpectraToDisk; }
-        public bool CacheSpectra { get; set; }
+        public Scan(bool cacheSpectraToDisk) { CacheSpectraToDisk = cacheSpectraToDisk; }
+
+        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, int scanStartTime, int msLevel, int density)
+        {
+            this.CacheSpectraToDisk = cacheSpectraToDisk;
+            this.IsolationWindowLowerOffset = isolationWindowLowerOffset;
+            this.IsolationWindowUpperOffset = isolationWindowUpperOffset;
+            this.ScanStartTime = scanStartTime;
+            this.MsLevel = msLevel;
+            this.Density = density;
+        }
+
+        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, int scanStartTime, int msLevel, int density, int rtSegment)
+        {
+            this.CacheSpectraToDisk = cacheSpectraToDisk;
+            this.IsolationWindowLowerOffset = isolationWindowLowerOffset;
+            this.IsolationWindowUpperOffset = isolationWindowUpperOffset;
+            this.ScanStartTime = scanStartTime;
+            this.MsLevel = msLevel;
+            this.Density = density;
+            this.RTsegment = rtSegment;
+        }
+        public bool CacheSpectraToDisk { get; set; }
         public string Base64IntensityArray { get; set; }
         public int Cycle { get; set; }
         public int? MsLevel { get; set; }
@@ -18,8 +39,8 @@ namespace MzmlParser
         public double TotalIonCurrent { get; set; }
         public double ScanStartTime { get; set; }
         public double IsolationWindowTargetMz { get; set; }
-        public double IsolationWindowUpperOffset { get; set; }
-        public double IsolationWindowLowerOffset { get; set; }
+        public double IsolationWindowUpperOffset { get; set; } = 100000;
+        public double IsolationWindowLowerOffset { get; set; } = 100000;
         public double IsolationWindowUpperBoundary { get; set; }
         public double IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
@@ -47,7 +68,7 @@ namespace MzmlParser
         {
             get
             {
-                if (CacheSpectra)
+                if (CacheSpectraToDisk)
                 {
                     using (var file = File.OpenRead(TempFileName))
                     {
@@ -59,10 +80,10 @@ namespace MzmlParser
                 {
                     return m_Spectrum;
                 }
-			}
+            }
             set
             {
-                if (CacheSpectra)
+                if (CacheSpectraToDisk)
                 {
                     using (var file = File.Create(TempFileName))
                     {

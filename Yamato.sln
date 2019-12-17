@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawdadSharp", "CrawdadShar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryParser.Test", "LibraryParser.Test\LibraryParser.Test.csproj", "{92BEEDE4-3CA2-4D7A-993C-42144AC4A944}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MzmlParser.Test", "MzmlParser.Test\MzmlParser.Test.csproj", "{CFF778E0-84F4-4865-9F7A-AB39039A95CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzmlParser.Test", "MzmlParser.Test\MzmlParser.Test.csproj", "{CFF778E0-84F4-4865-9F7A-AB39039A95CB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMeTest", "SwaMeTest\SwaMeTest\SwaMeTest.csproj", "{A4CB3D09-2D2F-4D23-ADD6-A2DC2C410874}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{CFF778E0-84F4-4865-9F7A-AB39039A95CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFF778E0-84F4-4865-9F7A-AB39039A95CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFF778E0-84F4-4865-9F7A-AB39039A95CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4CB3D09-2D2F-4D23-ADD6-A2DC2C410874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4CB3D09-2D2F-4D23-ADD6-A2DC2C410874}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4CB3D09-2D2F-4D23-ADD6-A2DC2C410874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4CB3D09-2D2F-4D23-ADD6-A2DC2C410874}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,6 +17,8 @@ namespace LibraryParser.Test
         }
 
         [TestMethod]
+
+        
         public void ProteinCountIsCorrect()
         {
             Assert.AreEqual(251, library.ProteinList.Count);
