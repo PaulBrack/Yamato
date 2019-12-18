@@ -152,7 +152,7 @@ namespace SwaMe.Test
         {
 
 
-            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_UnDividedMetrics_File1.tsv"));
+            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_undividedMetrics_File1.tsv"));
             string correctLine1 = "Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count ";
             string correctLine2 = "File1\t0\t70\t2\t10\t2\t1000\t50\t20\t5000";
             List<string> correctText = new List<string>() { correctLine1, correctLine2 };
@@ -218,7 +218,7 @@ namespace SwaMe.Test
             }
             else
             {
-                Assert.IsTrue(Enumerable.SequenceEqual(fileText, correctText));
+                Assert.IsTrue(Enumerable.SequenceEqual(fileText, correctText)) ;
 
             }
         }
