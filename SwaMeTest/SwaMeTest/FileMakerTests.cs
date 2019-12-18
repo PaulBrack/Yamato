@@ -214,11 +214,11 @@ namespace SwaMe.Test
             {
                 List<string> newfileText = new List<string>();
                 newfileText.Add(fileText.ElementAt(0).Replace(",", "."));
-                Assert.AreEqual(newfileText, correctText);
+                Assert.AreEqual(newfileText.ElementAt(0), correctText.ElementAt(0));
             }
             else
             {
-                Assert.IsTrue(Enumerable.SequenceEqual(fileText, correctText)) ;
+                Assert.AreEqual(fileText.ElementAt(0), correctText.ElementAt(0));
 
             }
         }
