@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryParser.Test", "Libra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzmlParser.Test", "MzmlParser.Test\MzmlParser.Test.csproj", "{CFF778E0-84F4-4865-9F7A-AB39039A95CB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMe.Test", "SwaMeTest\SwaMeTest\SwaMe.Test.csproj", "{A4CB3D09-2D2F-4D23-ADD6-A2DC2C410874}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMe.Test", "SwaMe.Test\SwaMe.Test\SwaMe.Test.csproj", "{A4CB3D09-2D2F-4D23-ADD6-A2DC2C410874}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
