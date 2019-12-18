@@ -15,14 +15,14 @@ namespace SwaMe.Test
         /// </summary>
         /// 
         //IRTPeaks
-        private static IRTPeak IRTPeak1 = new IRTPeak()
+        private static IRTPeak iRTPeak1 = new IRTPeak()
         {
             Mz = 550,
             RetentionTime = 20,
             FWHM = 18,
             Peaksym = 0.5
         };
-        private static IRTPeak IRTPeak2 = new IRTPeak()
+        private static IRTPeak iRTPeak2 = new IRTPeak()
         {
             Mz = 825,
             RetentionTime = 30,
@@ -32,7 +32,7 @@ namespace SwaMe.Test
         //Run
         Run iRTrun = new Run()
         {
-            IRTPeaks = {IRTPeak1, IRTPeak2 },
+            IRTPeaks = {iRTPeak1, iRTPeak2 },
             SourceFileNames = { "File1", "File2"}
         };
 
@@ -176,7 +176,7 @@ namespace SwaMe.Test
         ///Writes a tsv file for the iRT metrics with a run that includes iRTpeaks with all the necessary info and then reads it back in to verify it.
         /// </remarks>
         [TestMethod]
-        public void iRTFileCorrect()
+        public void IRTFileCorrect()
         {
             var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_iRTMetrics_File1.tsv"));
             string correctLine1 = "Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor ";
@@ -214,8 +214,10 @@ namespace SwaMe.Test
 
             if (fileText.Contains(","))//Stupid South Africa and its commas for decimals rules
             {
-                List<string> newfileText = new List<string>();
-                newfileText.Add(fileText.ElementAt(0).Replace(",", "."));
+                List<string> newfileText = new List<string>
+                {
+                    fileText.ElementAt(0).Replace(",", ".")
+                };
                 Assert.AreEqual(newfileText.ElementAt(0), correctText.ElementAt(0));
             }
             else
