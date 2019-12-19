@@ -10,7 +10,7 @@ namespace MzmlParser
 
         public Scan(bool cacheSpectraToDisk) { CacheSpectraToDisk = cacheSpectraToDisk; }
 
-        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, int scanStartTime, int msLevel, int density)
+        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density)
         {
             this.CacheSpectraToDisk = cacheSpectraToDisk;
             this.IsolationWindowLowerOffset = isolationWindowLowerOffset;
@@ -20,7 +20,7 @@ namespace MzmlParser
             this.Density = density;
         }
 
-        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, int scanStartTime, int msLevel, int density, int rtSegment)
+        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density, int cycle, double totalIonCurrent)
         {
             this.CacheSpectraToDisk = cacheSpectraToDisk;
             this.IsolationWindowLowerOffset = isolationWindowLowerOffset;
@@ -28,7 +28,8 @@ namespace MzmlParser
             this.ScanStartTime = scanStartTime;
             this.MsLevel = msLevel;
             this.Density = density;
-            this.RTsegment = rtSegment;
+            this.TotalIonCurrent = totalIonCurrent;
+            this.Cycle = cycle;
         }
         public bool CacheSpectraToDisk { get; set; }
         public string Base64IntensityArray { get; set; }

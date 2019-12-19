@@ -12,7 +12,7 @@ namespace SwaMe
         //It returns the number of swaths present in a full cycle.
         public class SwathMetrics
         {
-            public List<double> swathBoundaries;
+            public List<double> swathTargets;
             public double totalTIC;
             public List<int> numOfSwathPerGroup;
             public List<double> mzRange;
@@ -22,10 +22,14 @@ namespace SwaMe
             public List<double> SwathProportionOfTotalTIC;
             public List<double> SwathProportionPredictedSingleChargeAvg;
 
-            public SwathMetrics(List<double> swathBoundaries, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
+            public SwathMetrics()
+            {
+            }
+
+            public SwathMetrics(List<double> swathTargets, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
             List<double> SwathProportionOfTotalTIC, List<double> SwathProportionPredictedSingleChargeAvg)
             {
-                this.swathBoundaries = swathBoundaries;
+                this.swathTargets = swathTargets;
                 this.totalTIC = totalTIC;
                 this.numOfSwathPerGroup = numOfSwathPerGroup;
                 this.mzRange = mzRange;
@@ -40,8 +44,8 @@ namespace SwaMe
         {
             
             //Create list of target isolationwindows to serve as swathnumber
-            List<double> swathBoundaries = new List<double>();
-            swathBoundaries = run.Ms2Scans.OrderBy(y=>y.ScanStartTime).Select(x => x.IsolationWindowTargetMz).Distinct().ToList();
+            List<double> swathTargets = new List<double>();
+            swathTargets = run.Ms2Scans.OrderBy(y=>y.ScanStartTime).Select(x => x.IsolationWindowTargetMz).Distinct().ToList();
             double totalTIC = 0;
             foreach (var scan in run.Ms2Scans)
             {
@@ -62,14 +66,14 @@ namespace SwaMe
             List<double> SwathProportionPredictedSingleChargeAvg = new List<double>();
 
 //Loop through all the swaths of the same number and add to
-            for (int swathNumber = 0; swathNumber < swathBoundaries.Count(); swathNumber++)
+            for (int swathNumber = 0; swathNumber < swathTargets.Count(); swathNumber++)
             {
                 int track = 0;
 
                 double TICthisSwath = 0;
 
                 var orderedMS2Scans = run.Ms2Scans.OrderBy(s => s.ScanStartTime)
-                    .Where(x => x.MsLevel == 2 && x.IsolationWindowTargetMz == swathBoundaries[swathNumber]);
+                    .Where(x => x.MsLevel == 2 && x.IsolationWindowTargetMz == swathTargets[swathNumber]);
                 foreach (var scan in orderedMS2Scans)
                 {
                     mzTargetRange.Add(scan.IsolationWindowUpperOffset + scan.IsolationWindowLowerOffset);
@@ -91,12 +95,12 @@ namespace SwaMe
                 swDensity.Clear();
             }
 
-            for (int num = 0; num < swathBoundaries.Count(); num++)
+            for (int num = 0; num < swathTargets.Count(); num++)
             {
                 SwathProportionOfTotalTIC.Add(TICs[num] / totalTIC);
             }
 
-            SwathMetrics swathMetrics = new SwathMetrics(swathBoundaries, totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
+            SwathMetrics swathMetrics = new SwathMetrics(swathTargets, totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
             return swathMetrics;
         }
 

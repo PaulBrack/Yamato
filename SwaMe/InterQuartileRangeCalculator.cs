@@ -1,14 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SwaMe
 {
-    static class InterQuartileRangeCalculator
+    public static class InterQuartileRangeCalculator
     {
         public static double CalcIQR(List<double> list)
         {
+            if (list.Count < 5) 
+            {
+            throw new ArgumentException(String.Format("{0} is too few list items to calculate IQR", list.Count),
+                                      "list");
+            }
             // Note list must already be sorted.
             int length = list.Count;
-            double median = list[length / 2];
             double Q1 = list[length / 4];
             double Q3 = list[length / 4 * 3];
             return Q3 - Q1;
@@ -17,8 +22,12 @@ namespace SwaMe
         public static int CalcIQR(List<int> list)
         {
             // Note list must already be sorted.
+            if (list.Count < 5)
+            {
+                throw new ArgumentException(String.Format("{0} is too few list items to calculate IQR", list.Count),
+                                          "list");
+            }
             int length = list.Count;
-            int median = list[length / 2];
             int Q1 = list[length / 4];
             int Q3 = list[length / 4 * 3];
             return Q3 - Q1;
