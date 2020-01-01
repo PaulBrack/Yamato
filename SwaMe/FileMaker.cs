@@ -17,7 +17,7 @@ namespace SwaMe
         private int MS1Count;
         private int MS2Count;
         private int totalMS2IonCount;
-        private string filePath;
+        private string inputFileInclPath;
         private double RTDuration;
         private double swathSizeDifference;
         private Run run;
@@ -28,11 +28,11 @@ namespace SwaMe
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public FileMaker(int division, string filePath, Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
+        public FileMaker(int division, string inputFileInclPath, Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
         {
             this.swathMetrics = swathMetrics;
             this.division = division;
-            this.filePath = filePath;
+            this.inputFileInclPath = inputFileInclPath;
             this.run = run;
             this.rtMetrics = rtMetrics;
             this.RTDuration = RTDuration;
@@ -48,7 +48,7 @@ namespace SwaMe
         public void MakeMetricsPerSwathFile(SwathGrouper.SwathMetrics swathMetrics)
         {
             //tsv
-            CheckOutputDirectory(filePath);
+            CheckOutputDirectory(inputFileInclPath);
             string swathFileName = dateTime + "_MetricsBySwath_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(swathFileName);
             streamWriter.Write("Filename \t swathNumber \t targetMz \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
@@ -68,7 +68,7 @@ namespace SwaMe
         }
         public void MakeMetricsPerRTsegmentFile(RTGrouper.RTMetrics rtMetrics)
         {
-            CheckOutputDirectory(filePath);
+            CheckOutputDirectory(inputFileInclPath);
             string metricsPerRTSegmentFile = dateTime+ "_RTDividedMetrics_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
             streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal \n");
@@ -93,7 +93,7 @@ namespace SwaMe
         }
         public void MakeUndividedMetricsFile()
         {
-            CheckOutputDirectory(filePath);
+            CheckOutputDirectory(inputFileInclPath);
             string undividedFile = dateTime + "_undividedMetrics_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(undividedFile);
             streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count \n");
@@ -112,7 +112,7 @@ namespace SwaMe
 
         public void MakeiRTmetricsFile(Run run)
         {
-            CheckOutputDirectory(filePath);
+            CheckOutputDirectory(inputFileInclPath);
             string filename = dateTime + "_iRTMetrics_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(filename);
             streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor \n");
@@ -179,7 +179,7 @@ namespace SwaMe
             JsonClasses.FileProperties completionTime = new JsonClasses.FileProperties() { cvRef = "MS", accession = "MS:1000747", name = "completion time", value = run.CompletionTime };
             fileProperties.Add(fileProperty);
             List<JsonClasses.InputFiles> inputFiles = new List<JsonClasses.InputFiles>();
-            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles() { location = "file://" + filePath, name = run.SourceFileNames[0], fileFormat = fileFormat, fileProperties = fileProperties };
+            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles() { location = "file://" + inputFileInclPath, name = run.SourceFileNames[0], fileFormat = fileFormat, fileProperties = fileProperties };
             inputFiles.Add(inputFile);
             List<JsonClasses.AnalysisSoftware> analysisSoftwarelist = new List<JsonClasses.AnalysisSoftware>();
             JsonClasses.AnalysisSoftware analysisSoftware = new JsonClasses.AnalysisSoftware() { cvRef = "MS", accession = "XXXXXXXXXXXXXX", name = "SwaMe", uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", version = "1.0" };
@@ -195,7 +195,7 @@ namespace SwaMe
             JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, cv = cV };
 
             //Then save:
-            CheckOutputDirectory(filePath);
+            CheckOutputDirectory(inputFileInclPath);
             string mzQCFile = @"metrics_" + run.SourceFileNames[0]+ ".json";
             new MzqcGenerator.MzqcWriter().WriteMzqc(mzQCFile, metrics);
 
@@ -229,8 +229,20 @@ namespace SwaMe
                 logger.Error(inputFile + "does not appear to contain all the desired columns.");
             }
         }
-        public void CheckOutputDirectory(string filePath) 
+        public void CheckOutputDirectory(string inputFileInclPath) 
         {
+            string filePath = "";
+            if (inputFileInclPath.Contains(".mzML"))
+            {
+                string[] strings = inputFileInclPath.Split("\\");
+                filePath = strings[0];
+                for (int i = 1; i < strings.Count() - 1; i++)
+                {
+                    filePath = filePath +"\\"+ strings[i];
+                }
+            }
+            else { filePath = inputFileInclPath; }
+
             if (Directory.GetCurrentDirectory() != filePath && !string.IsNullOrEmpty(filePath)) Directory.SetCurrentDirectory(filePath);
         }
 
