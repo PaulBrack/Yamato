@@ -234,12 +234,7 @@ namespace SwaMe
             string filePath = "";
             if (inputFileInclPath.Contains(".mzML"))
             {
-                string[] strings = inputFileInclPath.Split("\\");
-                filePath = strings[0];
-                for (int i = 1; i < strings.Count() - 1; i++)
-                {
-                    filePath = filePath +"\\"+ strings[i];
-                }
+                filePath =  Path.GetDirectoryName(inputFileInclPath);
             }
             else { filePath = inputFileInclPath; }
 
