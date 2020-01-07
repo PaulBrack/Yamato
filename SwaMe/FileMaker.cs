@@ -231,8 +231,8 @@ namespace SwaMe
         }
         public void CheckOutputDirectory(string inputFileInclPath) 
         {
-            string filePath = "";
-            if (inputFileInclPath.Contains(".mzML"))
+            string filePath;
+            if (inputFileInclPath.Contains(".mzML", StringComparison.InvariantCultureIgnoreCase))
             {
                 filePath =  Path.GetDirectoryName(inputFileInclPath);
             }
