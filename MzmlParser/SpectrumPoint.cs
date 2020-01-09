@@ -21,6 +21,11 @@ namespace MzmlParser
     [ProtoContract]
     public class SpectrumPoint
     {
+
+        public SpectrumPoint()
+        {
+
+        }
         public SpectrumPoint(float intensity, float mz, float retentionTime)
         {
             this.Intensity = intensity;

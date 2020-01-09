@@ -50,9 +50,13 @@ namespace MzmlParser
             {
                 foreach (double targetMz in candidateHit.ProductTargetMzs)
                 {
-                    var match = matchingScan.Spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
-                    if (match.Any())
-                        matchingSpectrum.Add(match.First());//In a scan only one point is taken for each transition
+                    var spectrum = matchingScan.Spectrum;
+                    if (spectrum != null && spectrum.SpectrumPoints != null && spectrum.SpectrumPoints.Count > 0)
+                    {
+                        var match = matchingScan.Spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
+                        if (match.Any())
+                            matchingSpectrum.Add(match.First());//In a scan only one point is taken for each transition
+                    }
                 }
             }
             if (matchingSpectrum.Any())

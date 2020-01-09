@@ -43,7 +43,7 @@ namespace LibraryParser
                         }
                     }
                 }
-                LogResults(library, logger);
+                LogResults(library, logger, path);
             }
             return library;
         }

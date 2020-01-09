@@ -51,12 +51,22 @@ namespace MzmlParser
             cde.Wait();
             cde.Reset(1);
 
+            logger.Info("Finding base peak spectra...");
             AddBasePeakSpectra(run);
 
             cde.Signal();
             cde.Wait();
             cde.Reset(1);
+
+            logger.Info("Selecting best IRT peptide candidates...");
+
             IrtPeptideMatcher.ChooseIrtPeptides(run);
+            logger.Info("IRT peptides detected: ");
+            foreach (var x in run.IRTHits.OrderBy(x => x.RetentionTime))
+            {
+                logger.Info("{0} {1}", x.PeptideSequence, x.RetentionTime);
+            }
+
 
             return run;
         }
@@ -334,7 +344,7 @@ namespace MzmlParser
                 logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}. The empty scans have been filled with zero values.", scan.Scan.MsLevel, scan.Scan.Cycle);
                 run.MissingScans++;
             }
-            var spectrum = intensities.Select((x, i) => new SpectrumPoint(x, mzs[i], (float)scan.Scan.ScanStartTime)).ToList();
+            var spectrum = intensities.Select((x, i) => new SpectrumPoint(x, mzs[i], (float)scan.Scan.ScanStartTime)).Where(x => x.Intensity > 200).ToList();
 
 
             //Predicted singly charged proportion:
@@ -478,11 +488,14 @@ namespace MzmlParser
             foreach (BasePeak bp in run.BasePeaks.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= run.AnalysisSettings.MassTolerance))
             {
                 var temp = bp.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
-                if (temp.Any())
+                var spectrum = scan.Spectrum;
+                if (temp.Any() && spectrum != null && spectrum.SpectrumPoints != null && spectrum.SpectrumPoints.Count > 0)
                 {
-                    var matching = scan.Spectrum.SpectrumPoints.DefaultIfEmpty(null).Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance).OrderByDescending(x => x.Intensity).First();
+                    var matching = spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance);
+
                     if (matching != null)
-                        bp.Spectrum.Add(matching);
+                        bp.Spectrum.Add(matching.OrderByDescending(x => x.Intensity).FirstOrDefault());
+
                 }
             }
             cde.Signal();
@@ -533,6 +546,11 @@ namespace MzmlParser
             else
             {
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
+            }
+
+            if(run.Ms2Scans.Count % 10000 == 0)
+            {
+                logger.Info("{0} MS2 scans read", run.Ms2Scans.Count);
             }
         }
 
