@@ -27,14 +27,12 @@ namespace MzmlParser
         public bool ParseBinaryData { get; set; }
         public bool Threading { get; set; }
 
-        private const double BasePeakMinimumIntensity = 100;
         public int currentCycle = 0;
         bool MS1 = false;
         public double previousTargetMz = 0;
 
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        private static CountdownEvent cde = new CountdownEvent(1);
-        private static readonly Object Lock = new Object();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly CountdownEvent cde = new CountdownEvent(1);
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
 
         public Run LoadMzml(string path, bool storeScansInMemory, AnalysisSettings analysisSettings)
