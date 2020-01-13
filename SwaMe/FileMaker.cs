@@ -64,7 +64,7 @@ namespace SwaMe
                 streamWriter.Write("\n");
             }
             streamWriter.Close();
-            CheckColumnNumber(swathFileName, 8);
+            CheckColumnNumber(swathFileName, 9);
         }
         public void MakeMetricsPerRTsegmentFile(RTGrouper.RTMetrics rtMetrics)
         {
