@@ -64,7 +64,7 @@ namespace MzmlParser
             logger.Info("IRT peptides detected: ");
             foreach (var x in run.IRTHits.OrderBy(x => x.RetentionTime))
             {
-                logger.Info("{0} {1}", x.PeptideSequence, x.RetentionTime);
+                logger.Debug("{0} {1}", x.PeptideSequence, x.RetentionTime);
             }
 
 
@@ -73,6 +73,7 @@ namespace MzmlParser
 
         private void ReadMzml(string path, Run run, bool irt)
         {
+
             using (XmlReader reader = XmlReader.Create(path))
             {
                 Xli = (IXmlLineInfo)reader;
@@ -95,6 +96,7 @@ namespace MzmlParser
                                 break;
                         }
                     }
+
                 }
             }
         }
@@ -306,7 +308,7 @@ namespace MzmlParser
                         scan.Scan.SpectrumXmlBase64Line = Xli.LineNumber;
                         scan.Scan.SpectrumXmlBase64LinePos = Xli.LinePosition;
                         base64 = reader.ReadContentAsString();
-                        scan.Scan.SpectrumXmlBase64Length = base64.Length; 
+                        scan.Scan.SpectrumXmlBase64Length = base64.Length;
                     }
 
                 }
@@ -548,7 +550,7 @@ namespace MzmlParser
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
             }
 
-            if(run.Ms2Scans.Count % 10000 == 0)
+            if (run.Ms2Scans.Count % 10000 == 0)
             {
                 logger.Info("{0} MS2 scans read", run.Ms2Scans.Count);
             }

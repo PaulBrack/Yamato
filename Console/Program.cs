@@ -57,15 +57,13 @@ namespace Yamato.Console
                     else
                         throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
 
-                    bool irt = false;
-                    if (!String.IsNullOrEmpty(options.IRTFile))
-                        irt = true;
+                    bool irt = !String.IsNullOrEmpty(options.IRTFile);
 
-                    MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader();
-                    if (options.ParseBinaryData == false)
-                        mzmlParser.ParseBinaryData = false;
-                    if (options.Threading == false)
-                        mzmlParser.Threading = false;
+                    MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader
+                    {
+                        ParseBinaryData = options.ParseBinaryData ?? true,
+                        Threading = options.Threading ?? true
+                    };
 
                     CheckFileIsReadableOrComplain(inputFilePath);
 

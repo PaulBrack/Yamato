@@ -103,6 +103,8 @@ namespace MzmlParser
         public int SpectrumXmlBase64LinePos { get; set; }
 
         public int SpectrumXmlBase64Length { get; set; }
+
+        public int SpectrumXmlBase64BinaryOffset { get; set; }
     }
 
     [ProtoContract]
