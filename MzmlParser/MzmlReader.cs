@@ -344,7 +344,7 @@ namespace MzmlParser
                 logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}. The empty scans have been filled with zero values.", scan.Scan.MsLevel, scan.Scan.Cycle);
                 run.MissingScans++;
             }
-            var spectrum = intensities.Select((x, i) => new SpectrumPoint(x, mzs[i], (float)scan.Scan.ScanStartTime)).Where(x => x.Intensity > 200).ToList();
+            var spectrum = intensities.Select((x, i) => new SpectrumPoint(x, mzs[i], (float)scan.Scan.ScanStartTime)).Where(x => x.Intensity >= run.AnalysisSettings.MinimumIntensity).ToList();
 
 
             //Predicted singly charged proportion:

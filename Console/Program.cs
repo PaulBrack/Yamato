@@ -76,7 +76,8 @@ namespace Yamato.Console
                         IrtMinIntensity = options.IrtMinIntensity,
                         IrtMinPeptides = options.IrtMinPeptides,
                         IrtMassTolerance = options.IrtMassTolerance,
-                        CacheSpectraToDisk = options.Cache
+                        CacheSpectraToDisk = options.Cache,
+                        MinimumIntensity = options.MinimumIntensity
                     };
 
                     if (!String.IsNullOrEmpty(options.IRTFile))
@@ -162,6 +163,9 @@ namespace Yamato.Console
 
         [Option('z', "cacheSpectraToDisk", Required = false, HelpText = "Cache spectra on read")]
         public bool Cache { get; set; } = false;
+
+        [Option("minimumIntensity", Required = false, HelpText = "The minimum threshold of an intensity value to process")]
+        public int MinimumIntensity { get; set; } = 200;
     }
 }
 

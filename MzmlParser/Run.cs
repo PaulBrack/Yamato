@@ -59,5 +59,6 @@ namespace MzmlParser
             IrtMassTolerance = tolerance;
         }
         public bool CacheSpectraToDisk { get; set; }
+        public int MinimumIntensity { get; set; }
     }
 }
