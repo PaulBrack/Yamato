@@ -65,7 +65,10 @@ namespace SwaMe
             fileMaker.CreateAndSaveMzqc();
             if (combine && lastFile)
             {
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*", date + "AllIRTMetrics.tsv");
+                if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
+                {
+                    fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*", date + "AllIRTMetrics.tsv");
+                }
                 fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*", date + "AllMetricsBySwath.tsv");
                 fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", date + "AllRTDividedMetrics.tsv");
                 fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", date + "AllUndividedMetrics.tsv");
