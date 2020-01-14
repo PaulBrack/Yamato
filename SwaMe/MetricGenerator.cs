@@ -67,16 +67,16 @@ namespace SwaMe
             {
                 if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
                 {
-                    string[] iRTFilename = { "AllIRTMetrics", date, ".tsv" };
-                    fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*",string.Join("_",iRTFilename));
+                    string[] iRTFilename = { "AllIRTMetrics_", date, ".tsv" };
+                    fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*",string.Join("",iRTFilename));
                 }
 
-                string[] swathFilename = { "AllMetricsBySwath", date, ".tsv" };
-                string[] rtFilename = { "AllRTDividedMetrics", date, ".tsv" };
-                string[] undividedFilename = { "AllUndividedMetrics", date, ".tsv" };
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*",string.Join("_",swathFilename) );
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", string.Join("_", rtFilename));
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", string.Join("_",undividedFilename));
+                string[] swathFilename = { "AllMetricsBySwath_", date, ".tsv" };
+                string[] rtFilename = { "AllRTDividedMetrics_", date, ".tsv" };
+                string[] undividedFilename = { "AllUndividedMetrics_", date, ".tsv" };
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*",string.Join("",swathFilename) );
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", string.Join("", rtFilename));
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", string.Join("",undividedFilename));
              }
         }
     }
