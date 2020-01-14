@@ -105,6 +105,11 @@ namespace MzmlParser
         public int SpectrumXmlBase64Length { get; set; }
 
         public int SpectrumXmlBase64BinaryOffset { get; set; }
+
+        public void DeleteTempFile()
+        {
+            File.Delete(TempFileName);
+        }
     }
 
     [ProtoContract]
@@ -129,4 +134,6 @@ namespace MzmlParser
         public int IntensityBitLength { get; set; }
         public int MzBitLength { get; set; }
     }
+
+
 }

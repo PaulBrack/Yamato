@@ -89,7 +89,13 @@ namespace Yamato.Console
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
-                    logger.Info("Parsed file in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                    logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+
+                    if (analysisSettings.CacheSpectraToDisk)
+                    {
+                        logger.Info("Deleting temp files...");
+                        mzmlParser.DeleteTempFiles(run);
+                    }
                     logger.Info("Done!");
 
                 }

@@ -264,6 +264,15 @@ namespace MzmlParser
             }
         }
 
+        public void DeleteTempFiles(Run run)
+        {
+            foreach (Scan scan in run.Ms1Scans)
+                scan.DeleteTempFile();
+            foreach (Scan scan in run.Ms2Scans)
+                scan.DeleteTempFile();
+
+        }
+
         private static void GetBinaryData(XmlReader reader, ScanAndTempProperties scan)
         {
             string base64 = String.Empty;
