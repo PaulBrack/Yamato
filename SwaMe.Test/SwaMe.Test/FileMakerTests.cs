@@ -125,8 +125,8 @@ namespace SwaMe.Test
 
             var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_RTDividedMetrics_File1.tsv"));
             string correctLine1 = "Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal ";
-            string correctLine2 = "File1\t1\t20\t30\t44\t33\t36\t450\t21\t2\t6\t5\t2000\t1000";
-            string correctLine3 = "File1\t2\t40\t60\t120\t66\t68\t650\t51\t4\t5\t5\t4000\t3000";
+            string correctLine2 = "File1\tRTsegment_1\t20\t30\t44\t33\t36\t450\t21\t2\t6\t5\t2000\t1000";
+            string correctLine3 = "File1\tRTsegment_2\t40\t60\t120\t66\t68\t650\t51\t4\t5\t5\t4000\t3000";
             List<string> correctText = new List<string>() { correctLine1, correctLine2, correctLine3 };
 
             if (fileText.ElementAt(1).Contains(","))//Stupid South Africa and its commas for decimals rules. The theory is that if they are there, they should be in both the second and third line, so we only need to check if its in the second line.
