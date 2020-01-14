@@ -26,6 +26,7 @@ namespace MzmlParser
         public bool ExtractBasePeaks { get; set; }
         public bool ParseBinaryData { get; set; }
         public bool Threading { get; set; }
+        public int MaxQueueSize { get; set; }
 
         public int currentCycle = 0;
         bool MS1 = false;
@@ -242,7 +243,7 @@ namespace MzmlParser
                             cde.AddCount();
                             if (run.AnalysisSettings.CacheSpectraToDisk) //this option exists largely to restrict RAM use, so don't let queue get too big
                             {
-                                while (cde.CurrentCount > 2000)
+                                while (cde.CurrentCount > MaxQueueSize)
                                     Thread.Sleep(1000);
                             }
 

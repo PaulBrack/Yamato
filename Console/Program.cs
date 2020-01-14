@@ -62,7 +62,8 @@ namespace Yamato.Console
                     MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader
                     {
                         ParseBinaryData = options.ParseBinaryData ?? true,
-                        Threading = options.Threading ?? true
+                        Threading = options.Threading ?? true,
+                        MaxQueueSize = options.MaxQueueSize
                     };
 
                     CheckFileIsReadableOrComplain(inputFilePath);
@@ -164,6 +165,9 @@ namespace Yamato.Console
 
         [Option("minimumIntensity", Required = false, HelpText = "The minimum threshold of an intensity value to process")]
         public int MinimumIntensity { get; set; } = 100;
+
+        [Option("maxQueueSize", Required = false, HelpText = "The maximum number of threads to queue. When the number is met, the parser will pause")]
+        public int MaxQueueSize { get; set; } = 1000;
     }
 }
 
