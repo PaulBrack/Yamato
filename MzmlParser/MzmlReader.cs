@@ -21,12 +21,15 @@ namespace MzmlParser
             Threading = true;
         }
 
+        
         public static IXmlLineInfo Xli;
 
         public bool ExtractBasePeaks { get; set; }
         public bool ParseBinaryData { get; set; }
         public bool Threading { get; set; }
         public int MaxQueueSize { get; set; }
+
+        public int MaxThreads { get; set; }
 
         public int currentCycle = 0;
         bool MS1 = false;
@@ -38,6 +41,8 @@ namespace MzmlParser
 
         public Run LoadMzml(string path, bool storeScansInMemory, AnalysisSettings analysisSettings)
         {
+            if(MaxThreads != 0)
+                ThreadPool.SetMaxThreads(MaxThreads, MaxThreads);
             Run run = new Run() { AnalysisSettings = analysisSettings };
             bool irt = run.AnalysisSettings.IrtLibrary != null;
             run.MissingScans = 0;

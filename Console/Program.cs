@@ -14,7 +14,7 @@ namespace Yamato.Console
 {
     class Program
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         static void Main(string[] args)
         {
@@ -30,13 +30,13 @@ namespace Yamato.Console
                 {
                     var directoryPath = Path.GetDirectoryName(options.InputFile);
                     DirectoryInfo di = new DirectoryInfo(directoryPath);
-                    logger.Info("Attempting to load files with the extension .mzml in the following directory: {0}", directoryPath);
+                    Logger.Info("Attempting to load files with the extension .mzml in the following directory: {0}", directoryPath);
                     foreach (var file in di.GetFiles("*.mzml", SearchOption.TopDirectoryOnly))
                         inputFiles.Add(file.FullName);
 
                     if (inputFiles.Count == 0)
                     {
-                        logger.Error("Unable to locate any MZML files in {0} directory", directoryPath);
+                        Logger.Error("Unable to locate any MZML files in {0} directory", directoryPath);
                         throw new FileNotFoundException();
                     }
                 }
@@ -47,7 +47,7 @@ namespace Yamato.Console
                 {
                     bool lastFile = false;//saving whether its the last file or not, so if we need to combine all the files in the end, we know when the end is.
                     if (inputFilePath == inputFiles.Last()) lastFile = true;
-                    logger.Info("Loading file: {0}", inputFilePath);
+                    Logger.Info("Loading file: {0}", inputFilePath);
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
 
@@ -63,7 +63,8 @@ namespace Yamato.Console
                     {
                         ParseBinaryData = options.ParseBinaryData ?? true,
                         Threading = options.Threading ?? true,
-                        MaxQueueSize = options.MaxQueueSize
+                        MaxQueueSize = options.MaxQueueSize,
+                        MaxThreads = options.MaxThreads
                     };
 
                     CheckFileIsReadableOrComplain(inputFilePath);
@@ -89,14 +90,14 @@ namespace Yamato.Console
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
-                    logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                    Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
                     if (analysisSettings.CacheSpectraToDisk)
                     {
-                        logger.Info("Deleting temp files...");
+                        Logger.Info("Deleting temp files...");
                         mzmlParser.DeleteTempFiles(run);
                     }
-                    logger.Info("Done!");
+                    Logger.Info("Done!");
 
                 }
             });
@@ -112,14 +113,14 @@ namespace Yamato.Console
             }
             catch (IOException)
             {
-                logger.Error(String.Format("Unable to open the file: {0}.", inputFilePath));
+                Logger.Error(String.Format("Unable to open the file: {0}.", inputFilePath));
                 throw;
             }
         }
 
         private static void UpdateLoggingLevels(Options options)
         {
-            logger.Info("Verbose output selected: enabled logging for all levels");
+            Logger.Info("Verbose output selected: enabled logging for all levels");
             foreach (var rule in LogManager.Configuration.LoggingRules)
             {
                 rule.EnableLoggingForLevels(LogLevel.Trace, LogLevel.Debug);
@@ -174,6 +175,9 @@ namespace Yamato.Console
 
         [Option("maxQueueSize", Required = false, HelpText = "The maximum number of threads to queue. When the number is met, the parser will pause")]
         public int MaxQueueSize { get; set; } = 1000;
+
+        [Option("maxThreads", Required = false, HelpText = "The maximum number of worker threads. Set as zero for default system max.")]
+        public int MaxThreads { get; set; } = 0;
     }
 }
 
