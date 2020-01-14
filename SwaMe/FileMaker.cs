@@ -55,7 +55,8 @@ namespace SwaMe
 
             for (int i = 0; i < swathMetrics.swathTargets.Count(); i++)
             {
-                string[] phraseToWrite = { run.SourceFileNames[0], Convert.ToString(i + 1), Convert.ToString(swathMetrics.swathTargets[i]), Convert.ToString(swathMetrics.numOfSwathPerGroup.ElementAt(i)),
+                string[] swathNumber = { "swath", Convert.ToString(i + 1) };
+                string[] phraseToWrite = { run.SourceFileNames[0], string.Join("_",swathNumber), Convert.ToString(swathMetrics.swathTargets[i]), Convert.ToString(swathMetrics.numOfSwathPerGroup.ElementAt(i)),
                     Convert.ToString(swathMetrics.mzRange.ElementAt(i)), Convert.ToString(swathMetrics.SwathProportionOfTotalTIC.ElementAt(i)),
                     Convert.ToString(swathMetrics.swDensity50[i]), Convert.ToString(swathMetrics.swDensityIQR[i]),
                     Convert.ToString(swathMetrics.SwathProportionPredictedSingleChargeAvg.ElementAt(i)) };

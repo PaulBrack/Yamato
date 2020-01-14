@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -94,8 +94,8 @@ namespace SwaMe.Test
         public void SwathMetricsFileCorrect()
         {
             string correctLine1 = "Filename \t swathNumber \t targetMz \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged ";
-            string correctLine2 = "File1\t1\t550\t5\t5\t0.2\t2\t1\t0.3";
-            string correctLine3 = "File1\t2\t1050\t5\t18\t0.8\t8\t2\t0.7";
+            string correctLine2 = "File1\tswath_1\t550\t5\t5\t0.2\t2\t1\t0.3";
+            string correctLine3 = "File1\tswath_2\t1050\t5\t18\t0.8\t8\t2\t0.7";
             List<string> correctText = new List<string>() { correctLine1, correctLine2, correctLine3 };
 
             var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_MetricsBySwath_File1.tsv"));
