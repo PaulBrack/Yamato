@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -55,7 +55,8 @@ namespace SwaMe.Test
         private static Run RunWithoutIRT = new Run()
         { 
         SourceFileNames = { "File1", "File2"},
-        SourceFileChecksums = {"aaa","bbb" }
+        SourceFileChecksums = {"aaa","bbb" },
+        StartTimeStamp = "2017-02-26T13:07:31Z"
         };
 
         //RTMetrics
@@ -153,8 +154,8 @@ namespace SwaMe.Test
 
 
             var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_undividedMetrics_File1.tsv"));
-            string correctLine1 = "Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count ";
-            string correctLine2 = "File1\t0\t70\t2\t10\t2\t1000\t50\t20\t5000";
+            string correctLine1 = "Filename \t StartTimeStamp \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count ";
+            string correctLine2 = "File1\t2017-02-26T13:07:31Z\t0\t70\t2\t10\t2\t1000\t50\t20\t5000";
             List<string> correctText = new List<string>() { correctLine1, correctLine2 };
 
             if (fileText.ElementAt(1).Contains(","))//Stupid South Africa and its commas for decimals rules. The theory is that if they are there, they should be in both the second and third line, so we only need to check if its in the second line.
