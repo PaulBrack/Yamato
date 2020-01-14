@@ -61,7 +61,7 @@ namespace MzmlParser.Test
         [TestMethod]
         public void SourceFileNameReadCorrectly()
         {
-            Assert.IsTrue(Enumerable.Contains(run.SourceFileNames, "SWATH_OC_244_1.wiff")&& Enumerable.Contains(run.SourceFileNames, "SWATH_OC_244_1.wiff.scan"));
+            Assert.IsTrue(Enumerable.Contains(run.SourceFileNames, "SWATH_OC_244_1"));
         }
 
         [TestMethod]

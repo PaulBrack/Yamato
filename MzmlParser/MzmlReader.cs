@@ -102,7 +102,9 @@ namespace MzmlParser
         public void ReadSourceFileMetaData(XmlReader reader, Run run)
         {
             bool cvParamsRead = false;
-            run.SourceFileNames.Add(Path.GetFileName(reader.GetAttribute("name")));
+            string rawFilename = Path.GetFileName(reader.GetAttribute("name"));
+            string[] filenameWithoutExtention = rawFilename.Split(".", 2, StringSplitOptions.None);
+            run.SourceFileNames.Add(filenameWithoutExtention[0]);
             run.SourceFileTypes.Add(Path.GetExtension(reader.GetAttribute("name")));
             run.SourceFilePath = reader.GetAttribute("location");
 
