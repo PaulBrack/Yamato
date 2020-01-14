@@ -81,6 +81,10 @@ namespace MzmlParser
                     {
                         switch (reader.LocalName)
                         {
+                            case "run":
+                                run.StartTimeStamp = reader.GetAttribute("startTimeStamp");
+                                break;
+
                             case "sourceFile":
                                 ReadSourceFileMetaData(reader, run);
                                 break;

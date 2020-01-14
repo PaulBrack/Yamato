@@ -41,6 +41,12 @@ namespace MzmlParser.Test
         }
 
         [TestMethod]
+        public void StartTimeStampReadCorrectly()
+        {
+            Assert.AreEqual("2017-08-10T11:23:54Z", run.StartTimeStamp);
+        }
+
+        [TestMethod]
         public void StartTimeReadCorrectly()
         {
             Assert.AreEqual(0.0046, run.StartTime);
