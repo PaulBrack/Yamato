@@ -65,10 +65,18 @@ namespace SwaMe
             fileMaker.CreateAndSaveMzqc();
             if (combine && lastFile)
             {
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*", date + "AllIRTMetrics.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*", date + "AllMetricsBySwath.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", date + "AllRTDividedMetrics.tsv");
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", date + "AllUndividedMetrics.tsv");
+                if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
+                {
+                    string[] iRTFilename = { "AllIRTMetrics_", date, ".tsv" };
+                    fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*",string.Join("",iRTFilename));
+                }
+
+                string[] swathFilename = { "AllMetricsBySwath_", date, ".tsv" };
+                string[] rtFilename = { "AllRTDividedMetrics_", date, ".tsv" };
+                string[] undividedFilename = { "AllUndividedMetrics_", date, ".tsv" };
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*",string.Join("",swathFilename) );
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", string.Join("", rtFilename));
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", string.Join("",undividedFilename));
              }
         }
     }

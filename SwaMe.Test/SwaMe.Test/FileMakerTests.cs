@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -94,8 +94,8 @@ namespace SwaMe.Test
         public void SwathMetricsFileCorrect()
         {
             string correctLine1 = "Filename \t swathNumber \t targetMz \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged ";
-            string correctLine2 = "File1\t1\t550\t5\t5\t0.2\t2\t1\t0.3";
-            string correctLine3 = "File1\t2\t1050\t5\t18\t0.8\t8\t2\t0.7";
+            string correctLine2 = "File1\tswath_1\t550\t5\t5\t0.2\t2\t1\t0.3";
+            string correctLine3 = "File1\tswath_2\t1050\t5\t18\t0.8\t8\t2\t0.7";
             List<string> correctText = new List<string>() { correctLine1, correctLine2, correctLine3 };
 
             var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_MetricsBySwath_File1.tsv"));
@@ -125,8 +125,8 @@ namespace SwaMe.Test
 
             var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_RTDividedMetrics_File1.tsv"));
             string correctLine1 = "Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal ";
-            string correctLine2 = "File1\t1\t20\t30\t44\t33\t36\t450\t21\t2\t6\t5\t2000\t1000";
-            string correctLine3 = "File1\t2\t40\t60\t120\t66\t68\t650\t51\t4\t5\t5\t4000\t3000";
+            string correctLine2 = "File1\tRTsegment_1\t20\t30\t44\t33\t36\t450\t21\t2\t6\t5\t2000\t1000";
+            string correctLine3 = "File1\tRTsegment_2\t40\t60\t120\t66\t68\t650\t51\t4\t5\t5\t4000\t3000";
             List<string> correctText = new List<string>() { correctLine1, correctLine2, correctLine3 };
 
             if (fileText.ElementAt(1).Contains(","))//Stupid South Africa and its commas for decimals rules. The theory is that if they are there, they should be in both the second and third line, so we only need to check if its in the second line.
