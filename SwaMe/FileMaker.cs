@@ -98,10 +98,10 @@ namespace SwaMe
             CheckOutputDirectory(inputFileInclPath);
             string undividedFile = dateTime + "_undividedMetrics_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(undividedFile);
-            streamWriter.Write("Filename \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count \n");
+            streamWriter.Write("Filename \t StartTimeStamp \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count \n");
 
             //write streamWriter
-            string[] phraseToWrite = { run.SourceFileNames[0], Convert.ToString(run.MissingScans), Convert.ToString(RTDuration),
+            string[] phraseToWrite = { run.SourceFileNames[0], run.StartTimeStamp, Convert.ToString(run.MissingScans), Convert.ToString(RTDuration),
                     Convert.ToString(swathSizeDifference), Convert.ToString(MS2Count),
                     Convert.ToString(swathMetrics.swathTargets.Count()), Convert.ToString(totalMS2IonCount),
                     Convert.ToString(MS2Density50), Convert.ToString(MS2DensityIQR),
@@ -109,7 +109,7 @@ namespace SwaMe
 
             streamWriter.Write(string.Join("\t", phraseToWrite));
             streamWriter.Close();
-            CheckColumnNumber(undividedFile, 10);
+            CheckColumnNumber(undividedFile, 11);
         }
 
         public void MakeiRTmetricsFile(Run run)
