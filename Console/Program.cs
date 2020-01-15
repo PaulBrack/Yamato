@@ -5,10 +5,8 @@ using NLog;
 using LibraryParser;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.IO;
 using MzmlParser;
-using System.Collections.Concurrent;
 
 namespace Yamato.Console
 {
@@ -86,7 +84,7 @@ namespace Yamato.Console
                         TraMLReader traMLReader = new TraMLReader();
                         analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
                     }
-                    MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, irt, analysisSettings);
+                    MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
@@ -135,7 +133,7 @@ namespace Yamato.Console
         public bool? LoadFromDirectory { get; set; }
 
         [Option('i', "inputfile", Required = true, HelpText = "Input file path.")]
-        public String InputFile { get; set; }
+        public string InputFile { get; set; }
 
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
         public int Division { get; set; } = 1;

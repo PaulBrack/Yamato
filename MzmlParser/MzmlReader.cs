@@ -39,7 +39,7 @@ namespace MzmlParser
         private static readonly CountdownEvent cde = new CountdownEvent(1);
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
 
-        public Run LoadMzml(string path, bool storeScansInMemory, AnalysisSettings analysisSettings)
+        public Run LoadMzml(string path, AnalysisSettings analysisSettings)
         {
             if(MaxThreads != 0)
                 ThreadPool.SetMaxThreads(MaxThreads, MaxThreads);
@@ -54,6 +54,11 @@ namespace MzmlParser
             cde.Signal();
             cde.Wait();
             cde.Reset(1);
+
+            logger.Debug("{0} MS1 total scans read", run.Ms1Scans.Count);
+            logger.Debug("{0} MS2 total scans read", run.Ms2Scans.Count);
+            logger.Debug("{0} candidate IRT hits detected", run.IRTHits.Count);
+            logger.Debug("{0} base peaks selected", run.BasePeaks.Count);
 
             logger.Info("Finding base peak spectra...");
             AddBasePeakSpectra(run);

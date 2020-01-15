@@ -13,7 +13,7 @@ namespace MzmlParser.Test
     {
         private static Run run;
 
-        private static AnalysisSettings analysisSettings = new AnalysisSettings()
+        private static readonly AnalysisSettings analysisSettings = new AnalysisSettings()
         {
             MassTolerance = 0.05,
             RtTolerance = 5,
@@ -25,7 +25,7 @@ namespace MzmlParser.Test
         [ClassInitialize]
         public static void Initialize(TestContext t)
         {
-            run = new MzmlReader().LoadMzml(Path.Combine("mzmls", "test.mzml"), true, analysisSettings);
+            run = new MzmlReader().LoadMzml(Path.Combine("mzmls", "test.mzml"), analysisSettings);
         }
 
         [TestMethod]
