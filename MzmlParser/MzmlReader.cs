@@ -55,10 +55,12 @@ namespace MzmlParser
             cde.Wait();
             cde.Reset(1);
 
+            logger.Debug("Run length {0}", run.LastScanTime - run.StartTime);
             logger.Debug("{0} MS1 total scans read", run.Ms1Scans.Count);
             logger.Debug("{0} MS2 total scans read", run.Ms2Scans.Count);
             logger.Debug("{0} candidate IRT hits detected", run.IRTHits.Count);
             logger.Debug("{0} base peaks selected", run.BasePeaks.Count);
+            FindMs2IsolationWindows(run);
 
             logger.Info("Finding base peak spectra...");
             AddBasePeakSpectra(run);
@@ -70,12 +72,12 @@ namespace MzmlParser
             logger.Info("Selecting best IRT peptide candidates...");
 
             IrtPeptideMatcher.ChooseIrtPeptides(run);
-            logger.Info("IRT peptides detected: ");
+            logger.Debug("IRT peptides detected: ");
             foreach (var x in run.IRTHits.OrderBy(x => x.RetentionTime))
             {
                 logger.Debug("{0} {1}", x.PeptideSequence, x.RetentionTime);
             }
-
+           
 
             return run;
         }
@@ -574,10 +576,14 @@ namespace MzmlParser
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
             }
 
+            //Note: this isn't thread safe so there's a chance you could see one of these messages twice. 
+            //
+            //There's no real damage to showing one of these messages twice, and there would be a performance
+            //penalty for putting a lock around this method so I'm accepting this minor bug for now
+            //
+            //Paul Brack 2020/01/15
             if (run.Ms2Scans.Count % 10000 == 0)
-            {
                 logger.Info("{0} MS2 scans read", run.Ms2Scans.Count);
-            }
         }
 
         private static float[] FillZeroArray(float[] array)
@@ -589,6 +595,7 @@ namespace MzmlParser
         private void FindMs2IsolationWindows(Run run)
         {
             run.IsolationWindows = run.Ms2Scans.Select(x => (x.IsolationWindowTargetMz - x.IsolationWindowLowerOffset, x.IsolationWindowTargetMz + x.IsolationWindowUpperOffset)).Distinct().ToList();
+            logger.Debug("{0} isolation windows detected: min {1} max {2}", run.IsolationWindows.Count, run.IsolationWindows.Min(x => x.Item2 - x.Item1), run.IsolationWindows.Max(x => x.Item2 - x.Item1));
         }
     }
 }

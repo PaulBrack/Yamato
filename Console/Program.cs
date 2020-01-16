@@ -87,6 +87,8 @@ namespace Yamato.Console
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
 
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
+
+                    Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
                     Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
