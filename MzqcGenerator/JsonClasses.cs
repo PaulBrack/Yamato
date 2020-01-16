@@ -4,6 +4,10 @@ namespace MzqcGenerator
 {
     public class JsonClasses
     {
+        // Naming Styles - these names are reflected into the JSON so are
+        // exempted from normal style guidelines
+        #pragma warning disable IDE1006
+
         public class FileFormat
         {
             public string cvRef = "MS";
@@ -12,6 +16,7 @@ namespace MzqcGenerator
         }
         public class FileProperties
         {
+
             public string cvRef { get; set; }
             public string accession { get; set; }
             public string name { get; set; }
@@ -72,12 +77,14 @@ namespace MzqcGenerator
             public NUV UO { get; set; }
         }
 
-       
+
         public class MzQC
         {
             public string version = "0.0.11";
             public List<RunQuality> runQuality { get; set; }
             public CV cv { get; set; }
         }
+
+        #pragma warning restore IDE1006 // Naming Styles
     }
 }
