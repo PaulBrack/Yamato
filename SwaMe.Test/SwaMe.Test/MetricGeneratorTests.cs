@@ -81,7 +81,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void RTDurationCorrectIfcontainsLastAndFirstScanTimes()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, Path.GetTempPath(), false, false, false, "");
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "", false, false, false, "");
             Assert.AreEqual(MetricGenerator.RTDuration, 67.5);
         }
         /// <remarks>
@@ -90,7 +90,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void RTDurationZeroIfMissingLastScanTimeOrFirstScanTime()
         {
-            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, Path.GetTempPath(), false, false, false, "");
+            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, "", false, false, false, "");
             Assert.AreEqual(MetricGenerator.RTDuration, 0);
         }
         /// <remarks>
@@ -99,7 +99,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void swathSizeDifferenceCorrectIfOffsetsNotDefault()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, Path.GetTempPath(), false, false, false, "");
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "", false, false, false, "");
             Assert.AreEqual(MetricGenerator.swathSizeDifference, 8);
         }
         /// <remarks>
@@ -108,7 +108,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void swathSizeDifferenceZeroIfOffsetsAreDefault()
         {
-            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, Path.GetTempPath(), false, false, false, "");
+            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, "", false, false, false, "");
             Assert.AreEqual(MetricGenerator.swathSizeDifference, 0);
         }
         /// <remarks>
