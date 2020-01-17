@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MzmlParser;
+using System.IO;
 
 namespace SwaMe.Test
 {
@@ -80,7 +81,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void RTDurationCorrectIfcontainsLastAndFirstScanTimes()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "C:\\myfile.mzML", false, false, false, "");
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, Directory.GetCurrentDirectory(), false, false, false, "");
             Assert.AreEqual(MetricGenerator.RTDuration, 67.5);
         }
         /// <remarks>
@@ -89,7 +90,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void RTDurationZeroIfMissingLastScanTimeOrFirstScanTime()
         {
-            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, "C:\\myfile.mzML", false, false, false, "");
+            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, Directory.GetCurrentDirectory(), false, false, false, "");
             Assert.AreEqual(MetricGenerator.RTDuration, 0);
         }
         /// <remarks>
@@ -98,7 +99,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void swathSizeDifferenceCorrectIfOffsetsNotDefault()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "C:\\myfile.mzML", false, false, false, "");
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, Directory.GetCurrentDirectory(), false, false, false, "");
             Assert.AreEqual(MetricGenerator.swathSizeDifference, 8);
         }
         /// <remarks>
@@ -107,7 +108,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void swathSizeDifferenceZeroIfOffsetsAreDefault()
         {
-            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, "C:\\myfile.mzML", false, false, false, "");
+            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, Directory.GetCurrentDirectory(), false, false, false, "");
             Assert.AreEqual(MetricGenerator.swathSizeDifference, 0);
         }
         /// <remarks>
@@ -116,7 +117,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void DensityCorrect()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "C:\\myfile.mzML", false, false, false, "");
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, Directory.GetCurrentDirectory(), false, false, false, "");
             List<int> correctDensity = new List<int>() { 2, 2, 4, 4, 5 };
             Assert.IsTrue(Enumerable.SequenceEqual(MetricGenerator.Density, correctDensity));
         }
