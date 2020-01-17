@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MzmlParser;
+using System.IO;
 
 namespace SwaMe.Test
 {
@@ -116,7 +117,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void DensityCorrect()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, "", false, false, false, "");
+            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, Path.GetTempPath(), false, false, false, "");
             List<int> correctDensity = new List<int>() { 2, 2, 4, 4, 5 };
             Assert.IsTrue(Enumerable.SequenceEqual(MetricGenerator.Density, correctDensity));
         }
