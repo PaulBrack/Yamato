@@ -48,7 +48,7 @@ namespace SwaMe
         public void MakeMetricsPerSwathFile(SwathGrouper.SwathMetrics swathMetrics)
         {
             //tsv
-            CheckOutputDirectory(inputFileInclPath);
+            CreateOutputDirectory(inputFileInclPath);
             string swathFileName = dateTime + "_MetricsBySwath_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(swathFileName);
             streamWriter.Write("Filename \t swathNumber \t targetMz \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
@@ -69,7 +69,7 @@ namespace SwaMe
         }
         public void MakeMetricsPerRTsegmentFile(RTGrouper.RTMetrics rtMetrics)
         {
-            CheckOutputDirectory(inputFileInclPath);
+            CreateOutputDirectory(inputFileInclPath);
             string metricsPerRTSegmentFile = dateTime+ "_RTDividedMetrics_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
             streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal \n");
@@ -95,7 +95,7 @@ namespace SwaMe
         }
         public void MakeUndividedMetricsFile()
         {
-            CheckOutputDirectory(inputFileInclPath);
+            CreateOutputDirectory(inputFileInclPath);
             string undividedFile = dateTime + "_undividedMetrics_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(undividedFile);
             streamWriter.Write("Filename \t StartTimeStamp \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count \n");
@@ -114,7 +114,7 @@ namespace SwaMe
 
         public void MakeiRTmetricsFile(Run run)
         {
-            CheckOutputDirectory(inputFileInclPath);
+            CreateOutputDirectory(inputFileInclPath);
             string filename = dateTime + "_iRTMetrics_" + run.SourceFileNames[0] + ".tsv";
             StreamWriter streamWriter = new StreamWriter(filename);
             streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor \n");
@@ -196,7 +196,6 @@ namespace SwaMe
             JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, cv = cV };
 
             //Then save:
-            CheckOutputDirectory(inputFileInclPath);
             string mzQCFile = @"metrics_" + run.SourceFileNames[0]+ ".json";
             new MzqcGenerator.MzqcWriter().WriteMzqc(mzQCFile, metrics);
 
@@ -204,8 +203,8 @@ namespace SwaMe
 
         public void CombineMultipleFilesIntoSingleFile(string inputFileNamePattern, string outputFileName)
         {
-            string[] inputFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), inputFileNamePattern);
-
+            string[] inputFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), inputFileNamePattern, SearchOption.AllDirectories);
+            CheckOutputDirectory(inputFileInclPath);
             StreamWriter combinedwriter = new StreamWriter(outputFileName);
             int counter = 0;
             foreach (var inputFile in inputFiles)
@@ -232,14 +231,27 @@ namespace SwaMe
         }
         public void CheckOutputDirectory(string inputFileInclPath) 
         {
+            string filePath = Path.Join(GetFilePathWithoutExtension(inputFileInclPath), "SwaMe_results");
+
+            if (Directory.GetCurrentDirectory() != filePath && !string.IsNullOrEmpty(filePath)) Directory.SetCurrentDirectory(filePath);
+        }
+        public void CreateOutputDirectory(string inputFileInclPath)
+        {
+            string originalFilePath = GetFilePathWithoutExtension(inputFileInclPath);
+            string[] filePaths = { originalFilePath, "SwaMe_results",Path.GetFileNameWithoutExtension(inputFileInclPath), dateTime };
+            string filePath = Path.Combine(filePaths);
+            DirectoryInfo di = Directory.CreateDirectory(filePath);
+            Directory.SetCurrentDirectory(filePath);
+        }
+        public string GetFilePathWithoutExtension(string inputFileInclPath)
+        {
             string filePath;
             if (inputFileInclPath.Contains(".mzML", StringComparison.InvariantCultureIgnoreCase))
             {
-                filePath =  Path.GetDirectoryName(inputFileInclPath);
+                filePath = Path.GetDirectoryName(inputFileInclPath);
             }
             else { filePath = inputFileInclPath; }
-
-            if (Directory.GetCurrentDirectory() != filePath && !string.IsNullOrEmpty(filePath)) Directory.SetCurrentDirectory(filePath);
+            return filePath;
         }
 
     }
