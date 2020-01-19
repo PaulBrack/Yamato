@@ -37,6 +37,7 @@ namespace MzmlParser
         public ConcurrentBag<CandidateHit> IRTHits { get; set; }
         public AnalysisSettings AnalysisSettings { get; set; }
         public string StartTimeStamp { get; set; }
+        public string ID { get; set; }
     }
 
     public class Chromatograms

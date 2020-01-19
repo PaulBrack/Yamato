@@ -24,7 +24,7 @@ namespace SwaMe
         private SwathGrouper.SwathMetrics swathMetrics;
         private RTGrouper.RTMetrics rtMetrics;
         private string dateTime;
-
+        private string fileName;
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -43,13 +43,18 @@ namespace SwaMe
             this.MS2DensityIQR = MS2DensityIQR;
             this.MS1Count = MS1Count;
             this.dateTime = dateTime;
+            if (run.SourceFileNames[0].Contains("Func", System.StringComparison.CurrentCultureIgnoreCase))
+            {
+                this.fileName = run.ID;
+            }
+            else { this.fileName = run.SourceFileNames[0]; }
         }
 
         public void MakeMetricsPerSwathFile(SwathGrouper.SwathMetrics swathMetrics)
         {
             //tsv
             CreateOutputDirectory(inputFileInclPath);
-            string swathFileName = dateTime + "_MetricsBySwath_" + run.SourceFileNames[0] + ".tsv";
+            string swathFileName = dateTime + "_MetricsBySwath_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(swathFileName);
             streamWriter.Write("Filename \t swathNumber \t targetMz \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
 
@@ -70,7 +75,7 @@ namespace SwaMe
         public void MakeMetricsPerRTsegmentFile(RTGrouper.RTMetrics rtMetrics)
         {
             CreateOutputDirectory(inputFileInclPath);
-            string metricsPerRTSegmentFile = dateTime+ "_RTDividedMetrics_" + run.SourceFileNames[0] + ".tsv";
+            string metricsPerRTSegmentFile = dateTime+ "_RTDividedMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
             streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal \n");
 
@@ -78,7 +83,7 @@ namespace SwaMe
             {
                 //write streamWriter
                 string[] RTSegment = { "RTsegment", Convert.ToString(segment + 1) };
-                string[] phraseToWrite = { run.SourceFileNames[0], string.Join("_", RTSegment), Convert.ToString(rtMetrics.Peakwidths.ElementAt(segment)),
+                string[] phraseToWrite = { fileName, string.Join("_", RTSegment), Convert.ToString(rtMetrics.Peakwidths.ElementAt(segment)),
                     Convert.ToString(rtMetrics.TailingFactor.ElementAt(segment)), Convert.ToString(rtMetrics.PeakCapacity.ElementAt(segment)),
                     Convert.ToString(rtMetrics.PeakPrecision.ElementAt(segment)), Convert.ToString(rtMetrics.MS1PeakPrecision.ElementAt(segment)),
                     Convert.ToString(rtMetrics.TicChange50List.ElementAt(segment)), Convert.ToString(rtMetrics.TicChangeIqrList.ElementAt(segment)),
@@ -96,12 +101,12 @@ namespace SwaMe
         public void MakeUndividedMetricsFile()
         {
             CreateOutputDirectory(inputFileInclPath);
-            string undividedFile = dateTime + "_undividedMetrics_" + run.SourceFileNames[0] + ".tsv";
+            string undividedFile = dateTime + "_undividedMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(undividedFile);
             streamWriter.Write("Filename \t StartTimeStamp \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count \n");
 
             //write streamWriter
-            string[] phraseToWrite = { run.SourceFileNames[0], run.StartTimeStamp, Convert.ToString(run.MissingScans), Convert.ToString(RTDuration),
+            string[] phraseToWrite = { fileName, run.StartTimeStamp, Convert.ToString(run.MissingScans), Convert.ToString(RTDuration),
                     Convert.ToString(swathSizeDifference), Convert.ToString(MS2Count),
                     Convert.ToString(swathMetrics.swathTargets.Count()), Convert.ToString(totalMS2IonCount),
                     Convert.ToString(MS2Density50), Convert.ToString(MS2DensityIQR),
@@ -115,7 +120,7 @@ namespace SwaMe
         public void MakeiRTmetricsFile(Run run)
         {
             CreateOutputDirectory(inputFileInclPath);
-            string filename = dateTime + "_iRTMetrics_" + run.SourceFileNames[0] + ".tsv";
+            string filename = dateTime + "_iRTMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(filename);
             streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor \n");
 
@@ -125,7 +130,7 @@ namespace SwaMe
             {
 
                 //write streamWriter
-                string[] phraseToWrite = { run.SourceFileNames[0], Convert.ToString(peak.Mz), Convert.ToString(peak.RetentionTime),
+                string[] phraseToWrite = { fileName, Convert.ToString(peak.Mz), Convert.ToString(peak.RetentionTime),
                     Convert.ToString(peak.FWHM), Convert.ToString(peak.Peaksym)};
 
                 streamWriter.Write(string.Join("\t", phraseToWrite));
@@ -180,7 +185,7 @@ namespace SwaMe
             JsonClasses.FileProperties completionTime = new JsonClasses.FileProperties() { cvRef = "MS", accession = "MS:1000747", name = "completion time", value = run.CompletionTime };
             fileProperties.Add(fileProperty);
             List<JsonClasses.InputFiles> inputFiles = new List<JsonClasses.InputFiles>();
-            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles() { location = "file://" + inputFileInclPath, name = run.SourceFileNames[0], fileFormat = fileFormat, fileProperties = fileProperties };
+            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles() { location = "file://" + inputFileInclPath, name = fileName, fileFormat = fileFormat, fileProperties = fileProperties };
             inputFiles.Add(inputFile);
             List<JsonClasses.AnalysisSoftware> analysisSoftwarelist = new List<JsonClasses.AnalysisSoftware>();
             JsonClasses.AnalysisSoftware analysisSoftware = new JsonClasses.AnalysisSoftware() { cvRef = "MS", accession = "XXXXXXXXXXXXXX", name = "SwaMe", uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", version = "1.0" };
@@ -196,7 +201,7 @@ namespace SwaMe
             JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, cv = cV };
 
             //Then save:
-            string mzQCFile = @"metrics_" + run.SourceFileNames[0]+ ".json";
+            string mzQCFile = @"metrics_" + fileName+ ".json";
             new MzqcGenerator.MzqcWriter().WriteMzqc(mzQCFile, metrics);
 
         }
