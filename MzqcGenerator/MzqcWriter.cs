@@ -1,5 +1,6 @@
 ﻿using MzmlParser;
 using Newtonsoft.Json;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ namespace MzqcGenerator
 {
     public class MzqcWriter
     {
-
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public List<JsonClasses.QualityParameters> QualityParameterLookup
         {
             get; set;
@@ -61,7 +62,6 @@ namespace MzqcGenerator
 
         public void BuildMzqcAndWrite(string path, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath)
         {
-
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
             {
@@ -71,36 +71,38 @@ namespace MzqcGenerator
                     matchingMetric.value = metric.Value;
                     qualityParameters.Add(matchingMetric);
                 }
-
-                //Now for the other stuff
-                JsonClasses.FileFormat fileFormat = new JsonClasses.FileFormat() { };
-                List<JsonClasses.FileProperties> fileProperties = new List<JsonClasses.FileProperties>() { };
-
-
-                JsonClasses.FileProperties fileProperty = new JsonClasses.FileProperties("MS", run.FilePropertiesAccession, "SHA-1", run.SourceFileChecksums.First());
-                JsonClasses.FileProperties completionTime = new JsonClasses.FileProperties("MS", "MS:1000747", "completion time", run.CompletionTime);
-                fileProperties.Add(fileProperty);
-
-                List<JsonClasses.InputFiles> inputFiles = new List<JsonClasses.InputFiles>();
-                JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles("file://" + inputFileInclPath, run.SourceFileNames.First(), fileFormat, fileProperties);
-                inputFiles.Add(inputFile);
-
-                List<JsonClasses.AnalysisSoftware> analysisSoftwarelist = new List<JsonClasses.AnalysisSoftware>();
-                JsonClasses.AnalysisSoftware analysisSoftware = new JsonClasses.AnalysisSoftware() { cvRef = "MS", accession = "XXXXXXXXXXXXXX", name = "SwaMe", uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", version = "1.0" };
-                analysisSoftwarelist.Add(analysisSoftware);
-                JsonClasses.MetaData metadata = new JsonClasses.MetaData() { inputFiles = inputFiles, analysisSoftware = analysisSoftwarelist };
-                JsonClasses.RunQuality runQualitySingle = new JsonClasses.RunQuality() { metadata = metadata, qualityParameters = qualityParameters.ToArray() };
-                List<JsonClasses.RunQuality> runQuality = new List<JsonClasses.RunQuality>();
-                runQuality.Add(runQualitySingle);
-                JsonClasses.NUV qualityControl = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Quality Control Ontology", uri = "https://raw.githubusercontent.com/HUPO-PSI/mzqc/master/cv/v0_0_11/qc-cv.obo", version = "0.1.0" };
-                JsonClasses.NUV massSpectrometry = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Mass Spectrometry Ontology", uri = "https://raw.githubusercontent.com/HUPO-PSI/psi-ms-CV/master/psi-ms.obo", version = "4.1.7" };
-                JsonClasses.NUV UnitOntology = new JsonClasses.NUV() { name = "Unit Ontology", uri = "https://raw.githubusercontent.com/bio-ontology-research-group/unit-ontology/master/unit.obo", version = "09:04:2014 13:37" };
-                JsonClasses.CV cV = new JsonClasses.CV() { QC = qualityControl, MS = massSpectrometry, UO = UnitOntology };
-                JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, cv = cV };
-
-                //Then save:
-                WriteMzqc(path, metrics);
+                else
+                    Logger.Warn("Term \"{0}\" was not found in the MZQC definition when attempting to write output. This term was ignored.", metric.Key);
             }
+            //Now for the other stuff
+            JsonClasses.FileFormat fileFormat = new JsonClasses.FileFormat() { };
+            List<JsonClasses.FileProperties> fileProperties = new List<JsonClasses.FileProperties>() { };
+
+
+            JsonClasses.FileProperties fileProperty = new JsonClasses.FileProperties("MS", run.FilePropertiesAccession, "SHA-1", run.SourceFileChecksums.First());
+            JsonClasses.FileProperties completionTime = new JsonClasses.FileProperties("MS", "MS:1000747", "completion time", run.CompletionTime);
+            fileProperties.Add(fileProperty);
+
+            List<JsonClasses.InputFiles> inputFiles = new List<JsonClasses.InputFiles>();
+            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles("file://" + inputFileInclPath, run.SourceFileNames.First(), fileFormat, fileProperties);
+            inputFiles.Add(inputFile);
+
+            List<JsonClasses.AnalysisSoftware> analysisSoftwarelist = new List<JsonClasses.AnalysisSoftware>();
+            JsonClasses.AnalysisSoftware analysisSoftware = new JsonClasses.AnalysisSoftware() { cvRef = "MS", accession = "XXXXXXXXXXXXXX", name = "SwaMe", uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", version = "1.0" };
+            analysisSoftwarelist.Add(analysisSoftware);
+            JsonClasses.MetaData metadata = new JsonClasses.MetaData() { inputFiles = inputFiles, analysisSoftware = analysisSoftwarelist };
+            JsonClasses.RunQuality runQualitySingle = new JsonClasses.RunQuality() { metadata = metadata, qualityParameters = qualityParameters.ToArray() };
+            List<JsonClasses.RunQuality> runQuality = new List<JsonClasses.RunQuality>();
+            runQuality.Add(runQualitySingle);
+            JsonClasses.NUV qualityControl = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Quality Control Ontology", uri = "https://raw.githubusercontent.com/HUPO-PSI/mzqc/master/cv/v0_0_11/qc-cv.obo", version = "0.1.0" };
+            JsonClasses.NUV massSpectrometry = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Mass Spectrometry Ontology", uri = "https://raw.githubusercontent.com/HUPO-PSI/psi-ms-CV/master/psi-ms.obo", version = "4.1.7" };
+            JsonClasses.NUV UnitOntology = new JsonClasses.NUV() { name = "Unit Ontology", uri = "https://raw.githubusercontent.com/bio-ontology-research-group/unit-ontology/master/unit.obo", version = "09:04:2014 13:37" };
+            JsonClasses.CV cV = new JsonClasses.CV() { QC = qualityControl, MS = massSpectrometry, UO = UnitOntology };
+            JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, cv = cV };
+
+            //Then save:
+            WriteMzqc(path, metrics);
+
 
         }
 

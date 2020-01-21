@@ -7,18 +7,12 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public double RTDuration;
         public double swathSizeDifference;
         public List<int> Density;
-        SwathGrouper.SwathMetrics SwathMetrics { get; set; }
-        public dynamic MS2Count { get; private set; }
-        public dynamic TotalMS2IonCount { get; private set; }
-        public dynamic MS2Density50 { get; private set; }
-        public dynamic MS2DensityIQR { get; private set; }
+        public SwathGrouper.SwathMetrics SwathMetrics { get; private set; }
         public RTGrouper.RTMetrics RtMetrics { get; private set; }
-        public dynamic MS1Count { get; private set; }
-
         public Run Run { get; private set; }
 
         public Dictionary<string, dynamic> GenerateMetrics(Run run, int division, string inputFilePath, bool irt, bool combine, bool lastFile, string date)
@@ -31,7 +25,7 @@ namespace SwaMe
             }
             else
             {
-                logger.Error("StartTime {0} or lastScanTime {0} for the run is null. RTDuration is therefore zero", run.StartTime, run.LastScanTime);
+                Logger.Error("StartTime {0} or lastScanTime {0} for the run is null. RTDuration is therefore zero", run.StartTime, run.LastScanTime);
                 RTDuration = 0;
             }
 
@@ -46,7 +40,7 @@ namespace SwaMe
             //Calculating the largestswath
             if (run.Ms2Scans.Max(x => x.IsolationWindowUpperOffset) == 100000 || run.Ms2Scans.Max(x => x.IsolationWindowLowerOffset) == 100000)
             {
-                logger.Error(("IsolationWindowUpperOffset {0} or IsolationWindowLowerOffset {0} for the one of the scans has not been changed from default value. swathSizeDifference is therefore zero", run.Ms2Scans.Max(x => x.IsolationWindowUpperOffset), run.Ms2Scans.Max(x => x.IsolationWindowLowerOffset)));
+                Logger.Error(("IsolationWindowUpperOffset {0} or IsolationWindowLowerOffset {0} for the one of the scans has not been changed from default value. swathSizeDifference is therefore zero", run.Ms2Scans.Max(x => x.IsolationWindowUpperOffset), run.Ms2Scans.Max(x => x.IsolationWindowLowerOffset)));
                 swathSizeDifference = 0;
             }
             else
