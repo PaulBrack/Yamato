@@ -57,6 +57,13 @@ namespace MzqcGenerator
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:21", "SwaMe metric: MS1Density", Count, null));
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:22", "SwaMe metric: MS2TICTotal", Count, null));
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:23", "SwaMe metric: MS1TICTotal", Count, null));
+           
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:99", "Prognosticator Metric: MS1TICQuartiles", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:98", "Prognosticator Metric: MS2TICQuartiles", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:97", "Prognosticator Metric: MS1TIC", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:96", "Prognosticator Metric: MS2TIC", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:95", "Prognosticator Metric: MS1BPC", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:94", "Prognosticator Metric: MS2BPC", Count, null));
         }
 
 
