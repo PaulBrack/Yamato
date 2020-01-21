@@ -137,6 +137,36 @@ namespace SwaMe
 
         public void CreateAndSaveMzqc()
         {
+            Dictionary<string, object> qcParams = new Dictionary<string, object>();
+
+            qcParams.Add("QC:4000053", RTDuration);
+            qcParams.Add("QC:02", swathSizeDifference);
+            qcParams.Add("QC:4000060", MS2Count);
+            qcParams.Add("QC:04", swathMetrics.swathTargets.Count());
+            qcParams.Add("QC:05", swathMetrics.swathTargets);
+            qcParams.Add("QC:06", totalMS2IonCount);
+            qcParams.Add("QC:07", MS2Density50);
+            qcParams.Add("QC:08", MS2DensityIQR);
+            qcParams.Add("QC:09", swathMetrics.numOfSwathPerGroup);
+            qcParams.Add("QC:10", swathMetrics.mzRange);
+            qcParams.Add("QC:11", swathMetrics.SwathProportionOfTotalTIC); 
+            qcParams.Add("QC:12", swathMetrics.swDensity50);
+            qcParams.Add("QC:13", swathMetrics.swDensityIQR);
+            qcParams.Add("QC:14", rtMetrics.Peakwidths);
+            qcParams.Add("QC:15", rtMetrics.PeakCapacity);
+            qcParams.Add("QC:16", rtMetrics.MS1PeakPrecision);
+            qcParams.Add("QC:17", rtMetrics.TicChange50List);
+            qcParams.Add("QC:18", rtMetrics.TicChangeIqrList);
+            qcParams.Add("QC:19", rtMetrics.CycleTime);
+            qcParams.Add("QC:20", rtMetrics.MS2Density);
+            qcParams.Add("QC:21", rtMetrics.MS1Density);
+            qcParams.Add("QC:22", rtMetrics.MS2TicTotal);
+            qcParams.Add("QC:23", rtMetrics.MS1TicTotal);
+            qcParams.Add("QC:24", rtMetrics.TailingFactor);
+            qcParams.Add("QC:4000059", MS1Count);
+
+
+
             //Declare units:
             JsonClasses.Unit Count = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0000189", name = "count" };
             JsonClasses.Unit Second = new JsonClasses.Unit() { cvRef = "UO", accession = "UO:0000010", name = "second" };
