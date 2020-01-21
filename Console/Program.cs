@@ -89,7 +89,8 @@ namespace Yamato.Console
                     run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
 
                     Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-                    new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
+                    var metrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
+                    new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("test.json", run, metrics, inputFilePath);
                     Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
                     if (analysisSettings.CacheSpectraToDisk)

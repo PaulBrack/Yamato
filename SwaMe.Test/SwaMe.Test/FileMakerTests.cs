@@ -86,7 +86,7 @@ namespace SwaMe.Test
             fileMaker.MakeMetricsPerRTsegmentFile(RTMetrics);
             fileMaker.MakeUndividedMetricsFile();
             fileMaker.MakeiRTmetricsFile(iRTrun);
-            fileMaker.CreateAndSaveMzqc();
+            //fileMaker.AssembleMetrics();
         }
         /// <remarks>
         ///Writes a tsv swathmetrics file and then reads it back in to verify it.

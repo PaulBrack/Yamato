@@ -6,7 +6,7 @@ namespace MzqcGenerator
     {
         // Naming Styles - these names are reflected into the JSON so are
         // exempted from normal style guidelines
-        #pragma warning disable IDE1006
+#pragma warning disable IDE1006
 
         public class FileFormat
         {
@@ -16,7 +16,13 @@ namespace MzqcGenerator
         }
         public class FileProperties
         {
-
+            public FileProperties(string cvRef, string accession, string name, string value)
+            {
+                this.cvRef = cvRef;
+                this.accession = accession;
+                this.name = name;
+                this.value = value;
+            }
             public string cvRef { get; set; }
             public string accession { get; set; }
             public string name { get; set; }
@@ -24,6 +30,13 @@ namespace MzqcGenerator
         }
         public class InputFiles
         {
+            public InputFiles(string location, string name, FileFormat fileFormat, List<FileProperties> fileProperties)
+            {
+                this.location = location;
+                this.name = name;
+                this.fileFormat = fileFormat;
+                this.fileProperties = fileProperties;
+            }
             public string location { get; set; }
             public string name { get; set; }
             public FileFormat fileFormat { get; set; }
@@ -48,9 +61,26 @@ namespace MzqcGenerator
             public string cvRef { get; set; }
             public string accession { get; set; }
             public string name { get; set; }
+
+            public Unit(string cvRef, string accession, string name)
+            {
+                this.cvRef = cvRef;
+                this.accession = accession;
+                this.name = name;
+            }
         }
         public class QualityParameters
         {
+            public QualityParameters() { }
+
+            public QualityParameters(string cvRef, string accession, string name, Unit unit, dynamic value)
+            {
+                this.cvRef = cvRef;
+                this.accession = accession;
+                this.name = name;
+                this.unit = unit;
+                this.value = value;
+            }
             public string cvRef { get; set; }
             public string accession { get; set; }
             public string name { get; set; }
@@ -85,6 +115,6 @@ namespace MzqcGenerator
             public CV cv { get; set; }
         }
 
-        #pragma warning restore IDE1006 // Naming Styles
+#pragma warning restore IDE1006 // Naming Styles
     }
 }
