@@ -71,6 +71,12 @@ namespace MzmlParser.Test
         }
 
         [TestMethod]
+        public void IDReadCorrectly()
+        {
+            Assert.AreEqual(run.ID, "SWATH_OC_244_1");
+        }
+
+        [TestMethod]
         public void SourceFileChecksumReadCorrectly()
         {
             Assert.IsTrue(Enumerable.Contains(run.SourceFileChecksums, "b0e7fb43b8c828c51d715b21934d0e925844199e")&& Enumerable.Contains(run.SourceFileChecksums, "4cd26cdeb97116d5d4f62a575642383e8d6709d4"));
