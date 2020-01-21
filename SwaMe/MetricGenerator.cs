@@ -7,18 +7,29 @@ namespace SwaMe
 {
     public class MetricGenerator
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger(); 
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         public double RTDuration;
         public double swathSizeDifference;
         public List<int> Density;
-        public void GenerateMetrics(Run run, int division,  string inputFilePath, bool irt, bool combine, bool lastFile, string date)
+        SwathGrouper.SwathMetrics SwathMetrics { get; set; }
+        public dynamic MS2Count { get; private set; }
+        public dynamic TotalMS2IonCount { get; private set; }
+        public dynamic MS2Density50 { get; private set; }
+        public dynamic MS2DensityIQR { get; private set; }
+        public RTGrouper.RTMetrics RtMetrics { get; private set; }
+        public dynamic MS1Count { get; private set; }
+
+        public Run Run { get; private set; }
+
+        public Dictionary<string, dynamic> GenerateMetrics(Run run, int division, string inputFilePath, bool irt, bool combine, bool lastFile, string date)
         {
+            Run = run;
             if (run.LastScanTime != 0 && run.StartTime != 1000000)
             {
                 //Acquire RTDuration: last minus first
                 RTDuration = run.LastScanTime - run.StartTime;
             }
-            else 
+            else
             {
                 logger.Error("StartTime {0} or lastScanTime {0} for the run is null. RTDuration is therefore zero", run.StartTime, run.LastScanTime);
                 RTDuration = 0;
@@ -45,41 +56,74 @@ namespace SwaMe
 
             // This method will group the scans into swaths of the same number, return the number of swaths in a full cycle (maxswath) and call a FileMaker method to write out the metrics.
             SwathGrouper swathGrouper = new SwathGrouper { };
-            SwathGrouper.SwathMetrics swathMetrics = swathGrouper.GroupBySwath(run);
+            SwathMetrics = swathGrouper.GroupBySwath(run);
 
             //Retrieving Density metrics
             Density = run.Ms2Scans.OrderBy(g => g.Density).Select(g => g.Density).ToList();
 
-                    
+
             RTGrouper rtGrouper = new RTGrouper { };
-            RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
-            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, swathMetrics, rtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count(), date);
+            RtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
+            FileMaker fileMaker = new FileMaker(division, inputFilePath, run, SwathMetrics, RtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count(), date);
             fileMaker.MakeUndividedMetricsFile();
             if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
             {
                 fileMaker.MakeiRTmetricsFile(run);
             }
-            
-            fileMaker.MakeMetricsPerRTsegmentFile(rtMetrics);
-            fileMaker.MakeMetricsPerSwathFile(swathMetrics);
-            fileMaker.CreateAndSaveMzqc();
+
+            fileMaker.MakeMetricsPerRTsegmentFile(RtMetrics);
+            fileMaker.MakeMetricsPerSwathFile(SwathMetrics);
+
             if (combine && lastFile)
             {
                 if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
                 {
                     string[] iRTFilename = { "AllIRTMetrics_", date, ".tsv" };
-                    fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*",string.Join("",iRTFilename));
+                    fileMaker.CombineMultipleFilesIntoSingleFile(date + "_iRTMetrics_*", string.Join("", iRTFilename));
                 }
 
                 string[] swathFilename = { "AllMetricsBySwath_", date, ".tsv" };
                 string[] rtFilename = { "AllRTDividedMetrics_", date, ".tsv" };
                 string[] undividedFilename = { "AllUndividedMetrics_", date, ".tsv" };
                 fileMaker.CheckOutputDirectory(inputFilePath);
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*",string.Join("",swathFilename) );
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*", string.Join("", swathFilename));
                 fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", string.Join("", rtFilename));
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", string.Join("",undividedFilename));
-             }
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", string.Join("", undividedFilename));
+            }
+
+            return AssembleMetrics();
+        }
+
+        public Dictionary<string, dynamic> AssembleMetrics()
+        {
+            return new Dictionary<string, dynamic>
+            {
+                { "QC:4000053", RTDuration },
+                { "QC:02", swathSizeDifference },
+                { "QC:4000059", Run.Ms1Scans.Count() },
+                { "QC:4000060", Run.Ms2Scans.Count() },
+                { "QC:04", SwathMetrics.swathTargets.Count() },
+                { "QC:05", SwathMetrics.swathTargets },
+                { "QC:06", Density.Sum() },
+                { "QC:07", Density.ElementAt(Density.Count() / 2) },
+                { "QC:08", InterQuartileRangeCalculator.CalcIQR(Density) },
+                { "QC:09", SwathMetrics.numOfSwathPerGroup },
+                { "QC:10", SwathMetrics.mzRange },
+                { "QC:11", SwathMetrics.SwathProportionOfTotalTIC },
+                { "QC:12", SwathMetrics.swDensity50 },
+                { "QC:13", SwathMetrics.swDensityIQR },
+                { "QC:14", RtMetrics.Peakwidths },
+                { "QC:15", RtMetrics.PeakCapacity },
+                { "QC:16", RtMetrics.MS1PeakPrecision },
+                { "QC:17", RtMetrics.TicChange50List },
+                { "QC:18", RtMetrics.TicChangeIqrList },
+                { "QC:19", RtMetrics.CycleTime },
+                { "QC:20", RtMetrics.MS2Density },
+                { "QC:21", RtMetrics.MS1Density },
+                { "QC:22", RtMetrics.MS2TicTotal },
+                { "QC:23", RtMetrics.MS1TicTotal },
+                { "QC:24", RtMetrics.TailingFactor }
+            };
         }
     }
 }
-        
