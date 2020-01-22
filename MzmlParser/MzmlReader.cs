@@ -96,7 +96,6 @@ namespace MzmlParser
                         {
                             case "run":
                                 run.StartTimeStamp = reader.GetAttribute("startTimeStamp");
-                                run.ID = reader.GetAttribute("id");
                                 break;
 
                             case "sourceFile":

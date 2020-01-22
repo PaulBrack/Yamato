@@ -86,10 +86,13 @@ namespace Yamato.Console
                     }
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
 
-                    run = new MzmlParser.ChromatogramGenerator().CreateAllChromatograms(run);
+                    
 
                     Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-                    var metrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
+                    var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
+                    var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
+
+                    var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
                     new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("test.json", run, metrics, inputFilePath);
                     Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
