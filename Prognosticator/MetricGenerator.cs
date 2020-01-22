@@ -13,7 +13,7 @@ namespace Prognosticator
 
         public Dictionary<string, dynamic> GenerateMetrics(Run run)
         {
-            run = Prognosticator.ChromatogramGenerator.CreateAllChromatograms(run);
+            Run = Prognosticator.ChromatogramGenerator.CreateAllChromatograms(run);
             Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, 105, 1);
             Ms2QuartileDivisions = ExtractQuartileDivisionTimes(run, 105, 2);
 
@@ -36,18 +36,19 @@ namespace Prognosticator
             if (washTime == null)
                 chromatogramTotal = chromatogram.Sum(x => x.Item2);
             else
-                chromatogramTotal = chromatogram.Select(x => x.Item2).Where(x => x < washTime).Sum();
-            double[] quartileDivisionTimes = new double[3];
+                chromatogramTotal = chromatogram.Where(x => x.Item1 < washTime).Select(x => x.Item2).Sum();
+            double[] quartileDivisionTimes = new double[3] { 0, 0, 0 };
             double cumulativeChromatogramTotal = 0;
             foreach (var timeIntensityPair in chromatogram)
             {
+               
                 cumulativeChromatogramTotal += timeIntensityPair.Item2;
-                if (quartileDivisionTimes[0] != 0 && cumulativeChromatogramTotal >= chromatogramTotal * 0.25)
-                    quartileDivisionTimes[0] = timeIntensityPair.Item2;
-                else if (quartileDivisionTimes[0] != 0 && cumulativeChromatogramTotal >= chromatogramTotal * 0.5)
-                    quartileDivisionTimes[1] = timeIntensityPair.Item2;
-                else if (quartileDivisionTimes[0] != 0 && cumulativeChromatogramTotal >= chromatogramTotal * 0.75)
-                    quartileDivisionTimes[2] = timeIntensityPair.Item2;
+                if (!(quartileDivisionTimes[0] > 0) && cumulativeChromatogramTotal >= chromatogramTotal * 0.25)
+                    quartileDivisionTimes[0] = timeIntensityPair.Item1;
+                else if (!(quartileDivisionTimes[1] > 0) && cumulativeChromatogramTotal >= chromatogramTotal * 0.5)
+                    quartileDivisionTimes[1] = timeIntensityPair.Item1;
+                else if (!(quartileDivisionTimes[2] > 0) && cumulativeChromatogramTotal >= chromatogramTotal * 0.75)
+                    quartileDivisionTimes[2] = timeIntensityPair.Item1;
             }
             return quartileDivisionTimes;
         }
@@ -58,10 +59,11 @@ namespace Prognosticator
             {
                 { "QC:99", Ms1QuartileDivisions },
                 { "QC:98", Ms2QuartileDivisions },
-                { "QC:97", Run.Chromatograms.Ms1Tic },
-                { "QC:96", Run.Chromatograms.Ms2Tic },
-                { "QC:95", Run.Chromatograms.Ms1Bpc },
-                { "QC:94", Run.Chromatograms.Ms2Bpc }
+                { "QC:97", Run.Chromatograms.Ms1Tic.AsHorizontalArrays() },
+                { "QC:96", Run.Chromatograms.Ms2Tic.AsHorizontalArrays() },
+                { "QC:95", Run.Chromatograms.Ms1Bpc.AsHorizontalArrays() },
+                { "QC:94", Run.Chromatograms.Ms2Bpc.AsHorizontalArrays() },
+                { "QC:93", Run.Chromatograms.CombinedTic.AsHorizontalArrays() }
             };
         }
     }

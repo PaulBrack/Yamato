@@ -64,6 +64,7 @@ namespace MzqcGenerator
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:96", "Prognosticator Metric: MS2TIC", Count, null));
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:95", "Prognosticator Metric: MS1BPC", Count, null));
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:94", "Prognosticator Metric: MS2BPC", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:93", "Prognosticator Metric: CombinedTIC", Count, null));
         }
 
 
