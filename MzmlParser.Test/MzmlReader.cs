@@ -73,7 +73,7 @@ namespace MzmlParser.Test
         [TestMethod]
         public void IDReadCorrectly()
         {
-            Assert.AreEqual(run.ID, "SWATH_OC_244_1");
+            Assert.AreEqual(null, run.ID); // this should not be set as not a waters file
         }
 
         [TestMethod]
