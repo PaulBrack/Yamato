@@ -89,6 +89,7 @@ namespace MzqcGenerator.Test
 
             new MzqcWriter().BuildMzqcAndWrite("test.json", RunWithoutIRT, metrics, "");
         }
+        /*
         /// <remarks>
         ///Writes a .json file for the iRT metrics with a run that includes iRTpeaks with all the necessary info and then reads it back in to verify it.
         /// </remarks>
@@ -104,5 +105,7 @@ namespace MzqcGenerator.Test
             Assert.IsTrue(Enumerable.SequenceEqual(fileText, correctText));
 
         }
+
+    */
     }
 }
