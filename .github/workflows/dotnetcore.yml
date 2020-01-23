@@ -23,6 +23,8 @@ jobs:
       run: dotnet test SwaMe.Test/SwaMe.Test/SwaMe.Test.csproj --configuration Release
     - name: Test MzmlParser
       run: dotnet test MzmlParser.Test/MzmlParser.Test.csproj --configuration Release
+    - name: Test MzqcGenerator
+      run: dotnet test MzqcGenerator.Test/MzqcGenerator.Test.csproj --configuration Release
     - name: Publish binaries
       run: dotnet publish --self-contained true -p:UseAppHost=true -r linux-x64
     - name: Publish binaries back to Github
