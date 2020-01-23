@@ -21,7 +21,7 @@ namespace Prognosticator
 
         public static List<(double, double)> ExtractMs1TotalIonChromatogram(Run run)
         {
-            return run.Ms1Scans.Select(x => (x.ScanStartTime, x.TotalIonCurrent)).OrderBy(x => x.ScanStartTime).ToList();
+            return run.Ms1Scans.Select(x => (x.ScanStartTime, x.TotalIonCurrent)).ToList();
         }
 
         public static List<(double, double)> ExtractMs2TotalIonChromatogram(Run run)
@@ -31,7 +31,7 @@ namespace Prognosticator
 
         public static List<(double, double)> ExtractMs1BasePeakChromatogram(Run run)
         {
-            return run.Ms1Scans.Select(x => (x.ScanStartTime, x.BasePeakIntensity)).OrderBy(x => x.ScanStartTime).ToList();
+            return run.Ms1Scans.Select(x => (x.ScanStartTime, x.BasePeakIntensity)).ToList();
         }
 
         public static List<(double, double)> ExtractMs2BasePeakChromatogram(Run run)
