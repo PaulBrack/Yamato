@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using MzmlParser;
+using NLog;
 
 namespace Prognosticator
 {
     public static class ChromatogramGenerator
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public static Run CreateAllChromatograms(Run run)
         {
             run.Chromatograms.Ms1Tic = ExtractMs1TotalIonChromatogram(run);
@@ -39,7 +41,13 @@ namespace Prognosticator
 
         public static List<(double, double, double)> CreateCombinedChromatogram(Run run)
         {
-            return run.Chromatograms.Ms1Tic.Select((x, i) => new ValueTuple<double, double, double>(x.Item1, x.Item2, run.Chromatograms.Ms2Tic[i].Item2)).ToList();
+            if (run.Ms1Scans.Count == run.Ms2Scans.Count)
+                return run.Chromatograms.Ms1Tic.Select((x, i) => new ValueTuple<double, double, double>(x.Item1, x.Item2, run.Chromatograms.Ms2Tic[i].Item2)).ToList();
+            else
+            {
+                Logger.Warn("Unable to produce combine chromatogram as MS1 and MS2 chromatograms have different nummbers of elements ({0} vs {1})", run.Ms1Scans.Count, run.Ms2Scans.Count);
+                return null;
+            }
         }
     }
 }
