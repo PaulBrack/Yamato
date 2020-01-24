@@ -64,7 +64,7 @@ namespace Prognosticator
                 { "QC:95", Run.Chromatograms.Ms1Bpc.AsHorizontalArrays() },
                 { "QC:94", Run.Chromatograms.Ms2Bpc.AsHorizontalArrays() },
                 { "QC:93", Run.Chromatograms.CombinedTic.AsHorizontalArrays() },
-                { "QC:92", Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) }
+                { "QC:92", Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) / Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) }
             };
         }
     }
