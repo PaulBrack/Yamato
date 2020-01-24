@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using MzmlParser;
+using NLog.Fluent;
 
 namespace Yamato.Console
 {
@@ -16,8 +17,9 @@ namespace Yamato.Console
 
         static void Main(string[] args)
         {
-
-            Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
+            try
+            {
+                Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
                 UpdateLoggingLevels(options);
                 bool combine = options.Combine;
@@ -105,7 +107,18 @@ namespace Yamato.Console
 
                 }
             });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("An unexpected error occured:");
+                Logger.Error(ex.Message);
+                Logger.Error(ex.StackTrace);
+                LogManager.Shutdown();
+                Environment.Exit(1);
+            }
             LogManager.Shutdown();
+            Environment.Exit(0);
+            
         }
 
         private static void CheckFileIsReadableOrComplain(string inputFilePath)

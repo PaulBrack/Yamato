@@ -2,7 +2,7 @@
   "profiles": {
     "Console": {
       "commandName": "Project",
-      "commandLineArgs": "-i c:\\wiffs\\05_K562_swath_12April_01-K562_swathSOP.mzml -r c:\\wiffs\\hroest_DIA_iRT.TraML --cacheSpectraToDisk false --minimumIntensity 100"
+      "commandLineArgs": "-i c:\\wiffs\\24Feb2017-FU-Nantomics-DIA-20mz-ovlp-400to800-sample1-CF0390-01.mzML -r c:\\wiffs\\hroest_DIA_iRT.TraML --cacheSpectraToDisk false --minimumIntensity 100 --irtminintensity 100"
     }
   }
 }

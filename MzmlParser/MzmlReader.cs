@@ -263,11 +263,11 @@ namespace MzmlParser
                                     Thread.Sleep(1000);
                             }
 
-                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, ExtractBasePeaks, Threading, irt));
+                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scan, run, Threading, irt));
                         }
                         else
                         {
-                            ParseBase64Data(scan, run, ExtractBasePeaks, Threading, irt);
+                            ParseBase64Data(scan, run, Threading, irt);
                         }
                     }
                     else
@@ -357,11 +357,8 @@ namespace MzmlParser
             }
         }
 
-        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool extractBasePeaks, bool threading, bool irt)
+        private static void ParseBase64Data(ScanAndTempProperties scan, Run run, bool threading, bool irt)
         {
-
-
-
             float[] intensities = ExtractFloatArray(scan.Base64IntensityArray, scan.IntensityZlibCompressed, scan.IntensityBitLength);
             float[] mzs = ExtractFloatArray(scan.Base64MzArray, scan.MzZlibCompressed, scan.MzBitLength);
 
