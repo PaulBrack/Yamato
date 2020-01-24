@@ -529,7 +529,12 @@ namespace MzmlParser
         private static float[] ExtractFloatArray(string Base64Array, bool IsZlibCompressed, int bits)
         {
             float[] floats = new float[0];
-            byte[] bytes = Convert.FromBase64String(Base64Array);
+
+            byte[] bytes;
+            if (!String.IsNullOrEmpty(Base64Array))
+                bytes = Convert.FromBase64String(Base64Array);
+            else
+                return floats;
 
             if (IsZlibCompressed)
                 bytes = ZlibStream.UncompressBuffer(bytes);
