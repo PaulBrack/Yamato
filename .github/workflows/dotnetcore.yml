@@ -38,5 +38,5 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: release
-        path: Console/bin/Debug/netcoreapp2.2/windows-x64
+        path: Console/bin/Debug/netcoreapp2.2
     
