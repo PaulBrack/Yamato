@@ -25,11 +25,18 @@ jobs:
       run: dotnet test MzmlParser.Test/MzmlParser.Test.csproj --configuration Release
     - name: Test MzqcGenerator
       run: dotnet test MzqcGenerator.Test/MzqcGenerator.Test.csproj --configuration Release
-    - name: Publish binaries
+    - name: Publish Linux binaries
       run: dotnet publish --self-contained true -p:UseAppHost=true -r linux-x64
     - name: Publish binaries back to Github
       uses: actions/upload-artifact@master
       with:
         name: release
         path: Console/bin/Debug/netcoreapp2.2/linux-x64
+    - name: Publish Windows binaries
+      run: dotnet publish --self-contained true -p:UseAppHost=true -r win-x64
+    - name: Publish binaries back to Github
+      uses: actions/upload-artifact@master
+      with:
+        name: release
+        path: Console/bin/Debug/netcoreapp2.2/windows-x64
     
