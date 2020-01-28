@@ -21,7 +21,8 @@ namespace Yamato.Console
             {
                 Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
-                UpdateLoggingLevels(options);
+                if(options.Verbose)
+                    SetVerboseLogging();
                 bool combine = options.Combine;
                 string dateTime = DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss");
                 List<string> inputFiles = new List<string>();
@@ -55,8 +56,10 @@ namespace Yamato.Console
                     if (options.Division < 100 && options.Division > 0)
                         division = options.Division;
                     else
-                        throw new ArgumentOutOfRangeException("Your entry for division is not within the range 1 - 100");
-
+                    {
+                        Logger.Error("Number of divisions must be within the range 1 - 100. You have input: {0}", options.Division);
+                        throw new ArgumentOutOfRangeException();
+                    }
                     bool irt = !String.IsNullOrEmpty(options.IRTFile);
 
                     MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader
@@ -135,7 +138,7 @@ namespace Yamato.Console
             }
         }
 
-        private static void UpdateLoggingLevels(Options options)
+        private static void SetVerboseLogging()
         {
             Logger.Info("Verbose output selected: enabled logging for all levels");
             foreach (var rule in LogManager.Configuration.LoggingRules)
@@ -153,6 +156,9 @@ namespace Yamato.Console
 
         [Option('i', "inputfile", Required = true, HelpText = "Input file path.")]
         public string InputFile { get; set; }
+
+        [Option('v', "verbose", Required = false, HelpText = "Enable verbose logging.")]
+        public bool Verbose { get; set; } = false;
 
         [Option('d', "division", Required = false, HelpText = "Number of units the user would like to divide certain SwaMe metrics into.")]
         public int Division { get; set; } = 1;
