@@ -14,8 +14,8 @@ namespace Prognosticator
         public Dictionary<string, dynamic> GenerateMetrics(Run run)
         {
             Run = Prognosticator.ChromatogramGenerator.CreateAllChromatograms(run);
-            Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, 105, 1);
-            Ms2QuartileDivisions = ExtractQuartileDivisionTimes(run, 105, 2);
+            Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, run.AnalysisSettings.RunEndTime, 1);
+            Ms2QuartileDivisions = ExtractQuartileDivisionTimes(run, run.AnalysisSettings.RunEndTime, 2);
 
             return AssembleMetrics();
         }
@@ -33,7 +33,7 @@ namespace Prognosticator
 
 
             double chromatogramTotal = 0;
-            if (washTime == null)
+            if (washTime == 0)
                 chromatogramTotal = chromatogram.Sum(x => x.Item2);
             else
                 chromatogramTotal = chromatogram.Where(x => x.Item1 < washTime).Select(x => x.Item2).Sum();
@@ -41,7 +41,7 @@ namespace Prognosticator
             double cumulativeChromatogramTotal = 0;
             foreach (var timeIntensityPair in chromatogram)
             {
-               
+
                 cumulativeChromatogramTotal += timeIntensityPair.Item2;
                 if (!(quartileDivisionTimes[0] > 0) && cumulativeChromatogramTotal >= chromatogramTotal * 0.25)
                     quartileDivisionTimes[0] = timeIntensityPair.Item1;
@@ -55,6 +55,19 @@ namespace Prognosticator
 
         public Dictionary<string, dynamic> AssembleMetrics()
         {
+            List<double> smoothedIntensity = new List<double>();
+            for(int i = 0; i < Run.Chromatograms.Ms2Tic.Last().Item1; i += 5)
+            {
+                double y = Run.Chromatograms.Ms2Tic.Where(x => x.Item1 >= i && x.Item1 < i + 5).Average(x => x.Item2);
+                smoothedIntensity.Add(y);
+
+
+
+                Console.WriteLine(y);
+
+            }
+
+
             return new Dictionary<string, dynamic>
             {
                 { "QC:99", Ms1QuartileDivisions },
@@ -64,7 +77,14 @@ namespace Prognosticator
                 { "QC:95", Run.Chromatograms.Ms1Bpc.AsHorizontalArrays() },
                 { "QC:94", Run.Chromatograms.Ms2Bpc.AsHorizontalArrays() },
                 { "QC:93", Run.Chromatograms.CombinedTic.AsHorizontalArrays() },
-                { "QC:92", Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) / Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) }
+                { "QC:92", Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) / Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) },
+                { "QC:91", Run.AnalysisSettings.RunEndTime / 2 - Ms1QuartileDivisions[1] },
+                { "QC:90", Run.AnalysisSettings.RunEndTime / 2 - Ms2QuartileDivisions[1] },
+                { "QC:89", Run.IRTHits.Average(x => x.AverageMassErrorPpm) },
+                { "QC:88", Run.IRTHits.Max(x => x.AverageMassErrorPpm) },
+                { "QC:87", Run.IRTHits.Count() / Run.AnalysisSettings.IrtLibrary.PeptideList.Count },
+                { "QC:86", Run.IRTHits }
+
             };
         }
     }

@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CenterSpace.NMath.Standard.WindowsAndLinux.X64" Version="7.1.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MzmlParser\MzmlParser.csproj" />
   </ItemGroup>
 

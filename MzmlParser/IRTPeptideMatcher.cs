@@ -16,7 +16,7 @@ namespace MzmlParser
             var chosenCandidates = new ConcurrentBag<CandidateHit>();
             foreach (string peptideSequence in run.IRTHits.Select(x => x.PeptideSequence).Distinct())
             {
-                var candidate = ChoosePeptideCandidate(run, chosenCandidates, peptideSequence);
+                var candidate = ChoosePeptideCandidate(run, peptideSequence);
                 chosenCandidates.Add(candidate);
             }
             run.IRTHits = chosenCandidates;
@@ -74,11 +74,35 @@ namespace MzmlParser
             cde.Signal();
         }
 
-        private static CandidateHit ChoosePeptideCandidate(Run run, ConcurrentBag<CandidateHit> chosenCandidates, string peptideSequence)
+        private static CandidateHit ChoosePeptideCandidate(Run run, string peptideSequence)
         {
+
+
             var hits = run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).ToList(); // pick the potential hits for this peptide
             hits = hits.Where(x => x.Intensities.Count() == hits.OrderBy(y => y.Intensities.Count()).Last().Intensities.Count()).ToList(); // pick the hits matching the most transitions
-            return hits.OrderBy(x => x.Intensities.Min()).Last(); // pick the hit with the highest minimum intensity value
+            var bestHit = hits.OrderBy(x => x.Intensities.Min()).Last(); // pick the hit with the highest minimum intensity value
+
+
+
+
+            //Let's pull out the reference peptide
+            var refPeptideTransitionMzs = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Library.Peptide>().ToList().Where(x => x.Sequence == peptideSequence).Single().AssociatedTransitions.Select(x => x.ProductMz).OrderBy(x => x);
+            var bestHitTransitionMzs = bestHit.ActualMzs.OrderBy(x => x);
+
+            foreach (var mz in bestHitTransitionMzs)
+            {
+                var possHit = refPeptideTransitionMzs.Where(x => Math.Abs(x - mz) <= run.AnalysisSettings.IrtMassTolerance);
+                if (possHit.Count() == 1)
+                {
+                    bestHit.TotalMassError += Math.Abs(possHit.First() - mz);
+                    bestHit.TotalMassErrorPpm += bestHit.TotalMassError / possHit.First() * 1e6;
+                }
+            }
+
+            bestHit.AverageMassError = bestHit.TotalMassError / bestHit.ActualMzs.Count;
+            bestHit.AverageMassErrorPpm = bestHit.TotalMassErrorPpm / bestHit.ActualMzs.Count;
+
+            return bestHit;
         }
     }
 }

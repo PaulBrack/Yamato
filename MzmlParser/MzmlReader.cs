@@ -72,7 +72,7 @@ namespace MzmlParser
             logger.Info("Selecting best IRT peptide candidates...");
 
             IrtPeptideMatcher.ChooseIrtPeptides(run);
-            logger.Debug("IRT peptides detected: ");
+          
             foreach (var x in run.IRTHits.OrderBy(x => x.RetentionTime))
             {
                 logger.Debug("{0} {1}", x.PeptideSequence, x.RetentionTime);
@@ -471,6 +471,7 @@ namespace MzmlParser
             foreach (Library.Peptide peptide in run.AnalysisSettings.IrtLibrary.PeptideList.Values)
             {
                 var irtIntensities = new List<float>();
+                var irtMzs = new List<float>();
                 var peptideTransitions = run.AnalysisSettings.IrtLibrary.TransitionList.Values.OfType<Library.Transition>().Where(x => x.PeptideId == peptide.Id);
                 int transitionsLeftToSearch = peptideTransitions.Count();
                 foreach (Library.Transition t in peptideTransitions)
@@ -481,7 +482,11 @@ namespace MzmlParser
                     }
                     var spectrumPoints = spectrum.Where(x => x.Intensity > run.AnalysisSettings.IrtMinIntensity && Math.Abs(x.Mz - t.ProductMz) < run.AnalysisSettings.IrtMassTolerance);
                     if (spectrumPoints.Any())
-                        irtIntensities.Add(spectrumPoints.Max(x => x.Intensity));
+                    {
+                        var maxIntensity = spectrumPoints.Max(x => x.Intensity);
+                        irtIntensities.Add(maxIntensity);
+                        irtMzs.Add(spectrumPoints.Where(x => x.Intensity == maxIntensity).First().Mz);
+                    }
                     transitionsLeftToSearch--;
 
                 }
@@ -491,6 +496,7 @@ namespace MzmlParser
                     {
                         PeptideSequence = peptide.Sequence,
                         Intensities = irtIntensities,
+                        ActualMzs = irtMzs,
                         RetentionTime = scan.Scan.ScanStartTime,
                         PrecursorTargetMz = peptide.AssociatedTransitions.First().PrecursorMz,
                         ProductTargetMzs = peptide.AssociatedTransitions.Select(x => x.ProductMz).ToList()

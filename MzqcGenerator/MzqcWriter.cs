@@ -66,6 +66,14 @@ namespace MzqcGenerator
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:94", "Prognosticator Metric: MS2BPC", Count, null));
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:93", "Prognosticator Metric: CombinedTIC", Count, null));
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:92", "Prognosticator Metric: MS1:MS2 ratio", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:91", "Prognosticator Metric: MS1 weighted median skew", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:90", "Prognosticator Metric: MS2 weighted median skew", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:89", "Prognosticator Metric: MeanIrtMassError", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:88", "Prognosticator Metric: MaxIrtMassError", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:87", "Prognosticator Metric: IrtPeptideFoundProportion", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:86", "Prognosticator Metric: IrtPeptides", Count, null));
+
+
         }
 
 

@@ -137,9 +137,6 @@ namespace SwaMe
             CheckColumnNumber(filename, 5);
         }
 
-
-
-
         public void CombineMultipleFilesIntoSingleFile(string inputFileNamePattern, string outputFileName)
         {
             string[] inputFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), inputFileNamePattern, SearchOption.AllDirectories);
@@ -192,9 +189,7 @@ namespace SwaMe
             else { filePath = inputFileInclPath; }
             return filePath;
         }
-
     }
-
 }
 
 

@@ -80,7 +80,8 @@ namespace Yamato.Console
                         IrtMinPeptides = options.IrtMinPeptides,
                         IrtMassTolerance = options.IrtMassTolerance,
                         CacheSpectraToDisk = options.Cache ?? false,
-                        MinimumIntensity = options.MinimumIntensity
+                        MinimumIntensity = options.MinimumIntensity,
+                        RunEndTime = options.RunEndTime
                     };
 
                     if (!String.IsNullOrEmpty(options.IRTFile))
@@ -201,6 +202,9 @@ namespace Yamato.Console
 
         [Option("maxThreads", Required = false, HelpText = "The maximum number of worker threads. Set as zero for default system max.")]
         public int MaxThreads { get; set; } = 0;
+
+        [Option("runEndTime", Required = false, HelpText = "The time during the run to stop calculating metrics (e.g. when the wash begins)")]
+        public int RunEndTime { get; set; } 
     }
 }
 

@@ -49,9 +49,9 @@ output = document.getElementById('output');
 	  
 	  var data = new google.visualization.DataTable();
         data.addColumn('number', 'time');
-        
+        data.addColumn('number', 'MS1');
 		data.addColumn('number', 'MS2');
-        data.addRows(Array.from(newArr.mzQC.runQuality[0].qualityParameters[28].value));
+        data.addRows(Array.from(newArr.mzQC.runQuality[0].qualityParameters[31].value));
 
         // Set chart options
         var options = {'title':'TIC',
