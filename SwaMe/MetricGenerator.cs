@@ -59,7 +59,7 @@ namespace SwaMe
             RTGrouper rtGrouper = new RTGrouper { };
             RtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
             FileMaker fileMaker = new FileMaker(division, inputFilePath, run, SwathMetrics, RtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count(), date);
-            fileMaker.MakeUndividedMetricsFile();
+            fileMaker.MakeComprehensiveMetricsFile();
             if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
             {
                 fileMaker.MakeiRTmetricsFile(run);
