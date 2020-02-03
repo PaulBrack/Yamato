@@ -78,11 +78,11 @@ namespace SwaMe
 
                 string[] swathFilename = { "AllMetricsBySwath_", date, ".tsv" };
                 string[] rtFilename = { "AllRTDividedMetrics_", date, ".tsv" };
-                string[] undividedFilename = { "AllUndividedMetrics_", date, ".tsv" };
+                string[] ComprehensiveFilename = { "AllComprehensiveMetrics_", date, ".tsv" };
                 fileMaker.CheckOutputDirectory(inputFilePath);
                 fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*", string.Join("", swathFilename));
                 fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", string.Join("", rtFilename));
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", string.Join("", undividedFilename));
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_ComprehensiveMetrics_*", string.Join("", ComprehensiveFilename));
             }
 
             return AssembleMetrics();
