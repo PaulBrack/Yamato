@@ -1,4 +1,4 @@
-﻿using NLog;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -138,6 +138,7 @@ namespace LibraryParser
         {
             var transition = new Library.Transition();
             transition.Id = line[transMzIndex].Replace(",", ".");
+            transition.PeptideId=precursorMz.ToString().Replace(",", ".");
             transition.PrecursorMz = precursorMz;
             if (line[2].Length > 1)
             {
