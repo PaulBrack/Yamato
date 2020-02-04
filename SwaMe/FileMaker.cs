@@ -55,7 +55,7 @@ namespace SwaMe
             CreateOutputDirectory(inputFileInclPath);
             string swathFileName = dateTime + "_MetricsBySwath_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(swathFileName);
-            streamWriter.Write("Filename \t swathNumber \t targetMz \t scansPerSwath \t AvgMzRange \t SwathProportionOfTotalTIC \t swDensityAverage \t swDensityIQR \t swAvgProportionSinglyCharged \n");
+            streamWriter.Write("Filename\tswathNumber\ttargetMz\tscansPerSwath\tAvgMzRange\tSwathProportionOfTotalTIC\tswDensityAverage\tswDensityIQR\tswAvgProportionSinglyCharged\n");
 
             for (int i = 0; i < swathMetrics.swathTargets.Count(); i++)
             {
@@ -76,7 +76,7 @@ namespace SwaMe
             CreateOutputDirectory(inputFileInclPath);
             string metricsPerRTSegmentFile = dateTime + "_RTDividedMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
-            streamWriter.Write("Filename\t RTsegment \t MS2Peakwidths \t TailingFactor \t MS2PeakCapacity \t MS2Peakprecision \t MS1PeakPrecision \t DeltaTICAvgrage \t DeltaTICIQR \t AvgCycleTime \t AvgMS2Density \t AvgMS1Density \t MS2TICTotal \t MS1TICTotal \n");
+            streamWriter.Write("Filename\tRTsegment\tMS2Peakwidths\tTailingFactor\tMS2PeakCapacity\tMS2Peakprecision\tMS1PeakPrecision\tDeltaTICAvgrage\tDeltaTICIQR\tAvgCycleTime\tAvgMS2Density\tAvgMS1Density\tMS2TICTotal\tMS1TICTotal\n");
 
             for (int segment = 0; segment < division; segment++)
             {
@@ -121,7 +121,7 @@ namespace SwaMe
             CreateOutputDirectory(inputFileInclPath);
             string filename = dateTime + "_iRTMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(filename);
-            streamWriter.Write("Filename\t iRTPeptideMz \t RetentionTime\t Peakwidth \t TailingFactor \n");
+            streamWriter.Write("Filename\tiRTPeptideMz\tRetentionTime\tPeakwidth\tTailingFactor\n");
 
             foreach (IRTPeak peak in run.IRTPeaks)
             {
