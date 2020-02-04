@@ -60,7 +60,7 @@ namespace SwaMe
             {
                 rtSegs[i] = run.StartTime + rtSegment * i;
                 if(i>0)
-                    segmentBoundaries.Add(rtSegs[i-1]+"_"+ rtSegs[i]);
+                    segmentBoundaries.Add(rtSegs[i-1]+"_"+ rtSegs[i]);//segmentBoundaries is a string denoting the startOfTheRTsegment_endOfTheRTsegment for reference
                 else
                     segmentBoundaries.Add(run.StartTime+"_"+ rtSegs[i]);
             }
