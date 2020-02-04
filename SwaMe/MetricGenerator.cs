@@ -59,7 +59,7 @@ namespace SwaMe
             RTGrouper rtGrouper = new RTGrouper { };
             RtMetrics = rtGrouper.DivideByRT(run, division, RTDuration);
             FileMaker fileMaker = new FileMaker(division, inputFilePath, run, SwathMetrics, RtMetrics, RTDuration, swathSizeDifference, run.Ms2Scans.Count(), Density.Sum(), Density.ElementAt(Density.Count() / 2), InterQuartileRangeCalculator.CalcIQR(Density), run.Ms1Scans.Count(), date);
-            fileMaker.MakeUndividedMetricsFile();
+            fileMaker.MakeComprehensiveMetricsFile();
             if (run.IRTPeaks != null && run.IRTPeaks.Count() > 0)
             {
                 fileMaker.MakeiRTmetricsFile(run);
@@ -78,11 +78,11 @@ namespace SwaMe
 
                 string[] swathFilename = { "AllMetricsBySwath_", date, ".tsv" };
                 string[] rtFilename = { "AllRTDividedMetrics_", date, ".tsv" };
-                string[] undividedFilename = { "AllUndividedMetrics_", date, ".tsv" };
+                string[] ComprehensiveFilename = { "AllComprehensiveMetrics_", date, ".tsv" };
                 fileMaker.CheckOutputDirectory(inputFilePath);
                 fileMaker.CombineMultipleFilesIntoSingleFile(date + "_MetricsBySwath_*", string.Join("", swathFilename));
                 fileMaker.CombineMultipleFilesIntoSingleFile(date + "_RTDividedMetrics_*", string.Join("", rtFilename));
-                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_undividedMetrics_*", string.Join("", undividedFilename));
+                fileMaker.CombineMultipleFilesIntoSingleFile(date + "_ComprehensiveMetrics_*", string.Join("", ComprehensiveFilename));
             }
 
             return AssembleMetrics();

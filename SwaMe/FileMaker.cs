@@ -97,11 +97,11 @@ namespace SwaMe
             streamWriter.Close();
             CheckColumnNumber(metricsPerRTSegmentFile, 14);
         }
-        public void MakeUndividedMetricsFile()
+        public void MakeComprehensiveMetricsFile()
         {
             CreateOutputDirectory(inputFileInclPath);
-            string undividedFile = dateTime + "_undividedMetrics_" + fileName + ".tsv";
-            StreamWriter streamWriter = new StreamWriter(undividedFile);
+            string ComprehensiveFile = dateTime + "_ComprehensiveMetrics_" + fileName + ".tsv";
+            StreamWriter streamWriter = new StreamWriter(ComprehensiveFile);
             streamWriter.Write("Filename \t StartTimeStamp \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count \n");
 
             //write streamWriter
@@ -113,7 +113,7 @@ namespace SwaMe
 
             streamWriter.Write(string.Join("\t", phraseToWrite));
             streamWriter.Close();
-            CheckColumnNumber(undividedFile, 11);
+            CheckColumnNumber(ComprehensiveFile, 11);
         }
 
         public void MakeiRTmetricsFile(Run run)

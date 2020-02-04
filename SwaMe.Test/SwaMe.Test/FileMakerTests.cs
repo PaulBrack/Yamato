@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -84,7 +84,7 @@ namespace SwaMe.Test
 
             fileMaker.MakeMetricsPerSwathFile(swathMetrics);
             fileMaker.MakeMetricsPerRTsegmentFile(RTMetrics);
-            fileMaker.MakeUndividedMetricsFile();
+            fileMaker.MakeComprehensiveMetricsFile();
             fileMaker.MakeiRTmetricsFile(iRTrun);
             //fileMaker.AssembleMetrics();
         }
@@ -146,14 +146,14 @@ namespace SwaMe.Test
             }
         }
         /// <remarks>
-        ///Writes a tsv file for the undivided metrics and then reads it back in to verify it.
+        ///Writes a tsv file for the Comprehensive metrics and then reads it back in to verify it.
         /// </remarks>
         [TestMethod]
-        public void UndividedFileCorrect()
+        public void ComprehensiveFileCorrect()
         {
 
 
-            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "SwaMe_results", "Today", "Today_undividedMetrics_File1.tsv"));
+            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "SwaMe_results", "Today", "Today_ComprehensiveMetrics_File1.tsv"));
             string correctLine1 = "Filename \t StartTimeStamp \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count ";
             string correctLine2 = "File1\t2017-02-26T13:07:31Z\t0\t70\t2\t10\t2\t1000\t50\t20\t5000";
             List<string> correctText = new List<string>() { correctLine1, correctLine2 };
