@@ -74,9 +74,11 @@ namespace MzqcGenerator.Test
         private static List<double> PeakPrecision = new List<double>() { 33, 66 };
         private static List<double> MS1PeakPrecision = new List<double>() { 36, 68 };
         private static List<double> PeakCapacity = new List<double>() { 44, 120 };
+        private static List<string> segmentBoundaries = new List<string>() { "2.5_3.3", "3.3_4.0" };
+
 
         private static RTMetrics RTMetrics = new RTMetrics(MS1TICTotal, MS2TICTotal, CycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, TailingFactor,
-            PeakCapacity, PeakPrecision, MS1PeakPrecision)
+            PeakCapacity, PeakPrecision, MS1PeakPrecision, segmentBoundaries)
         { };
 
 

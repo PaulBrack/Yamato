@@ -25,12 +25,13 @@ namespace SwaMe
             public List<double> MS2TicTotal;
             public List<double> TicChange50List;
             public List<double> TicChangeIqrList;
+            public List<string> segmentBoundaries;
 
             public RTMetrics()//This is just to be used in the unittests
             {
             }
 
-            public RTMetrics(List<double> MS1TICTotal, List<double> MS2TICTotal, List<double> cycleTime, List<double> TICchange50List, List<double> TICchangeIQRList, List<int> MS1Density, List<int> MS2Density, List<double> Peakwidths, List<double> TailingFactor, List<double> PeakCapacity, List<double> PeakPrecision, List<double> MS1PeakPrecision)
+            public RTMetrics(List<double> MS1TICTotal, List<double> MS2TICTotal, List<double> cycleTime, List<double> TICchange50List, List<double> TICchangeIQRList, List<int> MS1Density, List<int> MS2Density, List<double> Peakwidths, List<double> TailingFactor, List<double> PeakCapacity, List<double> PeakPrecision, List<double> MS1PeakPrecision, List<string> segmentBoundaries)
             {
                 this.Peakwidths = Peakwidths;
                 this.TailingFactor = TailingFactor;
@@ -44,6 +45,7 @@ namespace SwaMe
                 this.MS2TicTotal = MS2TICTotal;
                 this.TicChange50List = TICchange50List;
                 this.TicChangeIqrList = TICchangeIQRList;
+                this.segmentBoundaries = segmentBoundaries;
             }
 
         }
@@ -52,11 +54,17 @@ namespace SwaMe
         {
             double rtSegment = rtDuration / division;
             rtSegs = new double[division];
-
+            List<string> segmentBoundaries = new List<string>();
 
             for (int i = 0; i < division; i++)
+            {
                 rtSegs[i] = run.StartTime + rtSegment * i;
-
+                if(i>0)
+                    segmentBoundaries.Add(rtSegs[i-1]+"_"+ rtSegs[i]);//segmentBoundaries is a string denoting the startOfTheRTsegment_endOfTheRTsegment for reference
+                else
+                    segmentBoundaries.Add(run.StartTime+"_"+ rtSegs[i]);
+            }
+                
             //dividing basepeaks into segments
             foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
             {
@@ -240,7 +248,7 @@ namespace SwaMe
                 Ms2TicTotal.Add(ms2TicTotalTemp);
             }
 
-            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, Ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, TailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision);
+            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, Ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, TailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision, segmentBoundaries);
             return rtMetrics;
         }
     }

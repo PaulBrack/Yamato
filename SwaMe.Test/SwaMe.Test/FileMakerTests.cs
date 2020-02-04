@@ -72,9 +72,10 @@ namespace SwaMe.Test
         private static List<double> PeakPrecision = new List<double>() { 33,66 };
         private static List<double> MS1PeakPrecision = new List<double>() { 36, 68 };
         private static List<double> PeakCapacity = new List<double>() { 44, 120 };
+        private static List<string> segmentBoundaries = new List<string>() { "2.5_3.3", "3.3_4.0" };//segmentBoundaries is a string denoting the startOfTheRTsegment_endOfTheRTsegment for reference
 
         private static RTMetrics RTMetrics = new RTMetrics(MS1TICTotal, MS2TICTotal, CycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, TailingFactor,
-            PeakCapacity, PeakPrecision, MS1PeakPrecision) { };
+            PeakCapacity, PeakPrecision, MS1PeakPrecision, segmentBoundaries) { };
 
         
         [TestInitialize]
@@ -125,9 +126,9 @@ namespace SwaMe.Test
             
 
             var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "SwaMe_results", "Today", "Today_RTDividedMetrics_File1.tsv"));
-            string correctLine1 = "Filename\tRTsegment\tMS2Peakwidths\tTailingFactor\tMS2PeakCapacity\tMS2Peakprecision\tMS1PeakPrecision\tDeltaTICAvgrage\tDeltaTICIQR\tAvgCycleTime\tAvgMS2Density\tAvgMS1Density\tMS2TICTotal\tMS1TICTotal";
-            string correctLine2 = "File1\tRTsegment_1\t20\t30\t44\t33\t36\t450\t21\t2\t6\t5\t2000\t1000";
-            string correctLine3 = "File1\tRTsegment_2\t40\t60\t120\t66\t68\t650\t51\t4\t5\t5\t4000\t3000";
+            string correctLine1 = "Filename\tRTsegment\tsegmentBoundaries\tMS2Peakwidths\tTailingFactor\tMS2PeakCapacity\tMS2Peakprecision\tMS1PeakPrecision\tDeltaTICAvgrage\tDeltaTICIQR\tAvgCycleTime\tAvgMS2Density\tAvgMS1Density\tMS2TICTotal\tMS1TICTotal";
+            string correctLine2 = "File1\tRTsegment_1\t2.5_3.3\t20\t30\t44\t33\t36\t450\t21\t2\t6\t5\t2000\t1000";
+            string correctLine3 = "File1\tRTsegment_2\t3.3_4.0\t40\t60\t120\t66\t68\t650\t51\t4\t5\t5\t4000\t3000";
             List<string> correctText = new List<string>() { correctLine1, correctLine2, correctLine3 };
 
             if (fileText.ElementAt(1).Contains(","))//Stupid South Africa and its commas for decimals rules. The theory is that if they are there, they should be in both the second and third line, so we only need to check if its in the second line.
