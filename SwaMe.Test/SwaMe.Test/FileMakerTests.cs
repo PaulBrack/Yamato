@@ -200,7 +200,6 @@ namespace SwaMe.Test
             else
             {
                 Assert.IsTrue(Enumerable.SequenceEqual(fileText, correctText));
-
             }
         }
 
