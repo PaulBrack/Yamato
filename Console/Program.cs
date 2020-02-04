@@ -92,8 +92,6 @@ namespace Yamato.Console
                     }
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
 
-                    
-
                     Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
                     var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
