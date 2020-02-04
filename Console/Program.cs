@@ -47,6 +47,7 @@ namespace Yamato.Console
                 foreach (string inputFilePath in inputFiles)
                 {
                     bool lastFile = false;//saving whether its the last file or not, so if we need to combine all the files in the end, we know when the end is.
+                    CreateOutputDirectory(inputFilePath, dateTime);
                     if (inputFilePath == inputFiles.Last()) lastFile = true;
                     Logger.Info("Loading file: {0}", inputFilePath);
                     Stopwatch sw = new Stopwatch();
@@ -145,6 +146,15 @@ namespace Yamato.Console
                 rule.EnableLoggingForLevels(LogLevel.Trace, LogLevel.Debug);
             }
             LogManager.ReconfigExistingLoggers();
+        }
+
+        public static void CreateOutputDirectory(string inputFileInclPath, string dateTime)
+        {
+            string originalFilePath = Path.GetDirectoryName(inputFileInclPath);
+            string[] filePaths = { originalFilePath, "QC_Results", Path.GetFileNameWithoutExtension(inputFileInclPath), dateTime };
+            string filePath = Path.Combine(filePaths);
+            DirectoryInfo di = Directory.CreateDirectory(filePath);
+            Directory.SetCurrentDirectory(filePath);
         }
     }
 

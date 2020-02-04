@@ -27,6 +27,9 @@ namespace SwaMe
         private string fileName;
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        public object OutputFolderActions { get; private set; }
+
         public FileMaker(int division, string inputFileInclPath, Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
         {
             this.swathMetrics = swathMetrics;
@@ -52,7 +55,6 @@ namespace SwaMe
         public void MakeMetricsPerSwathFile(SwathGrouper.SwathMetrics swathMetrics)
         {
             //tsv
-            CreateOutputDirectory(inputFileInclPath);
             string swathFileName = dateTime + "_MetricsBySwath_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(swathFileName);
             streamWriter.Write("Filename\tswathNumber\ttargetMz\tscansPerSwath\tAvgMzRange\tSwathProportionOfTotalTIC\tswDensityAverage\tswDensityIQR\tswAvgProportionSinglyCharged\n");
@@ -73,7 +75,6 @@ namespace SwaMe
         }
         public void MakeMetricsPerRTsegmentFile(RTGrouper.RTMetrics rtMetrics)
         {
-            CreateOutputDirectory(inputFileInclPath);
             string metricsPerRTSegmentFile = dateTime + "_RTDividedMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
             streamWriter.Write("Filename\tRTsegment\tsegmentBoundaries\tMS2Peakwidths\tTailingFactor\tMS2PeakCapacity\tMS2Peakprecision\tMS1PeakPrecision\tDeltaTICAvgrage\tDeltaTICIQR\tAvgCycleTime\tAvgMS2Density\tAvgMS1Density\tMS2TICTotal\tMS1TICTotal\n");
@@ -99,7 +100,6 @@ namespace SwaMe
         }
         public void MakeComprehensiveMetricsFile()
         {
-            CreateOutputDirectory(inputFileInclPath);
             string ComprehensiveFile = dateTime + "_ComprehensiveMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(ComprehensiveFile);
             streamWriter.Write("Filename \t StartTimeStamp \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count \n");
@@ -118,7 +118,6 @@ namespace SwaMe
 
         public void MakeiRTmetricsFile(Run run)
         {
-            CreateOutputDirectory(inputFileInclPath);
             string filename = dateTime + "_iRTMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(filename);
             streamWriter.Write("Filename\tiRTPeptideMz\tRetentionTime\tPeakwidth\tTailingFactor\n");
@@ -165,20 +164,14 @@ namespace SwaMe
                 logger.Error(inputFile + "does not appear to contain all the desired columns.");
             }
         }
+
         public void CheckOutputDirectory(string inputFileInclPath)
         {
-            string filePath = Path.Join(GetFilePathWithoutExtension(inputFileInclPath), "SwaMe_results");
+            string filePath = Path.Join(GetFilePathWithoutExtension(inputFileInclPath), "QC_results");
 
             if (Directory.GetCurrentDirectory() != filePath && !string.IsNullOrEmpty(filePath)) Directory.SetCurrentDirectory(filePath);
         }
-        public void CreateOutputDirectory(string inputFileInclPath)
-        {
-            string originalFilePath = GetFilePathWithoutExtension(inputFileInclPath);
-            string[] filePaths = { originalFilePath, "SwaMe_results", Path.GetFileNameWithoutExtension(inputFileInclPath), dateTime };
-            string filePath = Path.Combine(filePaths);
-            DirectoryInfo di = Directory.CreateDirectory(filePath);
-            Directory.SetCurrentDirectory(filePath);
-        }
+
         public string GetFilePathWithoutExtension(string inputFileInclPath)
         {
             string filePath;
@@ -189,6 +182,7 @@ namespace SwaMe
             else { filePath = inputFileInclPath; }
             return filePath;
         }
+
     }
 }
 
