@@ -76,13 +76,13 @@ namespace SwaMe
             CreateOutputDirectory(inputFileInclPath);
             string metricsPerRTSegmentFile = dateTime + "_RTDividedMetrics_" + fileName + ".tsv";
             StreamWriter streamWriter = new StreamWriter(metricsPerRTSegmentFile);
-            streamWriter.Write("Filename\tRTsegment\tMS2Peakwidths\tTailingFactor\tMS2PeakCapacity\tMS2Peakprecision\tMS1PeakPrecision\tDeltaTICAvgrage\tDeltaTICIQR\tAvgCycleTime\tAvgMS2Density\tAvgMS1Density\tMS2TICTotal\tMS1TICTotal\n");
+            streamWriter.Write("Filename\tRTsegment\tsegmentBoundaries\tMS2Peakwidths\tTailingFactor\tMS2PeakCapacity\tMS2Peakprecision\tMS1PeakPrecision\tDeltaTICAvgrage\tDeltaTICIQR\tAvgCycleTime\tAvgMS2Density\tAvgMS1Density\tMS2TICTotal\tMS1TICTotal\n");
 
             for (int segment = 0; segment < division; segment++)
             {
                 //write streamWriter
                 string[] RTSegment = { "RTsegment", Convert.ToString(segment + 1) };
-                string[] phraseToWrite = { fileName, string.Join("_", RTSegment), Convert.ToString(rtMetrics.Peakwidths.ElementAt(segment)),
+                string[] phraseToWrite = { fileName, string.Join("_", RTSegment),Convert.ToString(rtMetrics.segmentBoundaries.ElementAt(segment)), Convert.ToString(rtMetrics.Peakwidths.ElementAt(segment)),
                     Convert.ToString(rtMetrics.TailingFactor.ElementAt(segment)), Convert.ToString(rtMetrics.PeakCapacity.ElementAt(segment)),
                     Convert.ToString(rtMetrics.PeakPrecision.ElementAt(segment)), Convert.ToString(rtMetrics.MS1PeakPrecision.ElementAt(segment)),
                     Convert.ToString(rtMetrics.TicChange50List.ElementAt(segment)), Convert.ToString(rtMetrics.TicChangeIqrList.ElementAt(segment)),
