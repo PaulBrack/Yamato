@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Console\Yamato.Console.csproj" />
     <ProjectReference Include="..\..\SwaMe\SwaMe.csproj" />
   </ItemGroup>
 

@@ -28,7 +28,6 @@ namespace SwaMe
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public object OutputFolderActions { get; private set; }
 
         public FileMaker(int division, string inputFileInclPath, Run run, SwathGrouper.SwathMetrics swathMetrics, RTGrouper.RTMetrics rtMetrics, double RTDuration, double swathSizeDifference, int MS2Count, int totalMS2IonCount, int MS2Density50, int MS2DensityIQR, int MS1Count, string dateTime)
         {
