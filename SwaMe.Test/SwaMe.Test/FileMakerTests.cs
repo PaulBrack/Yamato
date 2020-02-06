@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MzmlParser;
 using static SwaMe.RTGrouper;
-
 namespace SwaMe.Test
 {
     [TestClass]
@@ -81,6 +80,7 @@ namespace SwaMe.Test
         [TestInitialize]
         public void Initialize() 
         {
+            Directory.SetCurrentDirectory(Path.GetTempPath());
             FileMaker fileMaker = new FileMaker(2, Path.GetTempPath(), RunWithoutIRT, swathMetrics, RTMetrics, 70, 2, 10, 1000, 50, 20, 5000, "Today") { };
 
             fileMaker.MakeMetricsPerSwathFile(swathMetrics);
@@ -100,7 +100,7 @@ namespace SwaMe.Test
             string correctLine3 = "File1\tswath_2\t1050\t5\t18\t0.8\t8\t2\t0.7";
             List<string> correctText = new List<string>() { correctLine1, correctLine2, correctLine3 };
 
-            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(),"SwaMe_results", "Today", "Today_MetricsBySwath_File1.tsv"));
+            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "Today_MetricsBySwath_File1.tsv"));
 
             if (fileText.ElementAt(1).Contains(","))//Stupid South Africa and its commas for decimals rules. The theory is that if they are there, they should be in both the second and third line, so we only need to check if its in the second line.
             {
@@ -125,7 +125,7 @@ namespace SwaMe.Test
         {
             
 
-            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "SwaMe_results", "Today", "Today_RTDividedMetrics_File1.tsv"));
+            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(),  "Today_RTDividedMetrics_File1.tsv"));
             string correctLine1 = "Filename\tRTsegment\tsegmentBoundaries\tMS2Peakwidths\tTailingFactor\tMS2PeakCapacity\tMS2Peakprecision\tMS1PeakPrecision\tDeltaTICAvgrage\tDeltaTICIQR\tAvgCycleTime\tAvgMS2Density\tAvgMS1Density\tMS2TICTotal\tMS1TICTotal";
             string correctLine2 = "File1\tRTsegment_1\t2.5_3.3\t20\t30\t44\t33\t36\t450\t21\t2\t6\t5\t2000\t1000";
             string correctLine3 = "File1\tRTsegment_2\t3.3_4.0\t40\t60\t120\t66\t68\t650\t51\t4\t5\t5\t4000\t3000";
@@ -154,7 +154,7 @@ namespace SwaMe.Test
         {
 
 
-            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "SwaMe_results", "Today", "Today_ComprehensiveMetrics_File1.tsv"));
+            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(),"Today_ComprehensiveMetrics_File1.tsv"));
             string correctLine1 = "Filename \t StartTimeStamp \t MissingScans\t RTDuration \t swathSizeDifference \t  MS2Count \t swathsPerCycle \t totalMS2IonCount \t MS2Density50 \t MS2DensityIQR \t MS1Count ";
             string correctLine2 = "File1\t2017-02-26T13:07:31Z\t0\t70\t2\t10\t2\t1000\t50\t20\t5000";
             List<string> correctText = new List<string>() { correctLine1, correctLine2 };
@@ -180,7 +180,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void IRTFileCorrect()
         {
-            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(), "SwaMe_results", "Today", "Today_iRTMetrics_File1.tsv"));
+            var fileText = File.ReadLines(Path.Combine(Path.GetTempPath(),  "Today_iRTMetrics_File1.tsv"));
             string correctLine1 = "Filename\tiRTPeptideMz\tRetentionTime\tPeakwidth\tTailingFactor";
             string correctLine2 = "File1\t825\t30\t30\t0.9";
             string correctLine3 = "File1\t550\t20\t18\t0.5";
@@ -198,7 +198,6 @@ namespace SwaMe.Test
             else
             {
                 Assert.IsTrue(Enumerable.SequenceEqual(fileText, correctText));
-
             }
         }
 
