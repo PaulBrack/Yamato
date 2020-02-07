@@ -85,7 +85,7 @@ namespace SwaMe
                         }
                 }
             }
-
+            double experimentWideMS2TICSquared = 0;
             //dividing ms2scans into segments of RT
             foreach (MzmlParser.Scan scan in run.Ms2Scans)
             {
@@ -101,6 +101,7 @@ namespace SwaMe
                         if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])// If the scan is larger than the previous boundary and smaller than this boundary, assign to the previous segment.
                             scan.RTsegment = segmentboundary - 1;
                     }
+                experimentWideMS2TICSquared += Math.Pow(scan.TotalIonCurrent,2);
             }
 
             //dividing ms1scans into segments of RT
@@ -121,17 +122,18 @@ namespace SwaMe
             List<double> ticChange50List = new List<double>();
             List<double> ticChangeIqrList = new List<double>();
             var tempTic = run.Ms2Scans.OrderBy(x => x.ScanStartTime).GroupBy(x => x.RTsegment).Select(d => d.Select(g => g.TotalIonCurrent).ToList());
+            double magnitude = Math.Pow(experimentWideMS2TICSquared, 0.5);
             for (int i = 0; i < tempTic.Count(); i++)
             {
                 var temp = tempTic.ElementAt(i);
                 List<double> tempList = new List<double>();
                 for (int j = 1; j < temp.Count(); j++)
-                    tempList.Add(Math.Abs(temp.ElementAt(j) - temp.ElementAt(j - 1)));
+                    tempList.Add(Math.Abs(temp.ElementAt(j) - temp.ElementAt(j - 1))/magnitude);//Normalised to TIC magnitude.
                 tempList.Sort();
-                ticChange50List.Add(Math.Truncate(Math.Round(tempList.Average())));
+                ticChange50List.Add(tempList.Average());
                 if (tempList.Count() > 4)
                 {
-                    ticChangeIqrList.Add(Math.Truncate(Math.Round(InterQuartileRangeCalculator.CalcIQR(tempList))));
+                    ticChangeIqrList.Add(InterQuartileRangeCalculator.CalcIQR(tempList));
                 }
                 else 
                 {

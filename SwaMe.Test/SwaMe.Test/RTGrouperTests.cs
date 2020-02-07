@@ -17,13 +17,13 @@ namespace SwaMe.Test
         public void Initialize() 
         {
 
-            Scan ms2scan1 = new Scan(false,1,1,0,2,2,1,1000.00){};
-            Scan ms2scan2 = new Scan(false, 1, 1, 20, 2, 2, 1,2000.02){};
-            Scan ms2scan3 = new Scan(false, 5, 5, 30, 2, 4, 2,3050){};
+            Scan ms2scan1 = new Scan(false,1,1,0,2,2,1,100.00){};
+            Scan ms2scan2 = new Scan(false, 1, 1, 20, 2, 2, 1,100000.02){};
+            Scan ms2scan3 = new Scan(false, 5, 5, 30, 2, 4, 2,30){};
             Scan ms2scan4 = new Scan(false, 5, 5, 32, 2, 4, 2, 20010.33){};
-            Scan ms2scan5 = new Scan(false, 5, 5, 34, 2, 4, 2, 5000.33){};
+            Scan ms2scan5 = new Scan(false, 5, 5, 34, 2, 4, 2, 50.33){};
             Scan ms2scan6 = new Scan(false, 1, 1, 35, 2, 4, 2, 4000){};
-            Scan ms2scan7= new Scan(false, 1, 1, 70, 2, 5, 3, 6000){};
+            Scan ms2scan7= new Scan(false, 1, 1, 70, 2, 5, 3, 60000){};
             Scan ms2scan8 = new Scan(false, 1, 1, 70, 2, 5, 3, 6000){};
             Scan ms2scan9 = new Scan(false)
             {
@@ -188,7 +188,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void TICChangeCorrect() 
         {
-            List<double> correctTICChangeList = new List<double>() {7004,0 };
+            List<double> correctTICChangeList = new List<double>() { 0.4112602937765108, 0.45553110066628605 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.TicChange50List, correctTICChangeList));
         }
         /// <remarks>
@@ -197,7 +197,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void TICChangeIQRCorrect()
         {
-            List<double> correctTICChangeIQRList = new List<double>() { 14010, 0 };
+            List<double> correctTICChangeIQRList = new List<double>() { 0.6743549129237949, 0 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.TicChangeIqrList, correctTICChangeIQRList));
         }
         /// <remarks>
@@ -206,7 +206,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void MS2TICTotalCorrect()
         {
-            List<double> correctMS2TICTotalList = new List<double>() { 35060.68, 12000 };
+            List<double> correctMS2TICTotalList = new List<double>() { 124190.68000000001, 66000 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.MS2TicTotal, correctMS2TICTotalList));
         }
         /// <remarks>
