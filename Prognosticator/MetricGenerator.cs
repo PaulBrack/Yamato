@@ -79,20 +79,19 @@ namespace Prognosticator
                 { "QC:90", Run.AnalysisSettings.RunEndTime / 2 - Ms2QuartileDivisions[1] }
             };
 
-            var libraryPeptides = Run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Peptide>().OrderBy(x => x.RetentionTime);
-            var orderedIrtPeptideSequences = libraryPeptides.Select(x => x.Sequence).ToList();
-            var orderedIrtHits = Run.IRTHits.OrderBy(x => orderedIrtPeptideSequences.IndexOf(x.PeptideSequence));
-
             if (Run.AnalysisSettings.IrtLibrary != null && Run.IRTHits.Count > 0)
             {
+                var libraryPeptides = Run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Peptide>().OrderBy(x => x.RetentionTime);
+                var orderedIrtPeptideSequences = libraryPeptides.Select(x => x.Sequence).ToList();
+                var orderedIrtHits = Run.IRTHits.OrderBy(x => orderedIrtPeptideSequences.IndexOf(x.PeptideSequence));
+
                 metrics.Add("QC:89", Run.IRTHits.Average(x => x.AverageMassErrorPpm));
                 metrics.Add("QC:88", Run.IRTHits.Max(x => x.AverageMassErrorPpm));
                 metrics.Add("QC:87", Run.IRTHits.Count() / Run.AnalysisSettings.IrtLibrary.PeptideList.Count);
                 metrics.Add("QC:86", orderedIrtHits);
+                metrics.Add("QC:85", Convert.ToDouble(Run.IRTHits.Count()) / Convert.ToDouble(Run.AnalysisSettings.IrtLibrary.PeptideList.Count));
             }
-
-            metrics.Add("QC:85", Convert.ToDouble(Run.IRTHits.Count()) / Convert.ToDouble(Run.AnalysisSettings.IrtLibrary.PeptideList.Count));
-
+           
             return metrics;
         }
     }
