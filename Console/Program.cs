@@ -92,6 +92,15 @@ namespace Yamato.Console
                         analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
                     }
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
+                    AnalysisSettingsFileWriter Aw = new AnalysisSettingsFileWriter();
+                    if (inputFiles.Count() > 1 && lastFile)//multiple files and this is the last
+                    {
+                        Aw.WriteASFile(run, dateTime, inputFiles);
+                    }
+                    else //only one file
+                    {
+                        Aw.WriteASFile(run, dateTime, inputFilePath);
+                    }
 
                     Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
