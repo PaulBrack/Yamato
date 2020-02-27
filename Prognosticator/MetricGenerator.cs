@@ -116,9 +116,42 @@ namespace Prognosticator
                 metrics.Add("QC:86", orderedIrtHits);
                 metrics.Add("QC:85", Convert.ToDouble(Run.IRTHits.Count()) / Convert.ToDouble(Run.AnalysisSettings.IrtLibrary.PeptideList.Count));
                 metrics.Add("QC:84", Run.IRTHits.Select(x=> x.RetentionTime).Max() - Run.IRTHits.Select(x => x.RetentionTime).Min());
+                metrics.Add("QC:81", GetOrderednessAsPercent(Run.IRTHits.Select(x => x.RetentionTime).ToArray()));
             }
            
             return metrics;
+        }
+
+        static double GetOrderednessAsPercent(double[] arr)
+        {
+            return (1 - (GetInversionCount(arr) / GetTriangularNumber(arr))) * 100;
+        }
+
+        static int GetInversionCount(double[] arr)
+        {
+            int inv_count = 0;
+
+            for (int i = 0; i < arr.Count() - 1; i++)
+                for (int j = i + 1; j < arr.Count(); j++)
+                    if (arr[i] > arr[j])
+                        inv_count++;
+
+            return inv_count;
+        }
+
+        static int GetTriangularNumber(double[] arr)
+        {
+            int n = arr.Count();
+            int i, j = 1, k = 1;
+            int result = 0;
+            for (i = 1; i <= n; i++)
+            {
+                j += 1; 
+                k += j; 
+                if (i == n)
+                    result = k;
+            }
+            return result;
         }
     }
 }
