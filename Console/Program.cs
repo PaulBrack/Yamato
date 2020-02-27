@@ -47,7 +47,7 @@ namespace Yamato.Console
                 foreach (string inputFilePath in inputFiles)
                 {
                     bool lastFile = false;//saving whether its the last file or not, so if we need to combine all the files in the end, we know when the end is.
-                    DirectoryCreator.CreateOutputDirectory(inputFilePath, dateTime);
+                    string fileSpecificDirectory = DirectoryCreator.CreateOutputDirectory(inputFilePath, dateTime);
                     if (inputFilePath == inputFiles.Last()) lastFile = true;
                     Logger.Info("Loading file: {0}", inputFilePath);
                     Stopwatch sw = new Stopwatch();
@@ -92,13 +92,24 @@ namespace Yamato.Console
                         analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
                     }
                     MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
+                    AnalysisSettingsFileWriter Aw = new AnalysisSettingsFileWriter();
+                    if (inputFiles.Count() > 1 && lastFile)//multiple files and this is the last
+                    {
+                        Aw.WriteASFile(run, dateTime, inputFiles);
+                    }
+                    else //only one file
+                    {
+                        Aw.WriteASFile(run, dateTime, inputFilePath);
+                    }
 
                     Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, combine, lastFile, dateTime);
                     var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
 
                     var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
-                    new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("test.json", run, metrics, inputFilePath);
+                    string[] mzQCName = { dateTime, Path.GetFileNameWithoutExtension(inputFilePath), "mzQC.json" };
+                    Directory.SetCurrentDirectory(fileSpecificDirectory);
+                    new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite(string.Join("_", mzQCName), run, metrics, inputFilePath);
                     Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
                     if (analysisSettings.CacheSpectraToDisk)
@@ -153,13 +164,14 @@ namespace Yamato.Console
 
     public class DirectoryCreator
     {
-        public static void CreateOutputDirectory(string inputFileInclPath, string dateTime)
+        public static string CreateOutputDirectory(string inputFileInclPath, string dateTime)
         {
-        string originalFilePath = Path.GetDirectoryName(inputFileInclPath);
-        string[] filePaths = { originalFilePath, "QC_Results", Path.GetFileNameWithoutExtension(inputFileInclPath), dateTime };
-        string filePath = Path.Combine(filePaths);
-        DirectoryInfo di = Directory.CreateDirectory(filePath);
-        Directory.SetCurrentDirectory(filePath);
+            string originalFilePath = Path.GetDirectoryName(inputFileInclPath);
+            string[] filePaths = { originalFilePath, "QC_Results", Path.GetFileNameWithoutExtension(inputFileInclPath), dateTime };
+            string filePath = Path.Combine(filePaths);
+            DirectoryInfo di = Directory.CreateDirectory(filePath);
+            Directory.SetCurrentDirectory(filePath);
+            return filePath;
         }
     }
         
