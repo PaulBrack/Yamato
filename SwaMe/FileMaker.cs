@@ -95,7 +95,7 @@ namespace SwaMe
 
             }
             streamWriter.Close();
-            CheckColumnNumber(metricsPerRTSegmentFile, 14);
+            CheckColumnNumber(metricsPerRTSegmentFile, 15);
         }
         public void MakeComprehensiveMetricsFile()
         {
