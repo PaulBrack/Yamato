@@ -191,10 +191,10 @@ namespace Yamato.Console
         public String IRTFile { get; set; } = null;
 
         [Option("irttolerance", Required = false, HelpText = "iRT mass tolerance")]
-        public double IrtMassTolerance { get; set; } = 0.05;
+        public double IrtMassTolerance { get; set; } = 0.005;
 
         [Option("irtminintensity", Required = false, HelpText = "iRT min intensity")]
-        public double IrtMinIntensity { get; set; } = 500;
+        public double IrtMinIntensity { get; set; } = 0;
 
         [Option("irtminpeptides", Required = false, HelpText = "iRT min peptides")]
         public int IrtMinPeptides { get; set; } = 3;

@@ -2,7 +2,7 @@
   "profiles": {
     "Console": {
       "commandName": "Project",
-      "commandLineArgs": "-i c:\\wiffs\\SWATH_OC_107_1.mzml -r c:\\wiffs\\hroest_DIA_iRT.TraML --cacheSpectraToDisk false --minimumIntensity 200 --irtminintensity 1000 --runEndTime 105"
+      "commandLineArgs": "-i C:\\Users\\mbrxspb5\\Desktop\\DASHBOARD\\e\\K562_1.mzML -r c:\\wiffs\\hroest_DIA_iRT.TraML --cacheSpectraToDisk false --minimumIntensity 100 --irtminintensity 0"
     }
   }
 }

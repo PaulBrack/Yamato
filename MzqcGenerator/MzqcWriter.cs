@@ -73,6 +73,7 @@ namespace MzqcGenerator
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:87", "Prognosticator Metric: IrtPeptideFoundProportion", Count, null));
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:86", "Prognosticator Metric: IrtPeptides", Count, null));
             QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:85", "Prognosticator Metric: IrtPeptidesFound", Count, null));
+            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:84", "Prognosticator Metric: IrtSpread", Count, null));
 
 
         }

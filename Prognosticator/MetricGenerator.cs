@@ -22,17 +22,28 @@ namespace Prognosticator
             return AssembleMetrics();
         }
 
+        private static double[] ExtractQuartileDivisionSummedIntensities(Run run, double? washTime, int msLevel)
+        {
+            List<(double, double)> chromatogram = LoadChromatogram(run, msLevel);
+
+            List<Double> quartileDivisionSummedIntensities = new List<double>();
+
+            double runEndTime = washTime ?? run.LastScanTime;
+
+            quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.25).Sum(x => x.Item2));
+            quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.5 && x.Item1 >= runEndTime * 0.25).Sum(x => x.Item2));
+            quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.75 && x.Item1 >= runEndTime * 0.5).Sum(x => x.Item2));
+            quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime && x.Item1 >= runEndTime * 0.75).Sum(x => x.Item2));
+
+            //express these as fractions of the whole
+            quartileDivisionSummedIntensities.ForEach(x => x = x / chromatogram.Sum(y => y.Item2));
+
+            return quartileDivisionSummedIntensities.ToArray();
+        }
+
         private static double[] ExtractQuartileDivisionTimes(Run run, double? washTime, int msLevel)
         {
-            List<(double, double)> chromatogram;
-
-            if (msLevel == 1)
-                chromatogram = run.Chromatograms.Ms1Tic;
-            else if (msLevel == 2)
-                chromatogram = run.Chromatograms.Ms2Tic;
-            else
-                throw new ArgumentOutOfRangeException("MS Level must be 1 or 2");
-
+            List<(double, double)> chromatogram = LoadChromatogram(run, msLevel);
 
             double chromatogramTotal = 0;
             if (washTime == 0)
@@ -53,6 +64,19 @@ namespace Prognosticator
                     quartileDivisionTimes[2] = timeIntensityPair.Item1;
             }
             return quartileDivisionTimes;
+        }
+
+        private static List<(double, double)> LoadChromatogram(Run run, int msLevel)
+        {
+            List<(double, double)> chromatogram;
+
+            if (msLevel == 1)
+                chromatogram = run.Chromatograms.Ms1Tic;
+            else if (msLevel == 2)
+                chromatogram = run.Chromatograms.Ms2Tic;
+            else
+                throw new ArgumentOutOfRangeException("MS Level must be 1 or 2");
+            return chromatogram;
         }
 
         public Dictionary<string, dynamic> AssembleMetrics()
@@ -76,7 +100,9 @@ namespace Prognosticator
                 { "QC:93", Run.Chromatograms.CombinedTic.AsHorizontalArrays() },
                 { "QC:92", Run.Chromatograms.Ms1Tic.Sum(x => x.Item2) / Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) },
                 { "QC:91", Run.AnalysisSettings.RunEndTime / 2 - Ms1QuartileDivisions[1] },
-                { "QC:90", Run.AnalysisSettings.RunEndTime / 2 - Ms2QuartileDivisions[1] }
+                { "QC:90", Run.AnalysisSettings.RunEndTime / 2 - Ms2QuartileDivisions[1] },
+                { "QC:83", ExtractQuartileDivisionSummedIntensities(Run, Run.AnalysisSettings.RunEndTime, 1) },
+                { "QC:82", ExtractQuartileDivisionSummedIntensities(Run, Run.AnalysisSettings.RunEndTime, 2) }
             };
 
             if (Run.AnalysisSettings.IrtLibrary != null && Run.IRTHits.Count > 0)
@@ -90,6 +116,7 @@ namespace Prognosticator
                 metrics.Add("QC:87", Run.IRTHits.Count() / Run.AnalysisSettings.IrtLibrary.PeptideList.Count);
                 metrics.Add("QC:86", orderedIrtHits);
                 metrics.Add("QC:85", Convert.ToDouble(Run.IRTHits.Count()) / Convert.ToDouble(Run.AnalysisSettings.IrtLibrary.PeptideList.Count));
+                metrics.Add("QC:84", Run.IRTHits.Select(x=> x.RetentionTime).Max() - Run.IRTHits.Select(x => x.RetentionTime).Min());
             }
            
             return metrics;
