@@ -60,7 +60,7 @@ namespace SwaMe
             List<double> swDensity50 = new List<double>();
             List<double> swDensityIQR = new List<double>();
             List<double> mzTargetRange = new List<double>();
-            List<double> medianMzTargetRange = new List<double>();
+            List<double> averageMzTargetRange = new List<double>();
             List<double> SwathProportionOfTotalTIC = new List<double>();
             List<double> TotalSwathProportionPredictedSingleCharge = new List<double>();
             List<double> SwathProportionPredictedSingleChargeAvg = new List<double>();
@@ -82,8 +82,7 @@ namespace SwaMe
                     TotalSwathProportionPredictedSingleCharge.Add(scan.ProportionChargeStateOne); //The chargestate one's we pick up is where there is a match for M+1. Therefore we need to double it to add the M.
                     track++;
                 }
-                mzTargetRange.Sort();
-                medianMzTargetRange.Add(mzTargetRange.ElementAt(mzTargetRange.Count/2));
+                averageMzTargetRange.Add(mzTargetRange.Average());
                 numOfSwathPerGroup.Add(track);
                 TICs.Add(TICthisSwath);
                 TICthisSwath = 0;
@@ -93,6 +92,7 @@ namespace SwaMe
                 swDensity50.Add(Math.Truncate(Math.Ceiling(swDensity.Average())));
                 swDensityIQR.Add(Math.Truncate(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity))));
                 swDensity.Clear();
+                mzTargetRange.Clear();
             }
 
             for (int num = 0; num < swathTargets.Count(); num++)
@@ -100,7 +100,7 @@ namespace SwaMe
                 SwathProportionOfTotalTIC.Add(TICs[num] / totalTIC);
             }
 
-            SwathMetrics swathMetrics = new SwathMetrics(swathTargets, totalTIC, numOfSwathPerGroup, mzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
+            SwathMetrics swathMetrics = new SwathMetrics(swathTargets, totalTIC, numOfSwathPerGroup, averageMzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
             return swathMetrics;
         }
 

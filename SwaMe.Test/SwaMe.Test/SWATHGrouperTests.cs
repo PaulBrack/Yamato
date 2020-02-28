@@ -267,7 +267,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void mzTargetRangePerGroupCorrect()
         {
-            List<double> correctmzTargetRange = new List<double>() { 2, 2, 2, 2, 2, 2, 2, 2, 10, 10 };
+            List<double> correctmzTargetRange = new List<double>() {3.6, 3.6};
             Assert.IsTrue(Enumerable.SequenceEqual(result.mzRange, correctmzTargetRange));
         }
         [TestMethod]
