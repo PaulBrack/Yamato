@@ -38,5 +38,5 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: release-win-x64
-        path: Console/bin/Debug/netcoreapp2.2/win-x64
+        path: SwaMe.Console/bin/Debug/netcoreapp2.2/win-x64
     
