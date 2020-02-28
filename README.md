@@ -15,11 +15,11 @@ A Quameter-based SWATH metrics library
 Author: **Marina Kriek**  
 pauwmarina@sun.ac.za
 
-## Prognosticator
+## SwaMePrognosticator
 A library to try and figure out if your DIA proteomics experiment is going okay 
 Author: **Paul Brack**  
 paul.brack@manchester.ac.uk
 
-## Yamato.Console
+## SwaMe.Console
 A command line application to generate SwaMe and Prognosticator metrics.
 
