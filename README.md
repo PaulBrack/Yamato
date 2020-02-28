@@ -16,7 +16,7 @@ Author: **Marina Kriek**
 pauwmarina@sun.ac.za
 
 ## SwaMePrognosticator
-A library to try and figure out if your DIA proteomics experiment is going okay 
+A library to try and figure out if your DIA proteomics experiment is going okay  
 Author: **Paul Brack**  
 paul.brack@manchester.ac.uk
 
