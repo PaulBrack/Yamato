@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Console": {
-      "commandName": "Project",
-      "commandLineArgs": "-i C:\\Users\\mbrxspb5\\Desktop\\DASHBOARD\\c\\K562_2.mzML -r c:\\wiffs\\hroest_DIA_iRT.TraML --cacheSpectraToDisk false --minimumIntensity 100 --irtminintensity 0"
-    }
-  }
-}
