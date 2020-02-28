@@ -64,6 +64,6 @@ namespace MzmlParser
         }
         public bool CacheSpectraToDisk { get; set; }
         public int MinimumIntensity { get; set; }
-        public int RunEndTime { get; set; }
+        public int? RunEndTime { get; set; }
     }
 }

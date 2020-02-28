@@ -29,15 +29,15 @@ namespace Prognosticator
 
             double runEndTime = washTime ?? run.LastScanTime;
 
+            var total = chromatogram.Sum(x => x.Item2);
+
             quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.25).Sum(x => x.Item2));
             quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.5 && x.Item1 >= runEndTime * 0.25).Sum(x => x.Item2));
             quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.75 && x.Item1 >= runEndTime * 0.5).Sum(x => x.Item2));
             quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime && x.Item1 >= runEndTime * 0.75).Sum(x => x.Item2));
 
             //express these as fractions of the whole
-            quartileDivisionSummedIntensities.ForEach(x => x = x / chromatogram.Sum(y => y.Item2));
-
-            return quartileDivisionSummedIntensities.ToArray();
+            return quartileDivisionSummedIntensities.Select(x => x / total).ToArray();
         }
 
         private static double[] ExtractQuartileDivisionTimes(Run run, double? washTime, int msLevel)
@@ -85,7 +85,6 @@ namespace Prognosticator
             {
                 double y = Run.Chromatograms.Ms2Tic.Where(x => x.Item1 >= i && x.Item1 < i + 5).Average(x => x.Item2);
                 smoothedIntensity.Add(y);
-                Console.WriteLine(y);
             }
 
             var metrics = new Dictionary<string, dynamic>

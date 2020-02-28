@@ -230,7 +230,7 @@ namespace Yamato.Console
         public int MaxThreads { get; set; } = 0;
 
         [Option("runEndTime", Required = false, HelpText = "The time during the run to stop calculating metrics (e.g. when the wash begins)")]
-        public int RunEndTime { get; set; } 
+        public int? RunEndTime { get; set; } = null;
     }
 }
 
