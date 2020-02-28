@@ -31,7 +31,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: release-linux-x64
-        path: Console/bin/Debug/netcoreapp2.2/linux-x64
+        path: SwaMe.Console/bin/Debug/netcoreapp2.2/linux-x64
     - name: Publish Windows binaries
       run: dotnet publish --self-contained true -p:UseAppHost=true -r win-x64
     - name: Publish binaries back to Github
