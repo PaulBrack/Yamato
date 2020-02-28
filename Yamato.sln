@@ -4,8 +4,6 @@ VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzmlParser", "MzmlParser\MzmlParser.csproj", "{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prognosticator", "Prognosticator\Prognosticator.csproj", "{38B33794-85A8-401C-B5CE-FE547F2B5A4F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMe", "SwaMe\SwaMe.csproj", "{A11DE82D-AF14-4F5B-BE52-10EF64E51944}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryParser", "LibraryParser\LibraryParser.csproj", "{DC33B002-23B9-4BE9-9D19-C663DF4D51A3}"
@@ -26,6 +24,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MzqcGenerator.Test", "MzqcG
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMe.Console", "SwaMe.Console\SwaMe.Console.csproj", "{4D44B154-8AFE-44C3-AF27-DCECC8A8D089}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaMe.Prognosticator", "SwaMe.Prognosticator\SwaMe.Prognosticator.csproj", "{7586BF88-E88F-4D0F-A273-8F6CB6EFEA81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,10 +36,6 @@ Global
 		{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98CBD6F8-5DF4-4D80-B25E-19862EA6B533}.Release|Any CPU.Build.0 = Release|Any CPU
-		{38B33794-85A8-401C-B5CE-FE547F2B5A4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38B33794-85A8-401C-B5CE-FE547F2B5A4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38B33794-85A8-401C-B5CE-FE547F2B5A4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38B33794-85A8-401C-B5CE-FE547F2B5A4F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A11DE82D-AF14-4F5B-BE52-10EF64E51944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A11DE82D-AF14-4F5B-BE52-10EF64E51944}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A11DE82D-AF14-4F5B-BE52-10EF64E51944}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -80,6 +76,10 @@ Global
 		{4D44B154-8AFE-44C3-AF27-DCECC8A8D089}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D44B154-8AFE-44C3-AF27-DCECC8A8D089}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D44B154-8AFE-44C3-AF27-DCECC8A8D089}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7586BF88-E88F-4D0F-A273-8F6CB6EFEA81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7586BF88-E88F-4D0F-A273-8F6CB6EFEA81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7586BF88-E88F-4D0F-A273-8F6CB6EFEA81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7586BF88-E88F-4D0F-A273-8F6CB6EFEA81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

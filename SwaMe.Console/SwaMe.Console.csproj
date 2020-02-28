@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MzmlParser\MzmlParser.csproj" />
-    <ProjectReference Include="..\Prognosticator\Prognosticator.csproj" />
+    <ProjectReference Include="..\SwaMe.Prognosticator\SwaMe.Prognosticator.csproj" />
     <ProjectReference Include="..\SwaMe\SwaMe.csproj" />
   </ItemGroup>
 
