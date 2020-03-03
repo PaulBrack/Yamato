@@ -68,11 +68,11 @@ namespace MzmlParser
             cde.Signal();
             cde.Wait();
             cde.Reset(1);
-
-            logger.Info("Selecting best IRT peptide candidates...");
-
-            IrtPeptideMatcher.ChooseIrtPeptides(run);
-          
+            if (irt)
+            {
+                logger.Info("Selecting best IRT peptide candidates...");
+                IrtPeptideMatcher.ChooseIrtPeptides(run);
+            }
             foreach (var x in run.IRTHits.OrderBy(x => x.RetentionTime))
             {
                 logger.Debug("{0} {1}", x.PeptideSequence, x.RetentionTime);
