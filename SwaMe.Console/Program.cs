@@ -88,13 +88,13 @@ namespace Yamato.Console
                     if (!String.IsNullOrEmpty(options.IRTFile))
                     {
                         irt = true;
-                        if (options.IRTFile.ToLower().EndsWith("traml"))
+                        if (options.IRTFile.ToLower().EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
                         {
                             TraMLReader traMLReader = new TraMLReader();
                             analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
 
                         }
-                        else if (options.IRTFile.ToLower().EndsWith("tsv") || options.IRTFile.ToLower().EndsWith("csv")) 
+                        else if (options.IRTFile.ToLower().EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.ToLower().EndsWith("csv", StringComparison.InvariantCultureIgnoreCase)) 
                         {
                             SVReader svReader = new SVReader();
                             analysisSettings.IrtLibrary = svReader.LoadLibrary(options.IRTFile);
