@@ -28,8 +28,8 @@ namespace MzmlParser
         public bool ParseBinaryData { get; set; }
         public bool Threading { get; set; }
         public int MaxQueueSize { get; set; }
-
         public int MaxThreads { get; set; }
+
 
         public int currentCycle = 0;
         bool MS1 = false;
@@ -38,6 +38,8 @@ namespace MzmlParser
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private static readonly CountdownEvent cde = new CountdownEvent(1);
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
+        private static bool TicNotFound = false;
+
 
         public Run LoadMzml(string path, AnalysisSettings analysisSettings)
         {
@@ -77,7 +79,9 @@ namespace MzmlParser
             {
                 logger.Debug("{0} {1}", x.PeptideSequence, x.RetentionTime);
             }
-           
+
+            if (TicNotFound)
+                logger.Warn("Total Ion Current value was not found and had to be calculated from the spectra. This will cause this value to be incorrect for centroided MZML files, peak picked data, or other manipulated spectra.");
 
             return run;
         }
@@ -417,7 +421,10 @@ namespace MzmlParser
             scan.Scan.ProportionChargeStateOne = (double)distinct / (double)len;
 
             if (scan.Scan.TotalIonCurrent == 0)
+            {
                 scan.Scan.TotalIonCurrent = intensities.Sum();
+                TicNotFound = true;
+            }
             scan.Scan.Spectrum = new Spectrum() { SpectrumPoints = spectrum };
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
