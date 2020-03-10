@@ -78,7 +78,7 @@ namespace Yamato.Console
                         MassTolerance = options.MassTolerance,
                         RtTolerance = options.RtTolerance,
                         IrtMinIntensity = options.IrtMinIntensity,
-                        IrtMinPeptides = options.IrtMinPeptides,
+                        IrtMinPeptides = options.IrtMinTransitions,
                         IrtMassTolerance = options.IrtMassTolerance,
                         CacheSpectraToDisk = options.Cache,
                         MinimumIntensity = options.MinimumIntensity,
@@ -217,8 +217,8 @@ namespace Yamato.Console
         [Option("irtminintensity", Required = false, HelpText = "iRT min intensity")]
         public double IrtMinIntensity { get; set; } = 0;
 
-        [Option("irtminpeptides", Required = false, HelpText = "iRT min peptides")]
-        public int IrtMinPeptides { get; set; } = 3;
+        [Option("irtmintransitions", Required = false, HelpText = "iRT min peptides")]
+        public int IrtMinTransitions { get; set; } = 2;
 
         [Option("rttolerance", Required = false, HelpText = "RT tolerance")]
         public double RtTolerance { get; set; } = 2.5;

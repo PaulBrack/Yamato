@@ -80,13 +80,6 @@ namespace Prognosticator
 
         public Dictionary<string, dynamic> AssembleMetrics()
         {
-            List<double> smoothedIntensity = new List<double>();
-            for (int i = 0; i < Run.Chromatograms.Ms2Tic.Last().Item1; i += 5)
-            {
-                double y = Run.Chromatograms.Ms2Tic.Where(x => x.Item1 >= i && x.Item1 < i + 5).Average(x => x.Item2);
-                smoothedIntensity.Add(y);
-            }
-
             var metrics = new Dictionary<string, dynamic>
             {
                 { "QC:99", Ms1QuartileDivisions },

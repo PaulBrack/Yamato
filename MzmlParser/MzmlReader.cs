@@ -166,9 +166,7 @@ namespace MzmlParser
 
             if (run.SourceFileTypes[0].EndsWith("wiff", StringComparison.InvariantCultureIgnoreCase) || run.SourceFileTypes[0].ToUpper().EndsWith("scan", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (!string.IsNullOrEmpty(reader.GetAttribute("id")))
-                {
-                    if (!string.IsNullOrEmpty(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle"))))
+                if (!string.IsNullOrEmpty(reader.GetAttribute("id"))&&!string.IsNullOrEmpty(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle"))))
                     {
                         scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle")).Split('=').Last());
                         if (scan.Scan.Cycle != 0)//Some wiffs don't have that info so let's check
@@ -176,7 +174,7 @@ namespace MzmlParser
                             CycleInfoInID = true;
                         }
                     }
-                }
+     
             }
 
             bool cvParamsRead = false;
@@ -418,7 +416,8 @@ namespace MzmlParser
             int len = mzs.Length;
             scan.Scan.ProportionChargeStateOne = (double)distinct / (double)len;
 
-
+            if (scan.Scan.TotalIonCurrent == 0)
+                scan.Scan.TotalIonCurrent = intensities.Sum();
             scan.Scan.Spectrum = new Spectrum() { SpectrumPoints = spectrum };
             scan.Scan.IsolationWindowLowerBoundary = scan.Scan.IsolationWindowTargetMz - scan.Scan.IsolationWindowLowerOffset;
             scan.Scan.IsolationWindowUpperBoundary = scan.Scan.IsolationWindowTargetMz + scan.Scan.IsolationWindowUpperOffset;
