@@ -215,10 +215,10 @@ namespace Yamato.Console
         public double IrtMassTolerance { get; set; } = 0.005;
 
         [Option("irtminintensity", Required = false, HelpText = "iRT min intensity")]
-        public double IrtMinIntensity { get; set; } = 0;
+        public double IrtMinIntensity { get; set; } = 200;
 
         [Option("irtmintransitions", Required = false, HelpText = "iRT min peptides")]
-        public int IrtMinTransitions { get; set; } = 2;
+        public int IrtMinTransitions { get; set; } = 3;
 
         [Option("rttolerance", Required = false, HelpText = "RT tolerance")]
         public double RtTolerance { get; set; } = 2.5;

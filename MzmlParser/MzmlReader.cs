@@ -39,6 +39,7 @@ namespace MzmlParser
         private static readonly CountdownEvent cde = new CountdownEvent(1);
         private string SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
         private static bool TicNotFound = false;
+        private static bool AnyEmptyBinaryArray = false;
 
 
         public Run LoadMzml(string path, AnalysisSettings analysisSettings)
@@ -82,6 +83,8 @@ namespace MzmlParser
 
             if (TicNotFound)
                 logger.Warn("Total Ion Current value was not found and had to be calculated from the spectra. This will cause this value to be incorrect for centroided MZML files, peak picked data, or other manipulated spectra.");
+            if (AnyEmptyBinaryArray)
+                logger.Warn("One or more binary data arrays was empty and was zero filled.");
 
             return run;
         }
@@ -374,7 +377,8 @@ namespace MzmlParser
             {
                 intensities = FillZeroArray(intensities);
                 mzs = FillZeroArray(mzs);
-                logger.Info("Empty binary array for a MS{0} scan in cycle number: {0}. The empty scans have been filled with zero values.", scan.Scan.MsLevel, scan.Scan.Cycle);
+                logger.Debug("Empty binary array for a MS{0} scan in cycle number: {1}. The empty scans have been filled with zero values.", scan.Scan.MsLevel, scan.Scan.Cycle);
+
                 run.MissingScans++;
             }
             var spectrum = intensities.Select((x, i) => new SpectrumPoint(x, mzs[i], (float)scan.Scan.ScanStartTime)).Where(x => x.Intensity >= run.AnalysisSettings.MinimumIntensity).ToList();
