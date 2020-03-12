@@ -1,0 +1,6 @@
+FROM ubuntu:18.04
+COPY release-linux-x64 /yamato
+RUN apt update && apt install -y curl && apt install -y --no-install-recommends libunwind8 libicu-dev unzip libssl && rm -rf /var/lib/apt/lists/* 
+RUN chmod +x /yamato/publish/SwaMe.Console
+ENV PATH=/yamato/publish:$PATH
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
