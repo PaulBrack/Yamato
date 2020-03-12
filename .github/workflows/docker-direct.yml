@@ -1,12 +1,12 @@
-name: container
+name: release container
 
-on: [push]
+on: [release]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         submodules: true
     - name: Setup .NET Core
@@ -46,4 +46,4 @@ jobs:
           username: ${{ secrets.quay_robo_name }}
           password: ${{ secrets.quay_robo_pass }}
           dockerfile: container/Dockerfile-direct-build
-          tag: latest
+          tag: ${GITHUB_REF##*/}
