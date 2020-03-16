@@ -1,0 +1,49 @@
+name: release container
+
+on: [release]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+    - name: Test LibraryParser
+      run: dotnet test LibraryParser.Test/LibraryParser.Test.csproj --configuration Release
+    - name: Test SwaMe
+      run: dotnet test SwaMe.Test/SwaMe.Test/SwaMe.Test.csproj --configuration Release
+    - name: Test MzmlParser
+      run: dotnet test MzmlParser.Test/MzmlParser.Test.csproj --configuration Release
+    - name: Test MzqcGenerator
+      run: dotnet test MzqcGenerator.Test/MzqcGenerator.Test.csproj --configuration Release
+    - name: Publish Linux binaries
+      run: dotnet publish --self-contained true -p:UseAppHost=true -r linux-x64
+    - name: Publish binaries back to Github
+      uses: actions/upload-artifact@v1
+      with:
+        name: release-linux-x64
+        path: SwaMe.Console/bin/Debug/netcoreapp2.2/linux-x64
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v1
+        with:
+          name: release-linux-x64
+      - uses: mr-smithers-excellent/docker-build-push@v2
+        with:
+          image: mwalzer/yamato
+          registry: quay.io
+          username: ${{ secrets.quay_robo_name }}
+          password: ${{ secrets.quay_robo_pass }}
+          dockerfile: container/Dockerfile-direct-build
+          tag: ${GITHUB_REF##*/}
