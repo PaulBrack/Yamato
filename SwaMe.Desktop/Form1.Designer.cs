@@ -128,6 +128,7 @@
             this.ChooseSpectralLibraryButton.TabIndex = 6;
             this.ChooseSpectralLibraryButton.Text = "Choose spectral library";
             this.ChooseSpectralLibraryButton.UseVisualStyleBackColor = true;
+            this.ChooseSpectralLibraryButton.Click += new System.EventHandler(this.ChooseSpectralLibraryButton_Click);
             // 
             // SpectralLibraryLabel
             // 

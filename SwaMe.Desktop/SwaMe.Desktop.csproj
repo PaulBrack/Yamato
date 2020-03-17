@@ -10,4 +10,12 @@
     <PackageReference Include="NLog" Version="4.6.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
+    <ProjectReference Include="..\MzmlParser\MzmlParser.csproj" />
+    <ProjectReference Include="..\MzqcGenerator\MzqcGenerator.csproj" />
+    <ProjectReference Include="..\SwaMe.Prognosticator\SwaMe.Prognosticator.csproj" />
+    <ProjectReference Include="..\SwaMe\SwaMe.csproj" />
+  </ItemGroup>
+
 </Project>

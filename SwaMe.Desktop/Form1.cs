@@ -1,8 +1,11 @@
-﻿using NLog;
+﻿using LibraryParser;
+using MzmlParser;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,6 +19,7 @@ namespace SwaMe.Desktop
     {
 
         private string inputFilePath = "";
+        private string irtFilePath = "";
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public Form1()
@@ -49,7 +53,24 @@ namespace SwaMe.Desktop
 
         }
 
+        private void ChooseSpectralLibraryButton_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = "c:\\";
+                openFileDialog.Filter = "mzml files (*.mzml)|*.mzml|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
 
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    //Get the path of specified file
+                    
+                    irtFilePath = openFileDialog.FileName;
+                    SpectralLibraryLabel.Text = openFileDialog.SafeFileName;
+                }
+            }
+        }
 
         private void Form1_Load_1(object sender, EventArgs e)
         {
@@ -112,50 +133,50 @@ namespace SwaMe.Desktop
                 sw.Start();
 
                 int division;
-                if (options.Division < 100 && options.Division > 0)
-                    division = options.Division;
+                if (rtDivisionUpDown.Value < 100 && rtDivisionUpDown.Value > 0)
+                    division = Decimal.ToInt32(rtDivisionUpDown.Value);
                 else
                 {
-                    Logger.Error("Number of divisions must be within the range 1 - 100. You have input: {0}", options.Division);
+                    Logger.Error("Number of divisions must be within the range 1 - 100. You have input: {0}", rtDivisionUpDown.Value);
                     throw new ArgumentOutOfRangeException();
                 }
-                bool irt = !String.IsNullOrEmpty(options.IRTFile);
+                bool irt = !String.IsNullOrEmpty(irtFilePath);
 
                 MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader
                 {
-                    ParseBinaryData = options.ParseBinaryData ?? true,
-                    Threading = options.Threading ?? true,
-                    MaxQueueSize = options.MaxQueueSize,
-                    MaxThreads = options.MaxThreads
+                    ParseBinaryData = true,
+                    Threading = true,
+                    MaxQueueSize = Decimal.ToInt32(MaxQueueUpDown.Value),
+                    MaxThreads = Decimal.ToInt32(MaxThreadsUpDown.Value)
                 };
 
                 CheckFileIsReadableOrComplain(inputFilePath);
 
                 AnalysisSettings analysisSettings = new AnalysisSettings()
                 {
-                    MassTolerance = options.MassTolerance,
-                    RtTolerance = options.RtTolerance,
-                    IrtMinIntensity = options.IrtMinIntensity,
-                    IrtMinPeptides = options.IrtMinTransitions,
-                    IrtMassTolerance = options.IrtMassTolerance,
-                    CacheSpectraToDisk = options.Cache,
-                    MinimumIntensity = options.MinimumIntensity,
-                    RunEndTime = options.RunEndTime
+                    MassTolerance = Decimal.ToInt32(BasePeakMassToleranceUpDown.Value),
+                    RtTolerance = Decimal.ToInt32(BasePeakRtToleranceUpDown.Value),
+                    IrtMinIntensity = Decimal.ToInt32(MinIrtIntensityUpDown.Value),
+                    IrtMinPeptides = Decimal.ToInt32(irtPeptidesUpDown.Value),
+                    IrtMassTolerance = Decimal.ToInt32(irtToleranceUpDown.Value),
+                    CacheSpectraToDisk = CacheToDiskCheckBox.Checked,
+                    MinimumIntensity = Decimal.ToInt32(MinIrtIntensityUpDown.Value),
+                    RunEndTime = 0
                 };
 
-                if (!String.IsNullOrEmpty(options.IRTFile))
+                if (!String.IsNullOrEmpty(irtFilePath))
                 {
                     irt = true;
-                    if (options.IRTFile.ToLower().EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
+                    if (irtFilePath.ToLower().EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
                     {
                         TraMLReader traMLReader = new TraMLReader();
-                        analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
+                        analysisSettings.IrtLibrary = traMLReader.LoadLibrary(irtFilePath);
 
                     }
-                    else if (options.IRTFile.ToLower().EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.ToLower().EndsWith("csv", StringComparison.InvariantCultureIgnoreCase))
+                    else if (irtFilePath.ToLower().EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || irtFilePath.ToLower().EndsWith("csv", StringComparison.InvariantCultureIgnoreCase))
                     {
                         SVReader svReader = new SVReader();
-                        analysisSettings.IrtLibrary = svReader.LoadLibrary(options.IRTFile);
+                        analysisSettings.IrtLibrary = svReader.LoadLibrary(irtFilePath);
                     }
                 }
                 MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
@@ -198,6 +219,8 @@ namespace SwaMe.Desktop
             LogManager.Shutdown();
             Environment.Exit(0);
         }
+
+
     }
 
 
