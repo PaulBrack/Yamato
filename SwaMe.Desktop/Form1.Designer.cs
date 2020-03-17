@@ -34,7 +34,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.ChooseSpectralLibraryButton = new System.Windows.Forms.Button();
-            this.maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
             this.SpectralLibraryLabel = new System.Windows.Forms.Label();
             this.CacheToDiskCheckBox = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -47,7 +46,6 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.maskedTextBox6 = new System.Windows.Forms.MaskedTextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -56,6 +54,8 @@
             this.MaxQueueUpDown = new System.Windows.Forms.NumericUpDown();
             this.MinIrtIntensityUpDown = new System.Windows.Forms.NumericUpDown();
             this.rtDivisionUpDown = new System.Windows.Forms.NumericUpDown();
+            this.BasePeakMassToleranceUpDown = new System.Windows.Forms.NumericUpDown();
+            this.BasePeakRtToleranceUpDown = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.irtToleranceUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -66,6 +66,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.MaxQueueUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MinIrtIntensityUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.rtDivisionUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BasePeakMassToleranceUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BasePeakRtToleranceUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -124,14 +126,6 @@
             this.ChooseSpectralLibraryButton.TabIndex = 6;
             this.ChooseSpectralLibraryButton.Text = "Choose spectral library";
             this.ChooseSpectralLibraryButton.UseVisualStyleBackColor = true;
-            // 
-            // maskedTextBox2
-            // 
-            this.maskedTextBox2.Location = new System.Drawing.Point(213, 56);
-            this.maskedTextBox2.Name = "maskedTextBox2";
-            this.maskedTextBox2.Size = new System.Drawing.Size(57, 23);
-            this.maskedTextBox2.TabIndex = 8;
-            this.maskedTextBox2.Text = "0.05";
             // 
             // SpectralLibraryLabel
             // 
@@ -209,7 +203,7 @@
             0,
             0});
             this.irtPeptidesUpDown.Minimum = new decimal(new int[] {
-            1,
+            2,
             0,
             0,
             0});
@@ -287,14 +281,6 @@
             this.label10.Text = "Maximum threads";
             this.label10.Click += new System.EventHandler(this.label10_Click);
             // 
-            // maskedTextBox6
-            // 
-            this.maskedTextBox6.Location = new System.Drawing.Point(213, 87);
-            this.maskedTextBox6.Name = "maskedTextBox6";
-            this.maskedTextBox6.Size = new System.Drawing.Size(57, 23);
-            this.maskedTextBox6.TabIndex = 8;
-            this.maskedTextBox6.Text = "0.05";
-            // 
             // label11
             // 
             this.label11.AutoSize = true;
@@ -306,12 +292,12 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.BasePeakRtToleranceUpDown);
+            this.groupBox3.Controls.Add(this.BasePeakMassToleranceUpDown);
             this.groupBox3.Controls.Add(this.rtDivisionUpDown);
             this.groupBox3.Controls.Add(this.label2);
             this.groupBox3.Controls.Add(this.label11);
-            this.groupBox3.Controls.Add(this.maskedTextBox6);
             this.groupBox3.Controls.Add(this.label3);
-            this.groupBox3.Controls.Add(this.maskedTextBox2);
             this.groupBox3.Location = new System.Drawing.Point(12, 444);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(292, 132);
@@ -332,10 +318,25 @@
             // 
             // IntensityFilterUpDown
             // 
+            this.IntensityFilterUpDown.Increment = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
             this.IntensityFilterUpDown.Location = new System.Drawing.Point(213, 63);
+            this.IntensityFilterUpDown.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
             this.IntensityFilterUpDown.Name = "IntensityFilterUpDown";
             this.IntensityFilterUpDown.Size = new System.Drawing.Size(57, 23);
             this.IntensityFilterUpDown.TabIndex = 12;
+            this.IntensityFilterUpDown.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // MaxThreadsUpDown
             // 
@@ -343,20 +344,55 @@
             this.MaxThreadsUpDown.Name = "MaxThreadsUpDown";
             this.MaxThreadsUpDown.Size = new System.Drawing.Size(58, 23);
             this.MaxThreadsUpDown.TabIndex = 13;
+            this.MaxThreadsUpDown.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // MaxQueueUpDown
             // 
+            this.MaxQueueUpDown.Increment = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             this.MaxQueueUpDown.Location = new System.Drawing.Point(213, 127);
+            this.MaxQueueUpDown.Maximum = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
             this.MaxQueueUpDown.Name = "MaxQueueUpDown";
             this.MaxQueueUpDown.Size = new System.Drawing.Size(57, 23);
             this.MaxQueueUpDown.TabIndex = 14;
+            this.MaxQueueUpDown.Value = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
             // 
             // MinIrtIntensityUpDown
             // 
+            this.MinIrtIntensityUpDown.Increment = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
             this.MinIrtIntensityUpDown.Location = new System.Drawing.Point(213, 153);
+            this.MinIrtIntensityUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
             this.MinIrtIntensityUpDown.Name = "MinIrtIntensityUpDown";
             this.MinIrtIntensityUpDown.Size = new System.Drawing.Size(57, 23);
             this.MinIrtIntensityUpDown.TabIndex = 15;
+            this.MinIrtIntensityUpDown.Value = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
             // 
             // rtDivisionUpDown
             // 
@@ -364,11 +400,46 @@
             this.rtDivisionUpDown.Name = "rtDivisionUpDown";
             this.rtDivisionUpDown.Size = new System.Drawing.Size(57, 23);
             this.rtDivisionUpDown.TabIndex = 15;
+            this.rtDivisionUpDown.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // BasePeakMassToleranceUpDown
+            // 
+            this.BasePeakMassToleranceUpDown.DecimalPlaces = 3;
+            this.BasePeakMassToleranceUpDown.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
+            this.BasePeakMassToleranceUpDown.Location = new System.Drawing.Point(214, 57);
+            this.BasePeakMassToleranceUpDown.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.BasePeakMassToleranceUpDown.Name = "BasePeakMassToleranceUpDown";
+            this.BasePeakMassToleranceUpDown.Size = new System.Drawing.Size(57, 23);
+            this.BasePeakMassToleranceUpDown.TabIndex = 15;
+            this.BasePeakMassToleranceUpDown.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            196608});
+            // 
+            // BasePeakRtToleranceUpDown
+            // 
+            this.BasePeakRtToleranceUpDown.Location = new System.Drawing.Point(214, 86);
+            this.BasePeakRtToleranceUpDown.Name = "BasePeakRtToleranceUpDown";
+            this.BasePeakRtToleranceUpDown.Size = new System.Drawing.Size(57, 23);
+            this.BasePeakRtToleranceUpDown.TabIndex = 15;
             // 
             // Form1
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(910, 601);
+            this.ClientSize = new System.Drawing.Size(1229, 606);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -391,6 +462,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.MaxQueueUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MinIrtIntensityUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.rtDivisionUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BasePeakMassToleranceUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BasePeakRtToleranceUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -406,7 +479,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button ChooseSpectralLibraryButton;
-        private System.Windows.Forms.MaskedTextBox maskedTextBox2;
         private System.Windows.Forms.Label SpectralLibraryLabel;
         private System.Windows.Forms.CheckBox CacheToDiskCheckBox;
         private System.Windows.Forms.Label label6;
@@ -419,7 +491,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.MaskedTextBox maskedTextBox6;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label12;
@@ -428,6 +499,8 @@
         private System.Windows.Forms.NumericUpDown IntensityFilterUpDown;
         private System.Windows.Forms.NumericUpDown MinIrtIntensityUpDown;
         private System.Windows.Forms.NumericUpDown rtDivisionUpDown;
+        private System.Windows.Forms.NumericUpDown BasePeakRtToleranceUpDown;
+        private System.Windows.Forms.NumericUpDown BasePeakMassToleranceUpDown;
     }
 }
 
