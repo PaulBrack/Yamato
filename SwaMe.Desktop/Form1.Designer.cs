@@ -42,33 +42,34 @@
             this.label8 = new System.Windows.Forms.Label();
             this.irtPeptidesUpDown = new System.Windows.Forms.NumericUpDown();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.MinIrtIntensityUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label9 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label9 = new System.Windows.Forms.Label();
+            this.MaxQueueUpDown = new System.Windows.Forms.NumericUpDown();
+            this.MaxThreadsUpDown = new System.Windows.Forms.NumericUpDown();
+            this.IntensityFilterUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label12 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.IntensityFilterUpDown = new System.Windows.Forms.NumericUpDown();
-            this.MaxThreadsUpDown = new System.Windows.Forms.NumericUpDown();
-            this.MaxQueueUpDown = new System.Windows.Forms.NumericUpDown();
-            this.MinIrtIntensityUpDown = new System.Windows.Forms.NumericUpDown();
-            this.rtDivisionUpDown = new System.Windows.Forms.NumericUpDown();
-            this.BasePeakMassToleranceUpDown = new System.Windows.Forms.NumericUpDown();
             this.BasePeakRtToleranceUpDown = new System.Windows.Forms.NumericUpDown();
+            this.BasePeakMassToleranceUpDown = new System.Windows.Forms.NumericUpDown();
+            this.rtDivisionUpDown = new System.Windows.Forms.NumericUpDown();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.StartAnalysisButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.irtToleranceUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.IntensityFilterUpDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxThreadsUpDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxQueueUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MinIrtIntensityUpDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.rtDivisionUpDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BasePeakMassToleranceUpDown)).BeginInit();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxQueueUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxThreadsUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.IntensityFilterUpDown)).BeginInit();
+            this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.BasePeakRtToleranceUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BasePeakMassToleranceUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.rtDivisionUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -234,6 +235,38 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "iRT peptides";
             // 
+            // MinIrtIntensityUpDown
+            // 
+            this.MinIrtIntensityUpDown.Increment = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.MinIrtIntensityUpDown.Location = new System.Drawing.Point(213, 153);
+            this.MinIrtIntensityUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.MinIrtIntensityUpDown.Name = "MinIrtIntensityUpDown";
+            this.MinIrtIntensityUpDown.Size = new System.Drawing.Size(57, 23);
+            this.MinIrtIntensityUpDown.TabIndex = 15;
+            this.MinIrtIntensityUpDown.Value = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 155);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(126, 15);
+            this.label9.TabIndex = 3;
+            this.label9.Text = "Minimum iRT intensity";
+            this.label9.Click += new System.EventHandler(this.label2_Click);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -262,15 +295,71 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "File read settings";
             // 
-            // label9
+            // MaxQueueUpDown
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(6, 155);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(126, 15);
-            this.label9.TabIndex = 3;
-            this.label9.Text = "Minimum iRT intensity";
-            this.label9.Click += new System.EventHandler(this.label2_Click);
+            this.MaxQueueUpDown.Increment = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.MaxQueueUpDown.Location = new System.Drawing.Point(213, 127);
+            this.MaxQueueUpDown.Maximum = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
+            this.MaxQueueUpDown.Name = "MaxQueueUpDown";
+            this.MaxQueueUpDown.Size = new System.Drawing.Size(57, 23);
+            this.MaxQueueUpDown.TabIndex = 14;
+            this.MaxQueueUpDown.Value = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
+            // 
+            // MaxThreadsUpDown
+            // 
+            this.MaxThreadsUpDown.Location = new System.Drawing.Point(213, 95);
+            this.MaxThreadsUpDown.Name = "MaxThreadsUpDown";
+            this.MaxThreadsUpDown.Size = new System.Drawing.Size(58, 23);
+            this.MaxThreadsUpDown.TabIndex = 13;
+            this.MaxThreadsUpDown.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // IntensityFilterUpDown
+            // 
+            this.IntensityFilterUpDown.Increment = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.IntensityFilterUpDown.Location = new System.Drawing.Point(213, 63);
+            this.IntensityFilterUpDown.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            this.IntensityFilterUpDown.Name = "IntensityFilterUpDown";
+            this.IntensityFilterUpDown.Size = new System.Drawing.Size(57, 23);
+            this.IntensityFilterUpDown.TabIndex = 12;
+            this.IntensityFilterUpDown.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 129);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(120, 15);
+            this.label12.TabIndex = 11;
+            this.label12.Text = "Maximum queue size";
+            this.label12.Click += new System.EventHandler(this.label10_Click);
             // 
             // label10
             // 
@@ -307,105 +396,12 @@
             this.groupBox3.Text = "Swame.Core settings";
             this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter);
             // 
-            // label12
+            // BasePeakRtToleranceUpDown
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 129);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(120, 15);
-            this.label12.TabIndex = 11;
-            this.label12.Text = "Maximum queue size";
-            this.label12.Click += new System.EventHandler(this.label10_Click);
-            // 
-            // IntensityFilterUpDown
-            // 
-            this.IntensityFilterUpDown.Increment = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.IntensityFilterUpDown.Location = new System.Drawing.Point(213, 63);
-            this.IntensityFilterUpDown.Maximum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this.IntensityFilterUpDown.Name = "IntensityFilterUpDown";
-            this.IntensityFilterUpDown.Size = new System.Drawing.Size(57, 23);
-            this.IntensityFilterUpDown.TabIndex = 12;
-            this.IntensityFilterUpDown.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            // 
-            // MaxThreadsUpDown
-            // 
-            this.MaxThreadsUpDown.Location = new System.Drawing.Point(213, 95);
-            this.MaxThreadsUpDown.Name = "MaxThreadsUpDown";
-            this.MaxThreadsUpDown.Size = new System.Drawing.Size(58, 23);
-            this.MaxThreadsUpDown.TabIndex = 13;
-            this.MaxThreadsUpDown.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            // 
-            // MaxQueueUpDown
-            // 
-            this.MaxQueueUpDown.Increment = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.MaxQueueUpDown.Location = new System.Drawing.Point(213, 127);
-            this.MaxQueueUpDown.Maximum = new decimal(new int[] {
-            2000,
-            0,
-            0,
-            0});
-            this.MaxQueueUpDown.Name = "MaxQueueUpDown";
-            this.MaxQueueUpDown.Size = new System.Drawing.Size(57, 23);
-            this.MaxQueueUpDown.TabIndex = 14;
-            this.MaxQueueUpDown.Value = new decimal(new int[] {
-            2000,
-            0,
-            0,
-            0});
-            // 
-            // MinIrtIntensityUpDown
-            // 
-            this.MinIrtIntensityUpDown.Increment = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.MinIrtIntensityUpDown.Location = new System.Drawing.Point(213, 153);
-            this.MinIrtIntensityUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.MinIrtIntensityUpDown.Name = "MinIrtIntensityUpDown";
-            this.MinIrtIntensityUpDown.Size = new System.Drawing.Size(57, 23);
-            this.MinIrtIntensityUpDown.TabIndex = 15;
-            this.MinIrtIntensityUpDown.Value = new decimal(new int[] {
-            200,
-            0,
-            0,
-            0});
-            // 
-            // rtDivisionUpDown
-            // 
-            this.rtDivisionUpDown.Location = new System.Drawing.Point(214, 28);
-            this.rtDivisionUpDown.Name = "rtDivisionUpDown";
-            this.rtDivisionUpDown.Size = new System.Drawing.Size(57, 23);
-            this.rtDivisionUpDown.TabIndex = 15;
-            this.rtDivisionUpDown.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
+            this.BasePeakRtToleranceUpDown.Location = new System.Drawing.Point(214, 86);
+            this.BasePeakRtToleranceUpDown.Name = "BasePeakRtToleranceUpDown";
+            this.BasePeakRtToleranceUpDown.Size = new System.Drawing.Size(57, 23);
+            this.BasePeakRtToleranceUpDown.TabIndex = 15;
             // 
             // BasePeakMassToleranceUpDown
             // 
@@ -430,24 +426,41 @@
             0,
             196608});
             // 
-            // BasePeakRtToleranceUpDown
+            // rtDivisionUpDown
             // 
-            this.BasePeakRtToleranceUpDown.Location = new System.Drawing.Point(214, 86);
-            this.BasePeakRtToleranceUpDown.Name = "BasePeakRtToleranceUpDown";
-            this.BasePeakRtToleranceUpDown.Size = new System.Drawing.Size(57, 23);
-            this.BasePeakRtToleranceUpDown.TabIndex = 15;
+            this.rtDivisionUpDown.Location = new System.Drawing.Point(214, 28);
+            this.rtDivisionUpDown.Name = "rtDivisionUpDown";
+            this.rtDivisionUpDown.Size = new System.Drawing.Size(57, 23);
+            this.rtDivisionUpDown.TabIndex = 15;
+            this.rtDivisionUpDown.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // panel1
             // 
-            this.panel1.Location = new System.Drawing.Point(413, -66);
+            this.panel1.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.panel1.Location = new System.Drawing.Point(329, 56);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(108, 472);
+            this.panel1.Size = new System.Drawing.Size(727, 426);
             this.panel1.TabIndex = 18;
+            // 
+            // StartAnalysisButton
+            // 
+            this.StartAnalysisButton.Location = new System.Drawing.Point(12, 582);
+            this.StartAnalysisButton.Name = "StartAnalysisButton";
+            this.StartAnalysisButton.Size = new System.Drawing.Size(292, 31);
+            this.StartAnalysisButton.TabIndex = 19;
+            this.StartAnalysisButton.Text = "Start";
+            this.StartAnalysisButton.UseVisualStyleBackColor = true;
+            this.StartAnalysisButton.Click += new System.EventHandler(this.StartAnalysisButton_Click);
             // 
             // Form1
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1083, 728);
+            this.Controls.Add(this.StartAnalysisButton);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -462,17 +475,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MinIrtIntensityUpDown)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxQueueUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxThreadsUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.IntensityFilterUpDown)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.IntensityFilterUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxThreadsUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxQueueUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MinIrtIntensityUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.rtDivisionUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.BasePeakMassToleranceUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.BasePeakRtToleranceUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.BasePeakMassToleranceUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.rtDivisionUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -511,6 +524,7 @@
         private System.Windows.Forms.NumericUpDown BasePeakRtToleranceUpDown;
         private System.Windows.Forms.NumericUpDown BasePeakMassToleranceUpDown;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button StartAnalysisButton;
     }
 }
 
