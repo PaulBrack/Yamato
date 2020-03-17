@@ -56,8 +56,8 @@
             this.BasePeakRtToleranceUpDown = new System.Windows.Forms.NumericUpDown();
             this.BasePeakMassToleranceUpDown = new System.Windows.Forms.NumericUpDown();
             this.rtDivisionUpDown = new System.Windows.Forms.NumericUpDown();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.StartAnalysisButton = new System.Windows.Forms.Button();
+            this.LogBox = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.irtToleranceUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -142,6 +142,8 @@
             // CacheToDiskCheckBox
             // 
             this.CacheToDiskCheckBox.AutoSize = true;
+            this.CacheToDiskCheckBox.Checked = true;
+            this.CacheToDiskCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CacheToDiskCheckBox.Location = new System.Drawing.Point(214, 32);
             this.CacheToDiskCheckBox.Name = "CacheToDiskCheckBox";
             this.CacheToDiskCheckBox.Size = new System.Drawing.Size(15, 14);
@@ -434,18 +436,10 @@
             this.rtDivisionUpDown.Size = new System.Drawing.Size(57, 23);
             this.rtDivisionUpDown.TabIndex = 15;
             this.rtDivisionUpDown.Value = new decimal(new int[] {
-            100,
+            50,
             0,
             0,
             0});
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.panel1.Location = new System.Drawing.Point(329, 56);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(727, 426);
-            this.panel1.TabIndex = 18;
             // 
             // StartAnalysisButton
             // 
@@ -457,12 +451,20 @@
             this.StartAnalysisButton.UseVisualStyleBackColor = true;
             this.StartAnalysisButton.Click += new System.EventHandler(this.StartAnalysisButton_Click);
             // 
+            // LogBox
+            // 
+            this.LogBox.Location = new System.Drawing.Point(323, 56);
+            this.LogBox.Name = "LogBox";
+            this.LogBox.Size = new System.Drawing.Size(733, 225);
+            this.LogBox.TabIndex = 20;
+            this.LogBox.Text = "";
+            // 
             // Form1
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1083, 728);
+            this.Controls.Add(this.LogBox);
             this.Controls.Add(this.StartAnalysisButton);
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -524,8 +526,8 @@
         private System.Windows.Forms.NumericUpDown rtDivisionUpDown;
         private System.Windows.Forms.NumericUpDown BasePeakRtToleranceUpDown;
         private System.Windows.Forms.NumericUpDown BasePeakMassToleranceUpDown;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button StartAnalysisButton;
+        private System.Windows.Forms.RichTextBox LogBox;
     }
 }
 
