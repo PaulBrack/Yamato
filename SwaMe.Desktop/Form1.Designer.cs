@@ -33,20 +33,39 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
+            this.ChooseSpectralLibraryButton = new System.Windows.Forms.Button();
             this.maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.SpectralLibraryLabel = new System.Windows.Forms.Label();
+            this.CacheToDiskCheckBox = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.irtToleranceUpDown = new System.Windows.Forms.NumericUpDown();
             this.label8 = new System.Windows.Forms.Label();
             this.irtPeptidesUpDown = new System.Windows.Forms.NumericUpDown();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.maskedTextBox6 = new System.Windows.Forms.MaskedTextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.IntensityFilterUpDown = new System.Windows.Forms.NumericUpDown();
+            this.MaxThreadsUpDown = new System.Windows.Forms.NumericUpDown();
+            this.MaxQueueUpDown = new System.Windows.Forms.NumericUpDown();
+            this.MinIrtIntensityUpDown = new System.Windows.Forms.NumericUpDown();
+            this.rtDivisionUpDown = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.irtToleranceUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).BeginInit();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.IntensityFilterUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxThreadsUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxQueueUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MinIrtIntensityUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.rtDivisionUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -71,7 +90,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 78);
+            this.label2.Location = new System.Drawing.Point(6, 30);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(68, 15);
             this.label2.TabIndex = 3;
@@ -81,7 +100,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(10, 107);
+            this.label3.Location = new System.Drawing.Point(6, 59);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(141, 15);
             this.label3.TabIndex = 4;
@@ -90,60 +109,52 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 133);
+            this.label4.Location = new System.Drawing.Point(6, 31);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(78, 15);
             this.label4.TabIndex = 5;
             this.label4.Text = "Cache to disk";
             this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
-            // button2
+            // ChooseSpectralLibraryButton
             // 
-            this.button2.Location = new System.Drawing.Point(6, 22);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(162, 23);
-            this.button2.TabIndex = 6;
-            this.button2.Text = "Choose spectral library";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // maskedTextBox1
-            // 
-            this.maskedTextBox1.Location = new System.Drawing.Point(185, 75);
-            this.maskedTextBox1.Name = "maskedTextBox1";
-            this.maskedTextBox1.Size = new System.Drawing.Size(57, 23);
-            this.maskedTextBox1.TabIndex = 7;
-            this.maskedTextBox1.Text = "100";
+            this.ChooseSpectralLibraryButton.Location = new System.Drawing.Point(6, 22);
+            this.ChooseSpectralLibraryButton.Name = "ChooseSpectralLibraryButton";
+            this.ChooseSpectralLibraryButton.Size = new System.Drawing.Size(265, 23);
+            this.ChooseSpectralLibraryButton.TabIndex = 6;
+            this.ChooseSpectralLibraryButton.Text = "Choose spectral library";
+            this.ChooseSpectralLibraryButton.UseVisualStyleBackColor = true;
             // 
             // maskedTextBox2
             // 
-            this.maskedTextBox2.Location = new System.Drawing.Point(185, 104);
+            this.maskedTextBox2.Location = new System.Drawing.Point(213, 56);
             this.maskedTextBox2.Name = "maskedTextBox2";
             this.maskedTextBox2.Size = new System.Drawing.Size(57, 23);
             this.maskedTextBox2.TabIndex = 8;
             this.maskedTextBox2.Text = "0.05";
             // 
-            // label5
+            // SpectralLibraryLabel
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(174, 26);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(105, 15);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "No library selected";
+            this.SpectralLibraryLabel.AutoSize = true;
+            this.SpectralLibraryLabel.Location = new System.Drawing.Point(6, 48);
+            this.SpectralLibraryLabel.Name = "SpectralLibraryLabel";
+            this.SpectralLibraryLabel.Size = new System.Drawing.Size(105, 15);
+            this.SpectralLibraryLabel.TabIndex = 9;
+            this.SpectralLibraryLabel.Text = "No library selected";
             // 
-            // checkBox1
+            // CacheToDiskCheckBox
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(185, 133);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(15, 14);
-            this.checkBox1.TabIndex = 10;
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.CacheToDiskCheckBox.AutoSize = true;
+            this.CacheToDiskCheckBox.Location = new System.Drawing.Point(214, 32);
+            this.CacheToDiskCheckBox.Name = "CacheToDiskCheckBox";
+            this.CacheToDiskCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.CacheToDiskCheckBox.TabIndex = 10;
+            this.CacheToDiskCheckBox.UseVisualStyleBackColor = true;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 60);
+            this.label6.Location = new System.Drawing.Point(6, 91);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(104, 15);
             this.label6.TabIndex = 11;
@@ -165,7 +176,7 @@
             0,
             0,
             196608});
-            this.irtToleranceUpDown.Location = new System.Drawing.Point(174, 58);
+            this.irtToleranceUpDown.Location = new System.Drawing.Point(214, 89);
             this.irtToleranceUpDown.Maximum = new decimal(new int[] {
             1,
             0,
@@ -183,7 +194,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 91);
+            this.label8.Location = new System.Drawing.Point(6, 122);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(126, 15);
             this.label8.TabIndex = 14;
@@ -191,7 +202,7 @@
             // 
             // irtPeptidesUpDown
             // 
-            this.irtPeptidesUpDown.Location = new System.Drawing.Point(173, 89);
+            this.irtPeptidesUpDown.Location = new System.Drawing.Point(213, 120);
             this.irtPeptidesUpDown.Maximum = new decimal(new int[] {
             5,
             0,
@@ -213,31 +224,155 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.button2);
+            this.groupBox1.Controls.Add(this.MinIrtIntensityUpDown);
+            this.groupBox1.Controls.Add(this.label9);
+            this.groupBox1.Controls.Add(this.ChooseSpectralLibraryButton);
             this.groupBox1.Controls.Add(this.irtPeptidesUpDown);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.irtToleranceUpDown);
             this.groupBox1.Controls.Add(this.label8);
-            this.groupBox1.Controls.Add(this.label5);
-            this.groupBox1.Location = new System.Drawing.Point(12, 187);
+            this.groupBox1.Controls.Add(this.SpectralLibraryLabel);
+            this.groupBox1.Location = new System.Drawing.Point(12, 236);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(326, 255);
+            this.groupBox1.Size = new System.Drawing.Size(292, 202);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "iRT peptides";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 65);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(157, 15);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Ignore peaks below intensity";
+            this.label1.Click += new System.EventHandler(this.label2_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.BackColor = System.Drawing.SystemColors.Control;
+            this.groupBox2.Controls.Add(this.MaxQueueUpDown);
+            this.groupBox2.Controls.Add(this.MaxThreadsUpDown);
+            this.groupBox2.Controls.Add(this.IntensityFilterUpDown);
+            this.groupBox2.Controls.Add(this.label12);
+            this.groupBox2.Controls.Add(this.label10);
+            this.groupBox2.Controls.Add(this.label1);
+            this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this.CacheToDiskCheckBox);
+            this.groupBox2.Location = new System.Drawing.Point(12, 56);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(292, 174);
+            this.groupBox2.TabIndex = 16;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "File read settings";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 155);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(126, 15);
+            this.label9.TabIndex = 3;
+            this.label9.Text = "Minimum iRT intensity";
+            this.label9.Click += new System.EventHandler(this.label2_Click);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(6, 97);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(104, 15);
+            this.label10.TabIndex = 11;
+            this.label10.Text = "Maximum threads";
+            this.label10.Click += new System.EventHandler(this.label10_Click);
+            // 
+            // maskedTextBox6
+            // 
+            this.maskedTextBox6.Location = new System.Drawing.Point(213, 87);
+            this.maskedTextBox6.Name = "maskedTextBox6";
+            this.maskedTextBox6.Size = new System.Drawing.Size(57, 23);
+            this.maskedTextBox6.TabIndex = 8;
+            this.maskedTextBox6.Text = "0.05";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 90);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(126, 15);
+            this.label11.TabIndex = 4;
+            this.label11.Text = "Base peak RT tolerance";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.rtDivisionUpDown);
+            this.groupBox3.Controls.Add(this.label2);
+            this.groupBox3.Controls.Add(this.label11);
+            this.groupBox3.Controls.Add(this.maskedTextBox6);
+            this.groupBox3.Controls.Add(this.label3);
+            this.groupBox3.Controls.Add(this.maskedTextBox2);
+            this.groupBox3.Location = new System.Drawing.Point(12, 444);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(292, 132);
+            this.groupBox3.TabIndex = 17;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Swame.Core settings";
+            this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 129);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(120, 15);
+            this.label12.TabIndex = 11;
+            this.label12.Text = "Maximum queue size";
+            this.label12.Click += new System.EventHandler(this.label10_Click);
+            // 
+            // IntensityFilterUpDown
+            // 
+            this.IntensityFilterUpDown.Location = new System.Drawing.Point(213, 63);
+            this.IntensityFilterUpDown.Name = "IntensityFilterUpDown";
+            this.IntensityFilterUpDown.Size = new System.Drawing.Size(57, 23);
+            this.IntensityFilterUpDown.TabIndex = 12;
+            // 
+            // MaxThreadsUpDown
+            // 
+            this.MaxThreadsUpDown.Location = new System.Drawing.Point(213, 95);
+            this.MaxThreadsUpDown.Name = "MaxThreadsUpDown";
+            this.MaxThreadsUpDown.Size = new System.Drawing.Size(58, 23);
+            this.MaxThreadsUpDown.TabIndex = 13;
+            // 
+            // MaxQueueUpDown
+            // 
+            this.MaxQueueUpDown.Location = new System.Drawing.Point(213, 127);
+            this.MaxQueueUpDown.Name = "MaxQueueUpDown";
+            this.MaxQueueUpDown.Size = new System.Drawing.Size(57, 23);
+            this.MaxQueueUpDown.TabIndex = 14;
+            // 
+            // MinIrtIntensityUpDown
+            // 
+            this.MinIrtIntensityUpDown.Location = new System.Drawing.Point(213, 153);
+            this.MinIrtIntensityUpDown.Name = "MinIrtIntensityUpDown";
+            this.MinIrtIntensityUpDown.Size = new System.Drawing.Size(57, 23);
+            this.MinIrtIntensityUpDown.TabIndex = 15;
+            // 
+            // rtDivisionUpDown
+            // 
+            this.rtDivisionUpDown.Location = new System.Drawing.Point(214, 28);
+            this.rtDivisionUpDown.Name = "rtDivisionUpDown";
+            this.rtDivisionUpDown.Size = new System.Drawing.Size(57, 23);
+            this.rtDivisionUpDown.TabIndex = 15;
+            // 
             // Form1
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(910, 499);
+            this.ClientSize = new System.Drawing.Size(910, 601);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label7);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.maskedTextBox2);
-            this.Controls.Add(this.maskedTextBox1);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.fileNameLabel);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
@@ -247,6 +382,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.IntensityFilterUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxThreadsUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxQueueUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MinIrtIntensityUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.rtDivisionUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -261,17 +405,29 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.MaskedTextBox maskedTextBox1;
+        private System.Windows.Forms.Button ChooseSpectralLibraryButton;
         private System.Windows.Forms.MaskedTextBox maskedTextBox2;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Label SpectralLibraryLabel;
+        private System.Windows.Forms.CheckBox CacheToDiskCheckBox;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.NumericUpDown irtToleranceUpDown;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.NumericUpDown irtPeptidesUpDown;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.MaskedTextBox maskedTextBox6;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.NumericUpDown MaxQueueUpDown;
+        private System.Windows.Forms.NumericUpDown MaxThreadsUpDown;
+        private System.Windows.Forms.NumericUpDown IntensityFilterUpDown;
+        private System.Windows.Forms.NumericUpDown MinIrtIntensityUpDown;
+        private System.Windows.Forms.NumericUpDown rtDivisionUpDown;
     }
 }
 
