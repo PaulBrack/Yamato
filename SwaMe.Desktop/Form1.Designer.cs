@@ -56,6 +56,7 @@
             this.rtDivisionUpDown = new System.Windows.Forms.NumericUpDown();
             this.BasePeakMassToleranceUpDown = new System.Windows.Forms.NumericUpDown();
             this.BasePeakRtToleranceUpDown = new System.Windows.Forms.NumericUpDown();
+            this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.irtToleranceUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -436,10 +437,18 @@
             this.BasePeakRtToleranceUpDown.Size = new System.Drawing.Size(57, 23);
             this.BasePeakRtToleranceUpDown.TabIndex = 15;
             // 
+            // panel1
+            // 
+            this.panel1.Location = new System.Drawing.Point(413, -66);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(108, 472);
+            this.panel1.TabIndex = 18;
+            // 
             // Form1
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1229, 606);
+            this.ClientSize = new System.Drawing.Size(1083, 728);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -501,6 +510,7 @@
         private System.Windows.Forms.NumericUpDown rtDivisionUpDown;
         private System.Windows.Forms.NumericUpDown BasePeakRtToleranceUpDown;
         private System.Windows.Forms.NumericUpDown BasePeakMassToleranceUpDown;
+        private System.Windows.Forms.Panel panel1;
     }
 }
 
