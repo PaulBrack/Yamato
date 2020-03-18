@@ -24,7 +24,7 @@ namespace Yamato.Console
                 if(options.Verbose)
                     SetVerboseLogging();
                 bool combine = options.Combine;
-                string dateTime = DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss");
+                string dateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
                 List<string> inputFiles = new List<string>();
 
                 if (options.LoadFromDirectory != null && options.LoadFromDirectory == true)//multiple files

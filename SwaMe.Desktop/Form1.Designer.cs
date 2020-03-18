@@ -185,10 +185,10 @@
             this.irtToleranceUpDown.Size = new System.Drawing.Size(57, 23);
             this.irtToleranceUpDown.TabIndex = 13;
             this.irtToleranceUpDown.Value = new decimal(new int[] {
-            5,
+            1,
             0,
             0,
-            196608});
+            131072});
             // 
             // label8
             // 
@@ -255,7 +255,7 @@
             this.MinIrtIntensityUpDown.Size = new System.Drawing.Size(57, 23);
             this.MinIrtIntensityUpDown.TabIndex = 15;
             this.MinIrtIntensityUpDown.Value = new decimal(new int[] {
-            200,
+            50,
             0,
             0,
             0});
@@ -348,11 +348,6 @@
             this.IntensityFilterUpDown.Name = "IntensityFilterUpDown";
             this.IntensityFilterUpDown.Size = new System.Drawing.Size(57, 23);
             this.IntensityFilterUpDown.TabIndex = 12;
-            this.IntensityFilterUpDown.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
             // 
             // label12
             // 
@@ -453,6 +448,8 @@
             // 
             // LogBox
             // 
+            this.LogBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.LogBox.Enabled = false;
             this.LogBox.Location = new System.Drawing.Point(323, 56);
             this.LogBox.Name = "LogBox";
             this.LogBox.Size = new System.Drawing.Size(733, 225);

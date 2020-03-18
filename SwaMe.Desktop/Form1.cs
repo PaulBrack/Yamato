@@ -19,8 +19,8 @@ namespace SwaMe.Desktop
     public partial class Form1 : Form
     {
 
-        private string inputFilePath = "";
-        private string irtFilePath = "";
+        private string inputFilePath = @"c:\wiffs\collinsb_I180316_005_SW-A.mzML";
+        private string irtFilePath = @"c:\wiffs\hroest_DIA_iRT.TraML";
 
 
 
@@ -134,7 +134,7 @@ namespace SwaMe.Desktop
             //LogManager.ReconfigExistingLoggers();
 
 
-            string dateTime = DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss");
+            string dateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             List<string> inputFiles = new List<string>();
             Logger logger = LogManager.GetCurrentClassLogger();
             bool lastFile = false;//saving whether its the last file or not, so if we need to combine all the files in the end, we know when the end is.
@@ -166,11 +166,11 @@ namespace SwaMe.Desktop
 
             AnalysisSettings analysisSettings = new AnalysisSettings()
             {
-                MassTolerance = Decimal.ToInt32(BasePeakMassToleranceUpDown.Value),
-                RtTolerance = Decimal.ToInt32(BasePeakRtToleranceUpDown.Value),
-                IrtMinIntensity = Decimal.ToInt32(MinIrtIntensityUpDown.Value),
+                MassTolerance = Decimal.ToDouble(BasePeakMassToleranceUpDown.Value),
+                RtTolerance = Decimal.ToDouble(BasePeakRtToleranceUpDown.Value),
+                IrtMinIntensity = Decimal.ToDouble(MinIrtIntensityUpDown.Value),
                 IrtMinPeptides = Decimal.ToInt32(irtPeptidesUpDown.Value),
-                IrtMassTolerance = Decimal.ToInt32(irtToleranceUpDown.Value),
+                IrtMassTolerance = Decimal.ToDouble(irtToleranceUpDown.Value),
                 CacheSpectraToDisk = CacheToDiskCheckBox.Checked,
                 MinimumIntensity = Decimal.ToInt32(MinIrtIntensityUpDown.Value),
                 RunEndTime = 0
