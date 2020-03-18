@@ -58,6 +58,7 @@
             this.rtDivisionUpDown = new System.Windows.Forms.NumericUpDown();
             this.StartAnalysisButton = new System.Windows.Forms.Button();
             this.LogBox = new System.Windows.Forms.RichTextBox();
+            this.CancelButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.irtToleranceUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -456,10 +457,22 @@
             this.LogBox.TabIndex = 20;
             this.LogBox.Text = "";
             // 
+            // CancelButton
+            // 
+            this.CancelButton.Enabled = false;
+            this.CancelButton.Location = new System.Drawing.Point(12, 619);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(292, 31);
+            this.CancelButton.TabIndex = 19;
+            this.CancelButton.Text = "Cancel";
+            this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.Click += new System.EventHandler(this.CancelAnalysisButton_Click);
+            // 
             // Form1
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1083, 728);
+            this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.LogBox);
             this.Controls.Add(this.StartAnalysisButton);
             this.Controls.Add(this.groupBox3);
@@ -525,6 +538,7 @@
         private System.Windows.Forms.NumericUpDown BasePeakMassToleranceUpDown;
         private System.Windows.Forms.Button StartAnalysisButton;
         private System.Windows.Forms.RichTextBox LogBox;
+        private System.Windows.Forms.Button CancelButton;
     }
 }
 

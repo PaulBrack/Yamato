@@ -10,6 +10,8 @@ namespace MzmlParser
     public static class IrtPeptideMatcher
     {
         private static CountdownEvent cde = new CountdownEvent(1);
+        public static CancellationToken _cancellationToken { get; set; }
+
 
         public static void ChooseIrtPeptides(Run run)
         {
@@ -27,10 +29,22 @@ namespace MzmlParser
         {
             foreach (CandidateHit candidateHit in run.IRTHits)
             {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException("Reading MZML was cancelled");
+                }
                 cde.AddCount();
                 ThreadPool.QueueUserWorkItem(state => FindIrtSpectra(run, candidateHit));
             }
             cde.Signal();
+            while (cde.CurrentCount > 1)
+            {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException("Reading MZML was cancelled");
+                }
+                Thread.Sleep(500);
+            }
             cde.Wait();
             cde.Reset(1);
 

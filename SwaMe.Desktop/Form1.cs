@@ -11,8 +11,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
 
 namespace SwaMe.Desktop
 {
@@ -21,10 +23,7 @@ namespace SwaMe.Desktop
 
         private string inputFilePath = @"c:\wiffs\collinsb_I180316_005_SW-A.mzML";
         private string irtFilePath = @"c:\wiffs\hroest_DIA_iRT.TraML";
-
-
-
-
+        private CancellationTokenSource _cts;
 
         public Form1()
         {
@@ -38,8 +37,6 @@ namespace SwaMe.Desktop
 
         private void choose_file_click(object sender, EventArgs e)
         {
-
-
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.InitialDirectory = "c:\\";
@@ -54,8 +51,6 @@ namespace SwaMe.Desktop
                     fileNameLabel.Text = openFileDialog.SafeFileName;
                 }
             }
-
-
         }
 
         private void ChooseSpectralLibraryButton_Click(object sender, EventArgs e)
@@ -122,24 +117,46 @@ namespace SwaMe.Desktop
             }
         }
 
-        private void StartAnalysisButton_Click(object sender, EventArgs e)
+        private async void StartAnalysisButton_Click(object sender, EventArgs e)
         {
+            CancelButton.Enabled = true;
+            StartAnalysisButton.Enabled = false;
+
+
             NLog.Windows.Forms.RichTextBoxTarget rtbTarget = new NLog.Windows.Forms.RichTextBoxTarget();
             LogManager.Configuration = new LoggingConfiguration();
 
-            rtbTarget.ControlName = "LogBox"; // your RichTextBox control/variable name
+            rtbTarget.ControlName = "LogBox";
             LogManager.Configuration.AddTarget("LogBox", rtbTarget);
-
 
             //LogManager.ReconfigExistingLoggers();
 
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
+            try
+            {
+                await Task.Run(() =>
+                {
+                    AnalyseSample();
+                });
+            }
+            catch (OperationCanceledException)
+            {
+               
+                StartAnalysisButton.Enabled = true;
+                CancelButton.Enabled = false;
+            }
+        }
 
+
+        private void AnalyseSample()
+        {
             string dateTime = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             List<string> inputFiles = new List<string>();
             Logger logger = LogManager.GetCurrentClassLogger();
             bool lastFile = false;//saving whether its the last file or not, so if we need to combine all the files in the end, we know when the end is.
             string fileSpecificDirectory = DirectoryCreator.CreateOutputDirectory(inputFilePath, dateTime);
-            
+
             logger.Info("Loading file: {0}", inputFilePath);
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -159,7 +176,8 @@ namespace SwaMe.Desktop
                 ParseBinaryData = true,
                 Threading = true,
                 MaxQueueSize = Decimal.ToInt32(MaxQueueUpDown.Value),
-                MaxThreads = Decimal.ToInt32(MaxThreadsUpDown.Value)
+                MaxThreads = Decimal.ToInt32(MaxThreadsUpDown.Value),
+                _cancellationToken = _cts.Token
             };
 
             CheckFileIsReadableOrComplain(inputFilePath);
@@ -218,10 +236,7 @@ namespace SwaMe.Desktop
                 mzmlParser.DeleteTempFiles(run);
             }
             logger.Info("Done!");
-
-
             LogManager.Shutdown();
-            
         }
 
         private static void SetVerboseLogging()
@@ -233,6 +248,13 @@ namespace SwaMe.Desktop
             }
             LogManager.ReconfigExistingLoggers();
         }
+
+        private void CancelAnalysisButton_Click(object sender, EventArgs e)
+        {
+            if (_cts != null)
+                _cts.Cancel();
+        }
+
     }
 }
 

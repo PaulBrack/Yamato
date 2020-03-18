@@ -21,7 +21,7 @@ namespace MzmlParser
             Threading = true;
         }
 
-        
+
         public static IXmlLineInfo Xli;
 
         public bool ExtractBasePeaks { get; set; }
@@ -29,6 +29,8 @@ namespace MzmlParser
         public bool Threading { get; set; }
         public int MaxQueueSize { get; set; }
         public int MaxThreads { get; set; }
+
+        public CancellationToken _cancellationToken { get; set; }
 
 
         public int currentCycle = 0;
@@ -44,7 +46,7 @@ namespace MzmlParser
 
         public Run LoadMzml(string path, AnalysisSettings analysisSettings)
         {
-            if(MaxThreads != 0)
+            if (MaxThreads != 0)
                 ThreadPool.SetMaxThreads(MaxThreads, MaxThreads);
             Run run = new Run() { AnalysisSettings = analysisSettings };
             bool irt = run.AnalysisSettings.IrtLibrary != null;
@@ -55,6 +57,14 @@ namespace MzmlParser
             ReadMzml(path, run, irt);
 
             cde.Signal();
+            while(cde.CurrentCount > 1)
+            {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException("Reading MZML was cancelled");
+                }
+                Thread.Sleep(500);
+            }
             cde.Wait();
             cde.Reset(1);
 
@@ -69,6 +79,14 @@ namespace MzmlParser
             AddBasePeakSpectra(run);
 
             cde.Signal();
+            while (cde.CurrentCount > 1)
+            {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException("Reading MZML was cancelled");
+                }
+                Thread.Sleep(500);
+            }
             cde.Wait();
             cde.Reset(1);
             if (irt)
@@ -97,6 +115,10 @@ namespace MzmlParser
                 Xli = (IXmlLineInfo)reader;
                 while (reader.Read())
                 {
+                    if (_cancellationToken.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException("Reading MZML was cancelled");
+                    }
                     if (reader.IsStartElement())
                     {
                         switch (reader.LocalName)
@@ -173,15 +195,15 @@ namespace MzmlParser
 
             if (run.SourceFileTypes[0].EndsWith("wiff", StringComparison.InvariantCultureIgnoreCase) || run.SourceFileTypes[0].ToUpper().EndsWith("scan", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (!string.IsNullOrEmpty(reader.GetAttribute("id"))&&!string.IsNullOrEmpty(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle"))))
+                if (!string.IsNullOrEmpty(reader.GetAttribute("id")) && !string.IsNullOrEmpty(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle"))))
+                {
+                    scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle")).Split('=').Last());
+                    if (scan.Scan.Cycle != 0)//Some wiffs don't have that info so let's check
                     {
-                        scan.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle")).Split('=').Last());
-                        if (scan.Scan.Cycle != 0)//Some wiffs don't have that info so let's check
-                        {
-                            CycleInfoInID = true;
-                        }
+                        CycleInfoInID = true;
                     }
-     
+                }
+
             }
 
             bool cvParamsRead = false;
@@ -521,10 +543,14 @@ namespace MzmlParser
             }
         }
 
-        private static void AddBasePeakSpectra(Run run)
+        private void AddBasePeakSpectra(Run run)
         {
             foreach (Scan scan in run.Ms2Scans)
             {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException("Reading MZML was cancelled");
+                }
                 cde.AddCount();
                 ThreadPool.QueueUserWorkItem(state => FindBasePeaks(run, scan));
             }
