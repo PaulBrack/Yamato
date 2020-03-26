@@ -148,7 +148,7 @@ namespace Yamato.Console
         {
             try
             {
-                Stream stream = new FileStream(inputFilePath, FileMode.Open);
+                Stream stream = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read);
                 stream.Close();
             }
             catch (IOException)
