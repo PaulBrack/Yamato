@@ -508,7 +508,6 @@
        
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label fileNameLabel;
-        private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
