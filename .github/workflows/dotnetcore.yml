@@ -37,5 +37,6 @@ jobs:
     - name: Publish binaries back to Github
       uses: actions/upload-artifact@v2-preview
       with:
+        name: release-win-x64
         path: SwaMe.Console/bin/Debug/netcoreapp3.1/win-x64/publish/SwaMe.Console.exe
     
