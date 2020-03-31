@@ -100,7 +100,7 @@
             this.label2.Size = new System.Drawing.Size(68, 15);
             this.label2.TabIndex = 3;
             this.label2.Text = "RT divisions";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
+
             // 
             // label3
             // 
@@ -119,7 +119,7 @@
             this.label4.Size = new System.Drawing.Size(78, 15);
             this.label4.TabIndex = 5;
             this.label4.Text = "Cache to disk";
-            this.label4.Click += new System.EventHandler(this.label4_Click);
+
             // 
             // ChooseSpectralLibraryButton
             // 
@@ -269,7 +269,7 @@
             this.label9.Size = new System.Drawing.Size(126, 15);
             this.label9.TabIndex = 3;
             this.label9.Text = "Minimum iRT intensity";
-            this.label9.Click += new System.EventHandler(this.label2_Click);
+           
             // 
             // label1
             // 
@@ -279,7 +279,7 @@
             this.label1.Size = new System.Drawing.Size(157, 15);
             this.label1.TabIndex = 3;
             this.label1.Text = "Ignore peaks below intensity";
-            this.label1.Click += new System.EventHandler(this.label2_Click);
+            
             // 
             // groupBox2
             // 
@@ -358,7 +358,7 @@
             this.label12.Size = new System.Drawing.Size(120, 15);
             this.label12.TabIndex = 11;
             this.label12.Text = "Maximum queue size";
-            this.label12.Click += new System.EventHandler(this.label10_Click);
+
             // 
             // label10
             // 
@@ -368,7 +368,7 @@
             this.label10.Size = new System.Drawing.Size(104, 15);
             this.label10.TabIndex = 11;
             this.label10.Text = "Maximum threads";
-            this.label10.Click += new System.EventHandler(this.label10_Click);
+
             // 
             // label11
             // 
@@ -393,7 +393,7 @@
             this.groupBox3.TabIndex = 17;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Swame.Core settings";
-            this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter);
+
             // 
             // BasePeakRtToleranceUpDown
             // 
@@ -483,7 +483,6 @@
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "SwaMe.Desktop";
-            this.Load += new System.EventHandler(this.Form1_Load_1);
             ((System.ComponentModel.ISupportInitialize)(this.irtToleranceUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.irtPeptidesUpDown)).EndInit();
             this.groupBox1.ResumeLayout(false);

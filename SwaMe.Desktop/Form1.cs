@@ -72,37 +72,6 @@ namespace SwaMe.Desktop
             }
         }
 
-        private void Form1_Load_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label10_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void maskedTextBox5_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
-        {
-
-        }
-
-        private void groupBox3_Enter(object sender, EventArgs e)
-        {
-
-
-        }
-
         private static void CheckFileIsReadableOrComplain(string inputFilePath)
         {
             try
