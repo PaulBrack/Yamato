@@ -2,7 +2,7 @@
   "profiles": {
     "Console": {
       "commandName": "Project",
-      "commandLineArgs": "-i d:\\wiffs\\collinsb_I180316_005_SW-A.mzML -r  c:\\wiffs\\hroest_DIA_iRT.TraML -o outputfile.mzqc"
+      "commandLineArgs": "-i d:\\wiffs\\collinsb_I180316_005_SW-A.mzML -r  c:\\wiffs\\hroest_DIA_iRT.TraML -o outputfile.mzqc --minimumIntensity 0"
     }
   }
 }

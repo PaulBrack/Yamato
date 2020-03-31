@@ -22,7 +22,7 @@ namespace LibraryParser
             logger.Debug("Loading iRT library {0}", path);
             logger.Debug("{0} peptides loaded", library.PeptideList.Count);
             logger.Debug("{0} transitions loaded", library.TransitionList.Count);
-            System.IO.File.WriteAllLines("proteins.txt", library.UniprotIdList.Select(x => x.Value).Distinct());
+            //System.IO.File.WriteAllLines("proteins.txt", library.UniprotIdList.Select(x => x.Value).Distinct());
         }
     }
 }
