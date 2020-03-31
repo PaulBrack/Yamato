@@ -86,7 +86,7 @@ namespace MzqcGenerator.Test
         public void Initialize()
         {
             var mg = new SwaMe.MetricGenerator();
-            mg.GenerateMetrics(RunWithoutIRT, 100, "", true, false, false, DateTime.Now.ToString());
+            mg.GenerateMetrics(RunWithoutIRT, 100, false);
             var metrics = mg.AssembleMetrics();
 
             new MzqcWriter().BuildMzqcAndWrite("test.json", RunWithoutIRT, metrics, "");

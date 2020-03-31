@@ -1,7 +1,6 @@
 ﻿using MzmlParser;
 using Newtonsoft.Json;
 using NLog;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -81,7 +80,7 @@ namespace MzqcGenerator
         }
 
 
-        public void BuildMzqcAndWrite(string path, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath)
+        public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath)
         {
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
@@ -122,7 +121,7 @@ namespace MzqcGenerator
             JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, cv = cV };
 
             //Then save:
-            WriteMzqc(path, metrics);
+            WriteMzqc(outputFileName, metrics);
 
 
         }

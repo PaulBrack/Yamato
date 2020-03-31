@@ -15,7 +15,7 @@ namespace SwaMe
         public RTGrouper.RTMetrics RtMetrics { get; private set; }
         public Run Run { get; private set; }
 
-        public Dictionary<string, dynamic> GenerateMetrics(Run run, int division, string inputFilePath, bool irt, bool combine, bool lastFile, string date)
+        public Dictionary<string, dynamic> GenerateMetrics(Run run, int division, bool irt)
         {
             Run = run;
             if (run.LastScanTime != 0 && run.StartTime != 1000000)

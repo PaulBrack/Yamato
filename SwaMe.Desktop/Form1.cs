@@ -124,7 +124,7 @@ namespace SwaMe.Desktop
             List<string> inputFiles = new List<string>();
             Logger logger = LogManager.GetCurrentClassLogger();
             bool lastFile = false;//saving whether its the last file or not, so if we need to combine all the files in the end, we know when the end is.
-            string fileSpecificDirectory = DirectoryCreator.CreateOutputDirectory(inputFilePath, dateTime);
+            
 
             logger.Info("Loading file: {0}", inputFilePath);
             Stopwatch sw = new Stopwatch();
@@ -190,13 +190,13 @@ namespace SwaMe.Desktop
             }
 
             logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-            var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, inputFilePath, irt, false, lastFile, dateTime);
+            var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt);
             var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
 
             var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
-            string[] mzQCName = { dateTime, Path.GetFileNameWithoutExtension(inputFilePath), "mzQC.json" };
-            Directory.SetCurrentDirectory(fileSpecificDirectory);
-            new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite(string.Join("_", mzQCName), run, metrics, inputFilePath);
+           
+            
+            new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("", run, metrics, inputFilePath);
             logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
             if (analysisSettings.CacheSpectraToDisk)
