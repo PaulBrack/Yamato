@@ -16,7 +16,7 @@ jobs:
       with:
         dotnet-version: '3.1.100'
     - name: Build with dotnet
-      run: dotnet build SwaMe--configuration Release
+      run: dotnet build SwaMe.Console --configuration Release
     - name: Test LibraryParser
       run: dotnet test LibraryParser.Test/LibraryParser.Test.csproj --configuration Release
     - name: Test SwaMe
