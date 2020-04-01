@@ -111,7 +111,7 @@ namespace SwaMe.Desktop
             }
             catch (OperationCanceledException)
             {
-               
+
                 StartAnalysisButton.Enabled = true;
                 CancelButton.Enabled = false;
             }
@@ -124,7 +124,7 @@ namespace SwaMe.Desktop
             List<string> inputFiles = new List<string>();
             Logger logger = LogManager.GetCurrentClassLogger();
             bool lastFile = false;//saving whether its the last file or not, so if we need to combine all the files in the end, we know when the end is.
-            
+
 
             logger.Info("Loading file: {0}", inputFilePath);
             Stopwatch sw = new Stopwatch();
@@ -160,8 +160,12 @@ namespace SwaMe.Desktop
                 IrtMassTolerance = Decimal.ToDouble(irtToleranceUpDown.Value),
                 CacheSpectraToDisk = CacheToDiskCheckBox.Checked,
                 MinimumIntensity = Decimal.ToInt32(MinIrtIntensityUpDown.Value),
-                RunEndTime = 0
+                RunEndTime = 0,
+                TempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
             };
+
+            if (analysisSettings.CacheSpectraToDisk && !Directory.Exists(analysisSettings.TempFolder))
+                Directory.CreateDirectory(analysisSettings.TempFolder);
 
             if (!String.IsNullOrEmpty(irtFilePath))
             {
@@ -194,8 +198,8 @@ namespace SwaMe.Desktop
             var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
 
             var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
-           
-            
+
+
             new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("", run, metrics, inputFilePath);
             logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
