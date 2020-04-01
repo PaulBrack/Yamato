@@ -201,16 +201,15 @@ namespace SwaMe.Desktop
 
             if (analysisSettings.CacheSpectraToDisk)
             {
-                logger.Info("Deleting temp files...");
+                logger.Trace("Deleting temp files...");
                 mzmlParser.DeleteTempFiles(run);
             }
-            logger.Info("Done!");
+            logger.Trace("Done!");
             LogManager.Shutdown();
         }
 
         private static void SetVerboseLogging()
         {
-            //logger.Info("Verbose output selected: enabled logging for all levels");
             foreach (var rule in LogManager.Configuration.LoggingRules)
             {
                 rule.EnableLoggingForLevels(LogLevel.Trace, LogLevel.Debug);

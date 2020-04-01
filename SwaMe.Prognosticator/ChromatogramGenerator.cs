@@ -45,7 +45,7 @@ namespace Prognosticator
                 return run.Chromatograms.Ms1Tic.Select((x, i) => new ValueTuple<double, double, double>(x.Item1, x.Item2, run.Chromatograms.Ms2Tic[i].Item2)).ToList();
             else
             {
-                Logger.Warn("Unable to produce combine chromatogram as MS1 and MS2 chromatograms have different nummbers of elements ({0} vs {1})", run.Ms1Scans.Count, run.Ms2Scans.Count);
+                Logger.Warn("Unable to produce combined chromatogram as MS1 and MS2 chromatograms have different nummbers of elements ({0} vs {1})", run.Ms1Scans.Count, run.Ms2Scans.Count);
                 return new List<(double, double, double)>();
             }
         }
