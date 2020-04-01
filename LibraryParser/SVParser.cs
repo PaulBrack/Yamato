@@ -59,7 +59,7 @@ namespace LibraryParser
             }
             else
             {
-                logger.Info("Seperated value file provided for iRT peptides, however the separater could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
+                logger.Fatal("Separated value file provided for iRT peptides, however the separator could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
                 Environment.Exit(0);
             }
 
@@ -86,8 +86,7 @@ namespace LibraryParser
             }
             if (sequenceIndex == 100 || pepMzIndex == 100 || transMzIndex == 100 || intensityIndex == 100)
             {
-                logger.Info("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
-                logger.Info("Exiting program");
+                logger.Fatal("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
                 Environment.Exit(0);
             }
 
@@ -149,7 +148,7 @@ namespace LibraryParser
             string keystring = transition.Id + "-" + transition.PrecursorMz;
             if (library.TransitionList.Contains(keystring))
             {
-                logger.Info("Two of the same peptide - transition combinations were detected. The second entry was not added as a valid transition.Please check your file for duplication.");
+                logger.Warn("Two of the same peptide - transition combinations were detected. The second entry was not added as a valid transition. Please check your file for duplication.");
             }
             else
             {
@@ -190,7 +189,7 @@ namespace LibraryParser
             }
             else
             {
-                logger.Info("Seperated value file provided for iRT peptides, however the separater could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
+                logger.Fatal("Separated value file provided for iRT peptides, however the separator could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
                 Environment.Exit(0);
             }
 
@@ -203,8 +202,7 @@ namespace LibraryParser
             }
             if (transMzIndex == 100)
             {
-                logger.Info("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
-                logger.Info("Exiting program");
+                logger.Fatal("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
                 Environment.Exit(0);
             }
 
