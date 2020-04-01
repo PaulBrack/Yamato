@@ -8,9 +8,13 @@ namespace MzmlParser
     public class Scan
     {
 
-        public Scan(bool cacheSpectraToDisk) { CacheSpectraToDisk = cacheSpectraToDisk; }
+        public Scan(bool cacheSpectraToDisk, string tempDirectory) 
+        {
+            this.CacheSpectraToDisk = cacheSpectraToDisk;
+            this.TempDirectory = tempDirectory;
+        }
 
-        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density)
+        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density, string tempDirectory)
         {
             this.CacheSpectraToDisk = cacheSpectraToDisk;
             this.IsolationWindowLowerOffset = isolationWindowLowerOffset;
@@ -18,9 +22,10 @@ namespace MzmlParser
             this.ScanStartTime = scanStartTime;
             this.MsLevel = msLevel;
             this.Density = density;
+            this.TempDirectory = tempDirectory;
         }
 
-        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density, int cycle, double totalIonCurrent)
+        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density, int cycle, double totalIonCurrent, string tempDirectory)
         {
             this.CacheSpectraToDisk = cacheSpectraToDisk;
             this.IsolationWindowLowerOffset = isolationWindowLowerOffset;
@@ -30,6 +35,7 @@ namespace MzmlParser
             this.Density = density;
             this.TotalIonCurrent = totalIonCurrent;
             this.Cycle = cycle;
+            this.TempDirectory = tempDirectory;
         }
         public bool CacheSpectraToDisk { get; set; }
         public string Base64IntensityArray { get; set; }
@@ -47,6 +53,7 @@ namespace MzmlParser
         public int RTsegment { get; set; }
         public int Density { get; set; }
         public double ProportionChargeStateOne { get; set; }
+        public string TempDirectory { get; set;  }
 
         private Spectrum m_Spectrum;
 
@@ -62,7 +69,7 @@ namespace MzmlParser
         {
             get
             {
-                return Path.Combine(Path.GetTempPath(), String.Format("Yamato_{0}.tempscan", ScanId));
+                return Path.Combine(TempDirectory, String.Format("Yamato_{0}.tempscan", ScanId));
             }
         }
         public Spectrum Spectrum
@@ -121,9 +128,9 @@ namespace MzmlParser
 
     public class ScanAndTempProperties
     {
-        public ScanAndTempProperties(bool cacheSpectra)
+        public ScanAndTempProperties(bool cacheSpectra, string tempDirectory)
         {
-            Scan = new Scan(cacheSpectra);
+            Scan = new Scan(cacheSpectra, tempDirectory);
         }
 
         public Scan Scan { get; set; }

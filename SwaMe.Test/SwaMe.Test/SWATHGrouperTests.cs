@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MzmlParser;
@@ -20,8 +21,9 @@ namespace SwaMe.Test
             var spectrumpoint2A = new SpectrumPoint(3000, 551F, 3.00F) { };
 
             List<SpectrumPoint> spectrum = new List<SpectrumPoint>() { spectrumpoint1A, spectrumpoint2A };
+            string tempPath = Path.GetTempPath();
 
-            Scan ms2scan1 = new Scan(false)
+            Scan ms2scan1 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowTargetMz = 550,
@@ -34,7 +36,7 @@ namespace SwaMe.Test
             };
 
 
-            Scan ms2scan2 = new Scan(false)
+            Scan ms2scan2 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowTargetMz = 550,
@@ -47,7 +49,7 @@ namespace SwaMe.Test
             };
 
 
-            Scan ms2scan3 = new Scan(false)
+            Scan ms2scan3 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowTargetMz = 550,
@@ -58,7 +60,7 @@ namespace SwaMe.Test
                 Cycle = 3,
                 TotalIonCurrent = 4000
             };
-            Scan ms2scan4 = new Scan(false)
+            Scan ms2scan4 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowTargetMz = 550,
@@ -69,7 +71,7 @@ namespace SwaMe.Test
                 Cycle = 4,
                 TotalIonCurrent = 6000
             };
-            Scan ms2scan5 = new Scan(false)
+            Scan ms2scan5 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowTargetMz = 550,
@@ -80,7 +82,7 @@ namespace SwaMe.Test
                 Cycle = 5,
                 TotalIonCurrent = 6000
             };
-            Scan ms2scan6 = new Scan(false)
+            Scan ms2scan6 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowTargetMz = 1050,
@@ -93,7 +95,7 @@ namespace SwaMe.Test
             };
 
 
-            Scan ms2scan7 = new Scan(false)
+            Scan ms2scan7 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowTargetMz = 1050,
@@ -106,7 +108,7 @@ namespace SwaMe.Test
             };
 
 
-            Scan ms2scan8 = new Scan(false)
+            Scan ms2scan8 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowTargetMz = 1050,
@@ -117,7 +119,7 @@ namespace SwaMe.Test
                 Cycle = 3,
                 TotalIonCurrent = 4000
             };
-            Scan ms2scan9 = new Scan(false)
+            Scan ms2scan9 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowTargetMz = 1050,
@@ -128,7 +130,7 @@ namespace SwaMe.Test
                 Cycle = 4,
                 TotalIonCurrent = 20000
             };
-            Scan ms2scan10 = new Scan(false)
+            Scan ms2scan10 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowTargetMz = 1050,
@@ -140,7 +142,7 @@ namespace SwaMe.Test
                 TotalIonCurrent = 10000
             };
             //MS1scans
-            Scan ms1scan1 = new Scan(false)
+            Scan ms1scan1 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowUpperOffset = 1,
@@ -152,7 +154,7 @@ namespace SwaMe.Test
                 BasePeakIntensity = 1000,
                 BasePeakMz = 1058
             };
-            Scan ms1scan2 = new Scan(false)
+            Scan ms1scan2 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,
@@ -164,7 +166,7 @@ namespace SwaMe.Test
                 BasePeakIntensity = 1500,
                 BasePeakMz = 459
             };
-            Scan ms1scan3 = new Scan(false)
+            Scan ms1scan3 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,

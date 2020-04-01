@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MzmlParser;
@@ -14,18 +15,18 @@ namespace SwaMe.Test
         private static RTGrouper RTGrouper;
         public RTGrouper.RTMetrics Result = new RTGrouper.RTMetrics();
        [TestInitialize]
-        public void Initialize() 
+        public void Initialize()
         {
-
-            Scan ms2scan1 = new Scan(false,1,1,0,2,2,1,100.00){};
-            Scan ms2scan2 = new Scan(false, 1, 1, 20, 2, 2, 1,100000.02){};
-            Scan ms2scan3 = new Scan(false, 5, 5, 30, 2, 4, 2,30){};
-            Scan ms2scan4 = new Scan(false, 5, 5, 32, 2, 4, 2, 20010.33){};
-            Scan ms2scan5 = new Scan(false, 5, 5, 34, 2, 4, 2, 50.33){};
-            Scan ms2scan6 = new Scan(false, 1, 1, 35, 2, 4, 2, 4000){};
-            Scan ms2scan7= new Scan(false, 1, 1, 70, 2, 5, 3, 60000){};
-            Scan ms2scan8 = new Scan(false, 1, 1, 70, 2, 5, 3, 6000){};
-            Scan ms2scan9 = new Scan(false)
+            string tempPath = Path.GetTempPath();
+            Scan ms2scan1 = new Scan(false,1,1,0,2,2,1,100.00, tempPath) {};
+            Scan ms2scan2 = new Scan(false, 1, 1, 20, 2, 2, 1,100000.02, tempPath) {};
+            Scan ms2scan3 = new Scan(false, 5, 5, 30, 2, 4, 2,30, tempPath) {};
+            Scan ms2scan4 = new Scan(false, 5, 5, 32, 2, 4, 2, 20010.33, tempPath) {};
+            Scan ms2scan5 = new Scan(false, 5, 5, 34, 2, 4, 2, 50.33, tempPath) {};
+            Scan ms2scan6 = new Scan(false, 1, 1, 35, 2, 4, 2, 4000, tempPath) {};
+            Scan ms2scan7= new Scan(false, 1, 1, 70, 2, 5, 3, 60000, tempPath) {};
+            Scan ms2scan8 = new Scan(false, 1, 1, 70, 2, 5, 3, 6000, tempPath) {};
+            Scan ms2scan9 = new Scan(false, tempPath)
             {
                 ScanStartTime = 0,
                 MsLevel = 2,
@@ -33,7 +34,7 @@ namespace SwaMe.Test
                 TotalIonCurrent = 8000
             };
             //MS1scans
-            Scan ms1scan1 = new Scan(false)
+            Scan ms1scan1 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowUpperOffset = 1,
@@ -45,7 +46,7 @@ namespace SwaMe.Test
                 BasePeakIntensity = 1000,
                 BasePeakMz = 1058
             };
-            Scan ms1scan2 = new Scan(false)
+            Scan ms1scan2 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,
@@ -57,7 +58,7 @@ namespace SwaMe.Test
                 BasePeakIntensity = 1500,
                 BasePeakMz = 459
             };
-            Scan ms1scan3 = new Scan(false)
+            Scan ms1scan3 = new Scan(false, tempPath)
             {
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,
