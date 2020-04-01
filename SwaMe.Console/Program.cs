@@ -56,7 +56,7 @@ namespace Yamato.Console
                     CacheSpectraToDisk = options.Cache,
                     MinimumIntensity = options.MinimumIntensity,
                     RunEndTime = options.RunEndTime,
-                    TempFolder = options.TempFolder
+                    TempFolder = Path.Combine(options.TempFolder, Guid.NewGuid().ToString())
                 };
 
                 if (!String.IsNullOrEmpty(options.IRTFile))
@@ -194,7 +194,7 @@ namespace Yamato.Console
         [Option("runEndTime", Required = false, HelpText = "The time during the run to stop calculating metrics (e.g. when the wash begins)")]
         public int? RunEndTime { get; set; } = null;
 
-        [Option("tempFolder", Required = false, HelpText = "The temp folder SwaMe will use. Defaults to the temp path defined by TMP or TEMP on Windows, or TMPPTH on Linux")]
+        [Option("tempFolder", Required = false, HelpText = "The temp folder SwaMe will use. Defaults to the temp path defined by TMP or TEMP on Windows, or TMPPTH on Linux. This folder must already exist and SwaMe must be able to read and write to it.")]
         public string TempFolder { get; set; } = Path.GetTempPath();
     }
 }
