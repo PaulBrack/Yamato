@@ -88,18 +88,16 @@ namespace Yamato.Console
 
                 if (analysisSettings.CacheSpectraToDisk)
                 {
-                    Logger.Info("Deleting temp files...");
+                    Logger.Trace("Deleting temp files...");
                     mzmlParser.DeleteTempFiles(run);
                 }
-                Logger.Info("Done!");
+                Logger.Trace("Done!");
 
             });
             }
             catch (Exception ex)
             {
-                Logger.Error("An unexpected error occured:");
-                Logger.Error(ex.Message);
-                Logger.Error(ex.StackTrace);
+                Logger.Fatal(ex, "An unexpected error occured");
                 LogManager.Shutdown();
                 Environment.Exit(1);
             }
@@ -112,7 +110,7 @@ namespace Yamato.Console
         {
             try
             {
-                Stream stream = new FileStream(inputFilePath, FileMode.Open);
+                Stream stream = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read);
                 stream.Close();
             }
             catch (IOException)
