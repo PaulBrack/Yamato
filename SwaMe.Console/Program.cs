@@ -59,6 +59,9 @@ namespace Yamato.Console
                     TempFolder = Path.Combine(options.TempFolder, Guid.NewGuid().ToString())
                 };
 
+                if (analysisSettings.CacheSpectraToDisk && !Directory.Exists(analysisSettings.TempFolder))
+                    Directory.CreateDirectory(analysisSettings.TempFolder);
+
                 if (!String.IsNullOrEmpty(options.IRTFile))
                 {
                     irt = true;
