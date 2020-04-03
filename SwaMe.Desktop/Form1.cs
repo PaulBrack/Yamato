@@ -207,6 +207,7 @@ namespace SwaMe.Desktop
             {
                 logger.Trace("Deleting temp files...");
                 mzmlParser.DeleteTempFiles(run);
+                Directory.Delete(analysisSettings.TempFolder);
             }
             logger.Trace("Done!");
             LogManager.Shutdown();

@@ -93,6 +93,7 @@ namespace Yamato.Console
                 {
                     Logger.Trace("Deleting temp files...");
                     mzmlParser.DeleteTempFiles(run);
+                    Directory.Delete(analysisSettings.TempFolder);
                 }
                 Logger.Trace("Done!");
 
