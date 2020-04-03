@@ -59,8 +59,7 @@ namespace LibraryParser
             }
             else
             {
-                logger.Fatal("Separated value file provided for iRT peptides, however the separator could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
-                Environment.Exit(0);
+                throw new SVFileFormatException("Separated value file provided for iRT peptides, however the separator could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab", path);
             }
 
 
@@ -86,8 +85,7 @@ namespace LibraryParser
             }
             if (sequenceIndex == 100 || pepMzIndex == 100 || transMzIndex == 100 || intensityIndex == 100)
             {
-                logger.Fatal("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
-                Environment.Exit(0);
+                throw new SVFileFormatException("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file", path);
             }
 
             for (int iii = 1; iii < allLines.Count(); iii++)
@@ -189,8 +187,7 @@ namespace LibraryParser
             }
             else
             {
-                logger.Fatal("Separated value file provided for iRT peptides, however the separator could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab.");
-                Environment.Exit(0);
+                throw new SVFileFormatException("Separated value file provided for iRT peptides, however the separator could not be established. Please rerun and ensure the file is separated with either a comma, semi-colon or tab", path);
             }
 
             for (int position = 0; position < line.Count(); position++)
@@ -202,8 +199,7 @@ namespace LibraryParser
             }
             if (transMzIndex == 100)
             {
-                logger.Fatal("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file.");
-                Environment.Exit(0);
+                throw new SVFileFormatException("iRT peptides file was provided, but the correct headings could not be found and column could not be distinguished. Please rename your headings as illustrated in the template file", path);
             }
 
             for (int iii = 1; iii < allLines.Count(); iii++)
@@ -230,7 +226,7 @@ namespace LibraryParser
                 catch (IOException ex)
                 {
                     logger.Error(ex, "There seems to be a problem with separating values in the iRT peptides file. Please go through the file and try to determine the cause.");
-                    throw ex;
+                    throw;
                 }
                 
                 Alltransitions.Add(transitionMz);
