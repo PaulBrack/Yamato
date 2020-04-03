@@ -31,12 +31,12 @@ jobs:
       uses: actions/upload-artifact@v2-preview
       with:
         name: release-linux-x64
-        path: SwaMe.Console/bin/Debug/netcoreapp3.1/linux-x64/publish/SwaMe.Console
+        path: SwaMe.Console/bin/Debug/netcoreapp3.1/linux-x64/publish
     - name: Publish Windows binaries
       run: dotnet publish SwaMe.Console --self-contained true -p:UseAppHost=true -p:PublishTrimmed=true -r win-x64
     - name: Publish binaries back to Github
       uses: actions/upload-artifact@v2-preview
       with:
         name: release-win-x64
-        path: SwaMe.Console/bin/Debug/netcoreapp3.1/win-x64/publish/SwaMe.Console.exe
+        path: SwaMe.Console/bin/Debug/netcoreapp3.1/win-x64/publish
     
