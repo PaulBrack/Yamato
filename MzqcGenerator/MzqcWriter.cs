@@ -80,8 +80,9 @@ namespace MzqcGenerator
         }
 
 
-        public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath)
+        public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
         {
+            
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
             {
@@ -108,7 +109,14 @@ namespace MzqcGenerator
             inputFiles.Add(inputFile);
 
             List<JsonClasses.AnalysisSoftware> analysisSoftwarelist = new List<JsonClasses.AnalysisSoftware>();
-            JsonClasses.AnalysisSoftware analysisSoftware = new JsonClasses.AnalysisSoftware() { cvRef = "MS", accession = "XXXXXXXXXXXXXX", name = "SwaMe", uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", version = "1.0" };
+            JsonClasses.AnalysisSoftware analysisSoftware = new JsonClasses.AnalysisSoftware() { 
+                cvRef = "MS", 
+                accession = "XXXXXXXXXXXXXX", 
+                name = "SwaMe", 
+                uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", 
+                version = typeof(MzqcWriter).Assembly.GetName().Version.ToString(), 
+                analysisSettings = analysisSettings 
+            };
             analysisSoftwarelist.Add(analysisSoftware);
             JsonClasses.MetaData metadata = new JsonClasses.MetaData() { inputFiles = inputFiles, analysisSoftware = analysisSoftwarelist };
             JsonClasses.RunQuality runQualitySingle = new JsonClasses.RunQuality() { metadata = metadata, qualityParameters = qualityParameters.ToArray() };

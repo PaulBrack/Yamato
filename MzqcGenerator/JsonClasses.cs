@@ -14,6 +14,8 @@ namespace MzqcGenerator
             public string accession = "MS:1000584";
             public string name = "mzML format";
         }
+
+
         public class FileProperties
         {
             public FileProperties(string cvRef, string accession, string name, string value)
@@ -49,6 +51,7 @@ namespace MzqcGenerator
             public string name { get; set; }
             public string version { get; set; }
             public string uri { get; set; }
+            public object analysisSettings { get; set; }
 
         }
         public class MetaData

@@ -86,7 +86,7 @@ namespace Yamato.Console
                 var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
 
 
-                new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite(options.OutputFile, run, metrics, options.InputFile);
+                new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite(options.OutputFile, run, metrics, options.InputFile, analysisSettings);
                 Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
                 if (analysisSettings.CacheSpectraToDisk)

@@ -200,7 +200,7 @@ namespace SwaMe.Desktop
             var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
 
 
-            new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("", run, metrics, inputFilePath);
+            new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("", run, metrics, inputFilePath, analysisSettings);
             logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
             if (analysisSettings.CacheSpectraToDisk)

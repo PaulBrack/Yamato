@@ -89,7 +89,7 @@ namespace MzqcGenerator.Test
             mg.GenerateMetrics(RunWithoutIRT, 100, false);
             var metrics = mg.AssembleMetrics();
 
-            new MzqcWriter().BuildMzqcAndWrite("test.json", RunWithoutIRT, metrics, "");
+            new MzqcWriter().BuildMzqcAndWrite("test.json", RunWithoutIRT, metrics, "", null);
         }
         /*
         /// <remarks>

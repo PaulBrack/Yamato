@@ -5,6 +5,7 @@
      <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon />
     <StartupObject />
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
