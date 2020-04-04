@@ -110,7 +110,7 @@ namespace MzmlParser
         private void ReadMzml(string path, Run run, bool irt)
         {
 
-            using (XmlReader reader = XmlReader.Create(path))
+            using (XmlReader reader = "-".Equals(path) ? XmlReader.Create(Console.In): XmlReader.Create(path))
             {
                 Xli = (IXmlLineInfo)reader;
                 while (reader.Read())

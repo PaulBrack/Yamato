@@ -1,6 +1,7 @@
 ﻿using MzmlParser;
 using Newtonsoft.Json;
 using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -136,7 +137,7 @@ namespace MzqcGenerator
 
         public void WriteMzqc(string path, JsonClasses.MzQC metrics)
         {
-            using (StreamWriter file = File.CreateText(path))
+            using (TextWriter file = "-".Equals(path, StringComparison.Ordinal) ? Console.Out : File.CreateText(path))
             {
                 file.Write("{ \"mzQC\":");
                 JsonSerializer serializer = new JsonSerializer()
