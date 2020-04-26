@@ -174,10 +174,14 @@ namespace SwaMe
                     {
                         if (basepeak.RTsegments[i] == segment)
                         {
-                            peakWidthsTemp.Add(basepeak.FWHMs[i]);
-                            peakSymTemp.Add(basepeak.Peaksyms[i]);
-                            peakPrecisionTemp.Add(basepeak.Intensities[i] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
-                            fullWidthBaselinesTemp.Add(basepeak.FullWidthBaselines[i]);
+                            //Each rtsegment should have all these values, but due to some of the peaks being decreased after release candidate 1, some basepeaks have rtsegments, but no datapoints. If min intensity is set high enough, this should never happen.
+                            if (basepeak.RTsegments.Count() == basepeak.FWHMs.Count() && basepeak.FWHMs.Count() == basepeak.Peaksyms.Count() && basepeak.FWHMs.Count()  == basepeak.Peaksyms.Count() && basepeak.FWHMs.Count()  == basepeak.Intensities.Count() && basepeak.FWHMs.Count() == basepeak.FullWidthBaselines.Count())
+                            {
+                                peakWidthsTemp.Add(basepeak.FWHMs[i]);
+                                peakSymTemp.Add(basepeak.Peaksyms[i]);
+                                peakPrecisionTemp.Add(basepeak.Intensities[i] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
+                                fullWidthBaselinesTemp.Add(basepeak.FullWidthBaselines[i]);
+                            }
                         }
                     }
                 }
