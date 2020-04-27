@@ -83,11 +83,11 @@ namespace SwaMe.Test
                 Spectrum = new List<SpectrumPoint>() { spectrumpoint1, spectrumpoint2 },
                 Mz = 150
             };
+            basePeak1.RTsegments.Add(2);
             basePeak1.FWHMs.Add(1);
             basePeak1.FWHMs.Add(2);
             basePeak1.Peaksyms.Add(1);
             basePeak1.Peaksyms.Add(2);
-            basePeak1.Intensities.Add(1);
             basePeak1.Intensities.Add(2);
             basePeak1.FullWidthBaselines.Add(1);
             basePeak1.FullWidthBaselines.Add(2);
@@ -97,10 +97,8 @@ namespace SwaMe.Test
                 BpkRTs = new List<double>() { 60 },
                 Spectrum = new List<SpectrumPoint>() { spectrumpoint3 }
             };
-            
             basePeak2.FWHMs.Add(2);
             basePeak2.Peaksyms.Add(1);
-            basePeak2.Intensities.Add(2);
             basePeak2.FullWidthBaselines.Add(1);
 
             //Runs:
@@ -165,7 +163,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void rtsegmentsAllocatedToSecondBasePeakCorrect()
         {
-            Assert.AreEqual(Ms2andms1Run.BasePeaks.ElementAt(1).RTsegments.ElementAt(0), 0);
+            Assert.AreEqual(Ms2andms1Run.BasePeaks.ElementAt(1).RTsegments.ElementAt(0), 2);
         }
         /// <remarks>
         /// RTSegs is correctly allocated to scans - first.
@@ -234,7 +232,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void PeakWidthsCorrect()
         {
-            List<double> correctPeakWidths= new List<double>() { 1, 2 };
+            List<double> correctPeakWidths= new List<double>() { 2, 2 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.Peakwidths, correctPeakWidths));
         }
         /// <remarks>
@@ -243,7 +241,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void TailingFactorCorrect()
         {
-            List<double> correctTailingFactor = new List<double>() { 1, 1 };
+            List<double> correctTailingFactor = new List<double>() { 2, 1 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.TailingFactor, correctTailingFactor));
         }
         /// <remarks>
@@ -252,7 +250,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void PeakCapacityCorrect()
         {
-            List<double> correctPeakCapacity = new List<double>() { 50, 50 };
+            List<double> correctPeakCapacity = new List<double>() { 25, 50 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.PeakCapacity, correctPeakCapacity));
         }
         /// <remarks>
@@ -261,7 +259,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void PeakPrecisionCorrect()
         {
-            List<double> correctPeakPrecision = new List<double>() { 0.34775743337043319, 0.58485595819805947 };
+            List<double> correctPeakPrecision = new List<double>() { 0.0046828263654738241, 0.590665785597378 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.PeakPrecision, correctPeakPrecision));
         }
         /// <remarks>
@@ -288,7 +286,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void MS1PeakPrecision()
         {
-            List<double> correctMS1PeakPrecisionList = new List<double>() { 6.330603131889676, 11.591914445681107 };
+            List<double> correctMS1PeakPrecisionList = new List<double>() { 6.3934899179680507, 11.707065913684561 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.MS1PeakPrecision, correctMS1PeakPrecisionList));
         }
     }
