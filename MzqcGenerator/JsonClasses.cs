@@ -52,13 +52,14 @@ namespace MzqcGenerator
             public string version { get; set; }
             public string uri { get; set; }
             public object analysisSettings { get; set; }
-
         }
+
         public class MetaData
         {
             public List<InputFiles> inputFiles { get; set; }
             public List<AnalysisSoftware> analysisSoftware { get; set; }
         }
+
         public class Unit
         {
             public string cvRef { get; set; }
@@ -72,6 +73,7 @@ namespace MzqcGenerator
                 this.name = name;
             }
         }
+
         public class QualityParameters
         {
             public QualityParameters() { }
@@ -84,12 +86,14 @@ namespace MzqcGenerator
                 this.unit = unit;
                 this.value = value;
             }
+
             public string cvRef { get; set; }
             public string accession { get; set; }
             public string name { get; set; }
             public Unit unit { get; set; }
             public dynamic value { get; set; }
         }
+
         public class RunQuality
         {
             public MetaData metadata { get; set; }
@@ -109,7 +113,6 @@ namespace MzqcGenerator
             public NUV MS { get; set; }
             public NUV UO { get; set; }
         }
-
 
         public class MzQC
         {
