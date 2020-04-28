@@ -1,4 +1,4 @@
-﻿using MzmlParser;
+using MzmlParser;
 using Newtonsoft.Json;
 using NLog;
 using System.Collections.Generic;
@@ -79,10 +79,8 @@ namespace MzqcGenerator
 
         }
 
-
         public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
         {
-            
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
             {
@@ -97,8 +95,7 @@ namespace MzqcGenerator
             }
             //Now for the other stuff
             JsonClasses.FileFormat fileFormat = new JsonClasses.FileFormat() { };
-            List<JsonClasses.FileProperties> fileProperties = new List<JsonClasses.FileProperties>() { };
-
+            List<JsonClasses.FileProperties> fileProperties = new List<JsonClasses.FileProperties>();
 
             JsonClasses.FileProperties fileProperty = new JsonClasses.FileProperties("MS", run.FilePropertiesAccession, "SHA-1", run.SourceFileChecksums.First());
             JsonClasses.FileProperties completionTime = new JsonClasses.FileProperties("MS", "MS:1000747", "completion time", run.CompletionTime);
@@ -130,8 +127,6 @@ namespace MzqcGenerator
 
             //Then save:
             WriteMzqc(outputFileName, metrics);
-
-
         }
 
         public void WriteMzqc(string path, JsonClasses.MzQC metrics)
@@ -148,5 +143,4 @@ namespace MzqcGenerator
             }
         }
     }
-
 }
