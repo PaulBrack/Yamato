@@ -19,7 +19,7 @@ namespace MzqcGenerator
             JsonClasses.Unit Count = new JsonClasses.Unit("UO", "UO:0000189", "count");
             JsonClasses.Unit Second = new JsonClasses.Unit("UO", "UO:0000010", "second");
             JsonClasses.Unit Mz = new JsonClasses.Unit("MS", "MS:1000040", "m/z");
-            JsonClasses.Unit Ratio = new JsonClasses.Unit("UO", "UO:0010006", "ratio");//Also doesn't exist, need to re-evaluate...
+            JsonClasses.Unit Ratio = new JsonClasses.Unit("UO", "UO:0010006", "ratio"); // TODO: What's the difference between this and UO:0000190?
             JsonClasses.Unit Intensity = new JsonClasses.Unit("MS", "MS:1000042", "Peak Intensity");
             Units = new List<JsonClasses.Unit>() { Count, Second, Mz, Ratio, Intensity };
 
