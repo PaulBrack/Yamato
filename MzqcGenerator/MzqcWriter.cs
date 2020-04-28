@@ -81,6 +81,7 @@ namespace MzqcGenerator
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
             {
+                // Note that this code smashes a value into the given QualityParameters; this will fail if the same one is used more than once, or the initialisation of those parameters is made static.
                 if (QualityParametersByAccession.TryGetValue(metric.Key, out var matchingMetric))
                 {
                     matchingMetric.value = metric.Value;
