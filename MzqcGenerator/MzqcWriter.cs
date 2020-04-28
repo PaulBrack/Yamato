@@ -10,10 +10,7 @@ namespace MzqcGenerator
     public class MzqcWriter
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        public List<JsonClasses.QualityParameters> QualityParameterLookup
-        {
-            get; set;
-        }
+        private IDictionary<string, JsonClasses.QualityParameters> QualityParametersByAccession { get; } = new Dictionary<string, JsonClasses.QualityParameters>();
 
         public List<JsonClasses.Unit> Units { get; }
 
@@ -26,54 +23,57 @@ namespace MzqcGenerator
             JsonClasses.Unit Intensity = new JsonClasses.Unit("MS", "MS:1000042", "Peak Intensity");
             Units = new List<JsonClasses.Unit>() { Count, Second, Mz, Ratio, Intensity };
 
-            QualityParameterLookup = new List<JsonClasses.QualityParameters>();
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:4000053", "Quameter metric: RT-Duration", Second, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:02", "SwaMe metric: swathSizeDifference", Mz, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:4000060", "Quameter metric: MS2-Count", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:04", "SwaMe metric: NumOfSwaths", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:05", "SwaMe metric: Target mz", Mz, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:06", "SwaMe metric: TotalMS2IonCount", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:07", "SwaMe metric: MS2Density50", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:08", "SwaMe metric: MS2DensityIQR", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:4000059", "Quameter metric: MS1-Count", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:09", "SwaMe metric: scansPerSwathGroup", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:10", "SwaMe metric: AvgMzRange", Mz, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:11", "SwaMe metric: SwathProportionOfTotalTIC", Ratio, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:12", "SwaMe metric: swDensity50", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:13", "SwaMe metric: swDensityIQR", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:14", "SwaMe metric: Peakwidths", Second, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:15", "SwaMe metric: PeakCapacity", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:24", "SwaMe metric: TailingFactor", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:XXXXXXXX", "SwaMe metric: MS2PeakPrecision", Mz, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:16", "SwaMe metric: MS1PeakPrecision", Mz, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:17", "SwaMe metric: DeltaTICAverage", Intensity, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:18", "SwaMe metric: DeltaTICIQR", Intensity, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:19", "SwaMe metric: AvgScanTime", Second, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:20", "SwaMe metric: MS2Density", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:21", "SwaMe metric: MS1Density", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:22", "SwaMe metric: MS2TICTotal", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:23", "SwaMe metric: MS1TICTotal", Count, null));
-           
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:99", "Prognosticator Metric: MS1TICQuartiles", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:98", "Prognosticator Metric: MS2TICQuartiles", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:97", "Prognosticator Metric: MS1TIC", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:96", "Prognosticator Metric: MS2TIC", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:95", "Prognosticator Metric: MS1BPC", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:94", "Prognosticator Metric: MS2BPC", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:93", "Prognosticator Metric: CombinedTIC", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:92", "Prognosticator Metric: MS1:MS2 ratio", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:91", "Prognosticator Metric: MS1 weighted median skew", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:90", "Prognosticator Metric: MS2 weighted median skew", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:89", "Prognosticator Metric: MeanIrtMassError", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:88", "Prognosticator Metric: MaxIrtMassError", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:87", "Prognosticator Metric: IrtPeptideFoundProportion", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:86", "Prognosticator Metric: IrtPeptides", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:85", "Prognosticator Metric: IrtPeptidesFound", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:84", "Prognosticator Metric: IrtSpread", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:83", "Prognosticator Metric: MS1TICQuartilesByRT", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:82", "Prognosticator Metric: MS2TICQuartilesByRT", Count, null));
-            QualityParameterLookup.Add(new JsonClasses.QualityParameters("QC", "QC:81", "Prognosticator Metric: IrtOrderedness", Count, null));
+            List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>
+            {
+                new JsonClasses.QualityParameters("QC", "QC:4000053", "Quameter metric: RT-Duration", Second, null),
+                new JsonClasses.QualityParameters("QC", "QC:02", "SwaMe metric: swathSizeDifference", Mz, null),
+                new JsonClasses.QualityParameters("QC", "QC:4000060", "Quameter metric: MS2-Count", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:04", "SwaMe metric: NumOfSwaths", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:05", "SwaMe metric: Target mz", Mz, null),
+                new JsonClasses.QualityParameters("QC", "QC:06", "SwaMe metric: TotalMS2IonCount", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:07", "SwaMe metric: MS2Density50", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:08", "SwaMe metric: MS2DensityIQR", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:4000059", "Quameter metric: MS1-Count", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:09", "SwaMe metric: scansPerSwathGroup", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:10", "SwaMe metric: AvgMzRange", Mz, null),
+                new JsonClasses.QualityParameters("QC", "QC:11", "SwaMe metric: SwathProportionOfTotalTIC", Ratio, null),
+                new JsonClasses.QualityParameters("QC", "QC:12", "SwaMe metric: swDensity50", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:13", "SwaMe metric: swDensityIQR", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:14", "SwaMe metric: Peakwidths", Second, null),
+                new JsonClasses.QualityParameters("QC", "QC:15", "SwaMe metric: PeakCapacity", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:24", "SwaMe metric: TailingFactor", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:XXXXXXXX", "SwaMe metric: MS2PeakPrecision", Mz, null),
+                new JsonClasses.QualityParameters("QC", "QC:16", "SwaMe metric: MS1PeakPrecision", Mz, null),
+                new JsonClasses.QualityParameters("QC", "QC:17", "SwaMe metric: DeltaTICAverage", Intensity, null),
+                new JsonClasses.QualityParameters("QC", "QC:18", "SwaMe metric: DeltaTICIQR", Intensity, null),
+                new JsonClasses.QualityParameters("QC", "QC:19", "SwaMe metric: AvgScanTime", Second, null),
+                new JsonClasses.QualityParameters("QC", "QC:20", "SwaMe metric: MS2Density", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:21", "SwaMe metric: MS1Density", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:22", "SwaMe metric: MS2TICTotal", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:23", "SwaMe metric: MS1TICTotal", Count, null),
 
+                new JsonClasses.QualityParameters("QC", "QC:99", "Prognosticator Metric: MS1TICQuartiles", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:98", "Prognosticator Metric: MS2TICQuartiles", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:97", "Prognosticator Metric: MS1TIC", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:96", "Prognosticator Metric: MS2TIC", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:95", "Prognosticator Metric: MS1BPC", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:94", "Prognosticator Metric: MS2BPC", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:93", "Prognosticator Metric: CombinedTIC", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:92", "Prognosticator Metric: MS1:MS2 ratio", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:91", "Prognosticator Metric: MS1 weighted median skew", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:90", "Prognosticator Metric: MS2 weighted median skew", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:89", "Prognosticator Metric: MeanIrtMassError", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:88", "Prognosticator Metric: MaxIrtMassError", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:87", "Prognosticator Metric: IrtPeptideFoundProportion", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:86", "Prognosticator Metric: IrtPeptides", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:85", "Prognosticator Metric: IrtPeptidesFound", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:84", "Prognosticator Metric: IrtSpread", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:83", "Prognosticator Metric: MS1TICQuartilesByRT", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:82", "Prognosticator Metric: MS2TICQuartilesByRT", Count, null),
+                new JsonClasses.QualityParameters("QC", "QC:81", "Prognosticator Metric: IrtOrderedness", Count, null)
+            };
+            foreach (var qp in qualityParameters)
+                QualityParametersByAccession.Add(qp.accession, qp);
         }
 
         public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
@@ -81,8 +81,7 @@ namespace MzqcGenerator
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
             {
-                var matchingMetric = QualityParameterLookup.SingleOrDefault(x => x.accession == metric.Key);
-                if (matchingMetric != null)
+                if (QualityParametersByAccession.TryGetValue(metric.Key, out var matchingMetric))
                 {
                     matchingMetric.value = metric.Value;
                     qualityParameters.Add(matchingMetric);
