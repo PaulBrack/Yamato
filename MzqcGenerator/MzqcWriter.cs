@@ -15,10 +15,7 @@ namespace MzqcGenerator
             get; set;
         }
 
-        public List<JsonClasses.Unit> Units
-        {
-            get; set;
-        }
+        public List<JsonClasses.Unit> Units { get; }
 
         public MzqcWriter()
         {
