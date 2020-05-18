@@ -1,3 +1,4 @@
+using CVLibrarian;
 using MzmlParser;
 using Newtonsoft.Json;
 using NLog;
@@ -10,70 +11,75 @@ namespace MzqcGenerator
     public class MzqcWriter
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private IDictionary<string, JsonClasses.QualityParameters> QualityParametersByAccession { get; } = new Dictionary<string, JsonClasses.QualityParameters>();
+        private IDictionary<string, JsonClasses.QualityParameters> QualityParametersByAccession { get; }
 
-        public List<JsonClasses.Unit> Units { get; }
+        private readonly CVLibrary cvLibrary = new CVLibrary();
+        private readonly ControlledVocabulary uo;
+        private readonly ControlledVocabulary ms;
+        private readonly ControlledVocabulary qc;
 
         public MzqcWriter()
         {
-            JsonClasses.Unit Count = new JsonClasses.Unit("UO", "UO:0000189", "count");
-            JsonClasses.Unit Second = new JsonClasses.Unit("UO", "UO:0000010", "second");
-            JsonClasses.Unit Mz = new JsonClasses.Unit("MS", "MS:1000040", "m/z");
-            JsonClasses.Unit Ratio = new JsonClasses.Unit("UO", "UO:0010006", "ratio"); // TODO: What's the difference between this and UO:0000190?
-            JsonClasses.Unit Intensity = new JsonClasses.Unit("MS", "MS:1000042", "Peak Intensity");
-            Units = new List<JsonClasses.Unit>() { Count, Second, Mz, Ratio, Intensity };
+            uo = cvLibrary.RegisterControlledVocabulary(UnitOntology.Get(), "UO");
+            ms = cvLibrary.RegisterControlledVocabulary(MSVocabulary.Get(), "MS");
+            qc = cvLibrary.RegisterControlledVocabulary(MzQCVocabulary.Get(), "QC");
 
-            List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>
+            JsonClasses.Unit Count = ToUnit(uo, "UO:0000189");
+            JsonClasses.Unit Intensity = ToUnit(ms, "MS:1000042");
+            JsonClasses.Unit Mz = ToUnit(ms, "MS:1000040");
+            JsonClasses.Unit Ratio = ToUnit(uo, "UO:0010006"); // TODO: What's the difference between this and UO:0000190?
+            JsonClasses.Unit Second = ToUnit(uo, "UO:0000010");
+
+            QualityParametersByAccession = new JsonClasses.QualityParameters[]
             {
-                new JsonClasses.QualityParameters("QC", "QC:4000053", "Quameter metric: RT-Duration", Second, null),
-                new JsonClasses.QualityParameters("QC", "QC:02", "SwaMe metric: swathSizeDifference", Mz, null),
-                new JsonClasses.QualityParameters("QC", "QC:4000060", "Quameter metric: MS2-Count", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:04", "SwaMe metric: NumOfSwaths", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:05", "SwaMe metric: Target mz", Mz, null),
-                new JsonClasses.QualityParameters("QC", "QC:06", "SwaMe metric: TotalMS2IonCount", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:07", "SwaMe metric: MS2Density50", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:08", "SwaMe metric: MS2DensityIQR", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:4000059", "Quameter metric: MS1-Count", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:09", "SwaMe metric: scansPerSwathGroup", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:10", "SwaMe metric: AvgMzRange", Mz, null),
-                new JsonClasses.QualityParameters("QC", "QC:11", "SwaMe metric: SwathProportionOfTotalTIC", Ratio, null),
-                new JsonClasses.QualityParameters("QC", "QC:12", "SwaMe metric: swDensity50", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:13", "SwaMe metric: swDensityIQR", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:14", "SwaMe metric: Peakwidths", Second, null),
-                new JsonClasses.QualityParameters("QC", "QC:15", "SwaMe metric: PeakCapacity", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:24", "SwaMe metric: TailingFactor", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:XXXXXXXX", "SwaMe metric: MS2PeakPrecision", Mz, null),
-                new JsonClasses.QualityParameters("QC", "QC:16", "SwaMe metric: MS1PeakPrecision", Mz, null),
-                new JsonClasses.QualityParameters("QC", "QC:17", "SwaMe metric: DeltaTICAverage", Intensity, null),
-                new JsonClasses.QualityParameters("QC", "QC:18", "SwaMe metric: DeltaTICIQR", Intensity, null),
-                new JsonClasses.QualityParameters("QC", "QC:19", "SwaMe metric: AvgScanTime", Second, null),
-                new JsonClasses.QualityParameters("QC", "QC:20", "SwaMe metric: MS2Density", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:21", "SwaMe metric: MS1Density", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:22", "SwaMe metric: MS2TICTotal", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:23", "SwaMe metric: MS1TICTotal", Count, null),
+                ToQualityParameters(qc, "QC:4000053", Second),
+                ToQualityParameters(qc, "QC:02", Mz),
+                ToQualityParameters(qc, "QC:4000060", Count),
+                ToQualityParameters(qc, "QC:04", Count),
+                ToQualityParameters(qc, "QC:05", Mz),
+                ToQualityParameters(qc, "QC:06", Count),
+                ToQualityParameters(qc, "QC:07", Count),
+                ToQualityParameters(qc, "QC:08", Count),
+                ToQualityParameters(qc, "QC:4000059", Count),
+                ToQualityParameters(qc, "QC:09", Count),
+                ToQualityParameters(qc, "QC:10", Mz),
+                ToQualityParameters(qc, "QC:11", Ratio),
+                ToQualityParameters(qc, "QC:12", Count),
+                ToQualityParameters(qc, "QC:13", Count),
+                ToQualityParameters(qc, "QC:14", Second),
+                ToQualityParameters(qc, "QC:15", Count),
+                ToQualityParameters(qc, "QC:24", Count),
+                ToQualityParameters(qc, "QC:XXXXXXXX", Mz),
+                ToQualityParameters(qc, "QC:16", Mz),
+                ToQualityParameters(qc, "QC:17", Intensity),
+                ToQualityParameters(qc, "QC:18", Intensity),
+                ToQualityParameters(qc, "QC:19", Second),
+                ToQualityParameters(qc, "QC:20", Count),
+                ToQualityParameters(qc, "QC:21", Count),
+                ToQualityParameters(qc, "QC:22", Count),
+                ToQualityParameters(qc, "QC:23", Count),
 
-                new JsonClasses.QualityParameters("QC", "QC:99", "Prognosticator Metric: MS1TICQuartiles", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:98", "Prognosticator Metric: MS2TICQuartiles", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:97", "Prognosticator Metric: MS1TIC", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:96", "Prognosticator Metric: MS2TIC", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:95", "Prognosticator Metric: MS1BPC", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:94", "Prognosticator Metric: MS2BPC", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:93", "Prognosticator Metric: CombinedTIC", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:92", "Prognosticator Metric: MS1:MS2 ratio", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:91", "Prognosticator Metric: MS1 weighted median skew", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:90", "Prognosticator Metric: MS2 weighted median skew", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:89", "Prognosticator Metric: MeanIrtMassError", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:88", "Prognosticator Metric: MaxIrtMassError", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:87", "Prognosticator Metric: IrtPeptideFoundProportion", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:86", "Prognosticator Metric: IrtPeptides", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:85", "Prognosticator Metric: IrtPeptidesFound", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:84", "Prognosticator Metric: IrtSpread", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:83", "Prognosticator Metric: MS1TICQuartilesByRT", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:82", "Prognosticator Metric: MS2TICQuartilesByRT", Count, null),
-                new JsonClasses.QualityParameters("QC", "QC:81", "Prognosticator Metric: IrtOrderedness", Count, null)
-            };
-            foreach (var qp in qualityParameters)
-                QualityParametersByAccession.Add(qp.accession, qp);
+                ToQualityParameters(qc, "QC:99", Count),
+                ToQualityParameters(qc, "QC:98", Count),
+                ToQualityParameters(qc, "QC:97", Count),
+                ToQualityParameters(qc, "QC:96", Count),
+                ToQualityParameters(qc, "QC:95", Count),
+                ToQualityParameters(qc, "QC:94", Count),
+                ToQualityParameters(qc, "QC:93", Count),
+                ToQualityParameters(qc, "QC:92", Count),
+                ToQualityParameters(qc, "QC:91", Count),
+                ToQualityParameters(qc, "QC:90", Count),
+                ToQualityParameters(qc, "QC:89", Count),
+                ToQualityParameters(qc, "QC:88", Count),
+                ToQualityParameters(qc, "QC:87", Count),
+                ToQualityParameters(qc, "QC:86", Count),
+                ToQualityParameters(qc, "QC:85", Count),
+                ToQualityParameters(qc, "QC:84", Count),
+                ToQualityParameters(qc, "QC:83", Count),
+                ToQualityParameters(qc, "QC:82", Count),
+                ToQualityParameters(qc, "QC:81", Count)
+            }
+            .ToDictionary(qp => qp.accession);
         }
 
         public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
@@ -91,35 +97,50 @@ namespace MzqcGenerator
                     Logger.Warn("Term \"{0}\" was not found in the MZQC definition when attempting to write output. This term was ignored.", metric.Key);
             }
             //Now for the other stuff
-            JsonClasses.FileFormat fileFormat = new JsonClasses.FileFormat() { };
-            List<JsonClasses.FileProperties> fileProperties = new List<JsonClasses.FileProperties>();
 
-            JsonClasses.FileProperties fileProperty = new JsonClasses.FileProperties("MS", run.FilePropertiesAccession, "SHA-1", run.SourceFileChecksums.First());
-            JsonClasses.FileProperties completionTime = new JsonClasses.FileProperties("MS", "MS:1000747", "completion time", run.CompletionTime);
-            fileProperties.Add(fileProperty);
+            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles(
+                "file://" + inputFileInclPath,
+                run.SourceFileNames.First(),
+                ToFileFormat(ms, "MS:1000584"),
+                new List<JsonClasses.FileProperties>()
+                {
+                    // ToFileProperties("MS", "MS:1000747", run.CompletionTime), // TODO: Include this?
+                    ToFileProperties(ms, run.FilePropertiesAccession, run.SourceFileChecksums.First())
+                }
+            );
 
-            List<JsonClasses.InputFiles> inputFiles = new List<JsonClasses.InputFiles>();
-            JsonClasses.InputFiles inputFile = new JsonClasses.InputFiles("file://" + inputFileInclPath, run.SourceFileNames.First(), fileFormat, fileProperties);
-            inputFiles.Add(inputFile);
-
-            List<JsonClasses.AnalysisSoftware> analysisSoftwarelist = new List<JsonClasses.AnalysisSoftware>();
+            Term swaMe = ms.GetById("XXXXXXXXXXXXXX");
             JsonClasses.AnalysisSoftware analysisSoftware = new JsonClasses.AnalysisSoftware() { 
-                cvRef = "MS", 
-                accession = "XXXXXXXXXXXXXX", 
-                name = "SwaMe", 
+                cvRef = ms.PrimaryNamespace, 
+                accession = swaMe.Id, 
+                name = swaMe.Name, 
                 uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", 
                 version = typeof(MzqcWriter).Assembly.GetName().Version.ToString(), 
                 analysisSettings = analysisSettings 
             };
-            analysisSoftwarelist.Add(analysisSoftware);
-            JsonClasses.MetaData metadata = new JsonClasses.MetaData() { inputFiles = inputFiles, analysisSoftware = analysisSoftwarelist };
-            JsonClasses.RunQuality runQualitySingle = new JsonClasses.RunQuality() { metadata = metadata, qualityParameters = qualityParameters.ToArray() };
-            List<JsonClasses.RunQuality> runQuality = new List<JsonClasses.RunQuality> { runQualitySingle };
-            JsonClasses.NUV qualityControl = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Quality Control Ontology", uri = "https://github.com/HUPO-PSI/mzQC/raw/master/cv/qc-cv.obo", version = "0.1.0" };
-            JsonClasses.NUV massSpectrometry = new JsonClasses.NUV() { name = "Proteomics Standards Initiative Mass Spectrometry Ontology", uri = "https://raw.githubusercontent.com/HUPO-PSI/psi-ms-CV/master/psi-ms.obo", version = "4.1.7" };
-            JsonClasses.NUV UnitOntology = new JsonClasses.NUV() { name = "Unit Ontology", uri = "http://ontologies.berkeleybop.org/uo.obo", version = "releases/2020-03-10" };
-            JsonClasses.CV cV = new JsonClasses.CV() { QC = qualityControl, MS = massSpectrometry, UO = UnitOntology };
-            JsonClasses.MzQC metrics = new JsonClasses.MzQC() { runQuality = runQuality, cv = cV };
+
+            JsonClasses.MzQC metrics = new JsonClasses.MzQC()
+            {
+                version = "0.0.11",
+                runQuality = new List<JsonClasses.RunQuality>
+                {
+                    new JsonClasses.RunQuality()
+                    {
+                        metadata = new JsonClasses.MetaData()
+                        {
+                            inputFiles = new List<JsonClasses.InputFiles>() {
+                                inputFile
+                            },
+                            analysisSoftware = new List<JsonClasses.AnalysisSoftware>()
+                            {
+                                analysisSoftware
+                            }
+                        },
+                        qualityParameters = qualityParameters.ToArray()
+                    }
+                },
+                cv = cvLibrary.ControlledVocabularies.ToDictionary(cv => cv.PrimaryNamespace, ToNUV)
+            };
 
             //Then save:
             WriteMzqc(outputFileName, metrics);
@@ -138,5 +159,28 @@ namespace MzqcGenerator
                 file.Write("}");
             }
         }
+
+        private JsonClasses.Unit ToUnit(string cvRef, string id) => ToUnit(cvLibrary.GetById(cvRef), id);
+        private JsonClasses.Unit ToUnit(string cvRef, Term term) => ToUnit(cvLibrary.GetById(cvRef), term);
+        private JsonClasses.Unit ToUnit(ControlledVocabulary cv, string id) => ToUnit(cv, cv.GetById(id));
+        private JsonClasses.Unit ToUnit(ControlledVocabulary cv, Term term) => new JsonClasses.Unit(cv.PrimaryNamespace, term.Id, term.Name);
+
+        private JsonClasses.FileFormat ToFileFormat(string cvRef, string id) => ToFileFormat(cvLibrary.GetById(cvRef), id);
+        private JsonClasses.FileFormat ToFileFormat(string cvRef, Term term) => ToFileFormat(cvLibrary.GetById(cvRef), term);
+        private JsonClasses.FileFormat ToFileFormat(ControlledVocabulary cv, string id) => ToFileFormat(cv, cv.GetById(id));
+        private JsonClasses.FileFormat ToFileFormat(ControlledVocabulary cv, Term term) => new JsonClasses.FileFormat(cv.PrimaryNamespace, term.Id, term.Name);
+
+        private JsonClasses.FileProperties ToFileProperties(string cvRef, string id, string value) => ToFileProperties(cvLibrary.GetById(cvRef), id, value);
+        private JsonClasses.FileProperties ToFileProperties(string cvRef, Term term, string value) => ToFileProperties(cvLibrary.GetById(cvRef), term, value);
+        private JsonClasses.FileProperties ToFileProperties(ControlledVocabulary cv, string id, string value) => ToFileProperties(cv, cv.GetById(id), value);
+        private JsonClasses.FileProperties ToFileProperties(ControlledVocabulary cv, Term term, string value) => new JsonClasses.FileProperties(cv.PrimaryNamespace, term.Id, term.Name, value);
+
+        private JsonClasses.QualityParameters ToQualityParameters(string cvRef, string id, JsonClasses.Unit unit) => ToQualityParameters(cvLibrary.GetById(cvRef), id, unit);
+        private JsonClasses.QualityParameters ToQualityParameters(string cvRef, Term term, JsonClasses.Unit unit) => ToQualityParameters(cvLibrary.GetById(cvRef), term, unit);
+        private JsonClasses.QualityParameters ToQualityParameters(ControlledVocabulary cv, string id, JsonClasses.Unit unit) => ToQualityParameters(cv, cv.GetById(id), unit);
+        private JsonClasses.QualityParameters ToQualityParameters(ControlledVocabulary cv, Term term, JsonClasses.Unit unit) => new JsonClasses.QualityParameters(cv.PrimaryNamespace, term.Id, term.Name, unit, null);
+
+        private JsonClasses.NUV ToNUV(string cvRef) => ToNUV(cvLibrary.GetById(cvRef));
+        private JsonClasses.NUV ToNUV(ControlledVocabulary controlledVocabulary) => new JsonClasses.NUV() { name = controlledVocabulary.Name, uri = controlledVocabulary.Url, version = controlledVocabulary.Version };
     }
 }

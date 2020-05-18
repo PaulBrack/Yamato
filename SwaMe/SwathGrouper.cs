@@ -18,7 +18,7 @@ namespace SwaMe
             public List<double> mzRange;
             public List<double> TICs;
             public List<double> swDensity50;
-            public List<double> swDensityIQR;
+            public List<double?> swDensityIQR;
             public List<double> SwathProportionOfTotalTIC;
             public List<double> SwathProportionPredictedSingleChargeAvg;
 
@@ -26,7 +26,7 @@ namespace SwaMe
             {
             }
 
-            public SwathMetrics(List<double> swathTargets, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double> swDensityIQR,
+            public SwathMetrics(List<double> swathTargets, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double?> swDensityIQR,
             List<double> SwathProportionOfTotalTIC, List<double> SwathProportionPredictedSingleChargeAvg)
             {
                 this.swathTargets = swathTargets;
@@ -58,7 +58,7 @@ namespace SwaMe
             List<double> TICs = new List<double>();
             List<double> swDensity = new List<double>();
             List<double> swDensity50 = new List<double>();
-            List<double> swDensityIQR = new List<double>();
+            List<double?> swDensityIQR = new List<double?>();
             List<double> mzTargetRange = new List<double>();
             List<double> averageMzTargetRange = new List<double>();
             List<double> SwathProportionOfTotalTIC = new List<double>();
@@ -90,7 +90,10 @@ namespace SwaMe
                 TotalSwathProportionPredictedSingleCharge.Clear();
                 swDensity.Sort();
                 swDensity50.Add(Math.Truncate(Math.Ceiling(swDensity.Average())));
-                swDensityIQR.Add(Math.Truncate(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity))));
+                if (swDensity.Count > 4)
+                    swDensityIQR.Add(Math.Truncate(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity))));
+                else
+                    swDensityIQR.Add(default);
                 swDensity.Clear();
                 mzTargetRange.Clear();
             }

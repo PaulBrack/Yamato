@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Peter Crowther &lt;peter.crowther@melandra.com&gt;</Authors>
+    <Company>The University of Manchester</Company>
+  </PropertyGroup>
+
+</Project>
