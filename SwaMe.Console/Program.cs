@@ -19,10 +19,21 @@ namespace Yamato.Console
             {
                 Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
+                // An inputfile of "-" on the command line denotes stdin, for which we use null internally.
+                if ("-".Equals(options.InputFile, StringComparison.Ordinal))
+                    options.InputFile = null;
+                // An outputfile of "-" on the command line denotes stdout, for which we use null internally.
+                if ("-".Equals(options.OutputFile, StringComparison.Ordinal))
+                    options.OutputFile = null;
+
                 if (options.Verbose)
                     SetVerboseLogging();
 
-                Logger.Info("Loading file: {0}", options.InputFile);
+                if (null == options.InputFile)
+                    Logger.Info("Loading file: {0}", options.InputFile);
+                else
+                    Logger.Info("Reading mzML from standard input");
+
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
@@ -44,7 +55,9 @@ namespace Yamato.Console
                     MaxThreads = options.MaxThreads
                 };
 
-                CheckFileIsReadableOrComplain(options.InputFile);
+                // stdin (denoted by null) is always considered readable; anything else needs a check (#99)
+                if (null != options.InputFile)
+                    CheckFileIsReadableOrComplain(options.InputFile);
 
                 AnalysisSettings analysisSettings = new AnalysisSettings()
                 {
@@ -143,10 +156,10 @@ namespace Yamato.Console
         [Option("dir", Required = false, HelpText = "Load from directory: if true, reads the directory path of the input file path and runs on all .mzml files in that directory")]
         public bool? LoadFromDirectory { get; set; }
 
-        [Option('i', "inputfile", Required = true, HelpText = "Input file path.")]
+        [Option('i', "inputfile", Required = true, HelpText = "Input file path, or - to use standard input.")]
         public string InputFile { get; set; }
 
-        [Option('o', "outputfile", Required = true, HelpText = "Output file path.")]
+        [Option('o', "outputfile", Required = true, HelpText = "Output file path, or - to use standard output (NOTE: Use production logging or your log output will also go to stdout).")]
         public string OutputFile { get; set; }
 
         [Option('v', "verbose", Required = false, HelpText = "Enable verbose logging.")]

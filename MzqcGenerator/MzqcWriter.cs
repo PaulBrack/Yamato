@@ -2,6 +2,7 @@ using CVLibrarian;
 using MzmlParser;
 using Newtonsoft.Json;
 using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -82,6 +83,7 @@ namespace MzqcGenerator
             .ToDictionary(qp => qp.accession);
         }
 
+        /// <param name="outputFileName">The path to the output file to be opened, or null to send to stdout</param>
         public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
         {
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
@@ -146,9 +148,10 @@ namespace MzqcGenerator
             WriteMzqc(outputFileName, metrics);
         }
 
+        /// <param name="path">The path to the output file to be opened, or null to send to stdout</param>
         public void WriteMzqc(string path, JsonClasses.MzQC metrics)
         {
-            using (StreamWriter file = File.CreateText(path))
+            using (TextWriter file = null == path ? Console.Out : File.CreateText(path))
             {
                 file.Write("{ \"mzQC\":");
                 JsonSerializer serializer = new JsonSerializer()
