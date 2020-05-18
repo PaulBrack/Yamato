@@ -19,10 +19,21 @@ namespace Yamato.Console
             {
                 Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
             {
+                // An inputfile of "-" on the command line denotes stdin, for which we use null internally.
+                if ("-".Equals(options.InputFile, StringComparison.Ordinal))
+                    options.InputFile = null;
+                // An outputfile of "-" on the command line denotes stdout, for which we use null internally.
+                if ("-".Equals(options.OutputFile, StringComparison.Ordinal))
+                    options.OutputFile = null;
+
                 if (options.Verbose)
                     SetVerboseLogging();
 
-                Logger.Info("Loading file: {0}", options.InputFile);
+                if (null == options.InputFile)
+                    Logger.Info("Loading file: {0}", options.InputFile);
+                else
+                    Logger.Info("Reading mzML from standard input");
+
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
@@ -44,8 +55,8 @@ namespace Yamato.Console
                     MaxThreads = options.MaxThreads
                 };
 
-                // stdin is always considered readable; anything else needs a check (#99)
-                if (!"-".Equals(options.InputFile))
+                // stdin (denoted by null) is always considered readable; anything else needs a check (#99)
+                if (null != options.InputFile)
                     CheckFileIsReadableOrComplain(options.InputFile);
 
                 AnalysisSettings analysisSettings = new AnalysisSettings()

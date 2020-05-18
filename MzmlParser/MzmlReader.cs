@@ -43,7 +43,7 @@ namespace MzmlParser
         private static bool TicNotFound = false;
         private static bool AnyEmptyBinaryArray = false;
 
-
+        /// <param name="path">The path to the input file to be opened, or null to read from stdin</param>
         public Run LoadMzml(string path, AnalysisSettings analysisSettings)
         {
             if (MaxThreads != 0)
@@ -107,10 +107,10 @@ namespace MzmlParser
             return run;
         }
 
+        /// <param name="path">The path to the input file to be opened, or null to read from stdin</param>
         private void ReadMzml(string path, Run run, bool irt)
         {
-
-            using (XmlReader reader = "-".Equals(path) ? XmlReader.Create(Console.In): XmlReader.Create(path))
+            using (XmlReader reader = null == path ? XmlReader.Create(Console.In): XmlReader.Create(path))
             {
                 Xli = (IXmlLineInfo)reader;
                 while (reader.Read())

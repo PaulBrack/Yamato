@@ -77,6 +77,7 @@ namespace MzqcGenerator
                 QualityParametersByAccession.Add(qp.accession, qp);
         }
 
+        /// <param name="outputFileName">The path to the output file to be opened, or null to send to stdout</param>
         public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
         {
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
@@ -126,9 +127,10 @@ namespace MzqcGenerator
             WriteMzqc(outputFileName, metrics);
         }
 
+        /// <param name="path">The path to the output file to be opened, or null to send to stdout</param>
         public void WriteMzqc(string path, JsonClasses.MzQC metrics)
         {
-            using (TextWriter file = "-".Equals(path, StringComparison.Ordinal) ? Console.Out : File.CreateText(path))
+            using (TextWriter file = null == path ? Console.Out : File.CreateText(path))
             {
                 file.Write("{ \"mzQC\":");
                 JsonSerializer serializer = new JsonSerializer()
