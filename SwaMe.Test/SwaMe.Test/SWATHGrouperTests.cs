@@ -287,7 +287,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void swDensityIQRCorrect()
         {
-            List<double> correctswDensityIQR = new List<double>() { 16, 1 };
+            List<double?> correctswDensityIQR = new List<double?>() { 16, 1 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.swDensityIQR, correctswDensityIQR));
         }
         [TestMethod]
