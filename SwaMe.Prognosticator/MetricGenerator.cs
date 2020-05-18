@@ -15,8 +15,8 @@ namespace Prognosticator
         public Dictionary<string, dynamic> GenerateMetrics(Run run)
         {
             Run = Prognosticator.ChromatogramGenerator.CreateAllChromatograms(run);
-            Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, run.AnalysisSettings.RunEndTime, 1);
-            Ms2QuartileDivisions = ExtractQuartileDivisionTimes(run, run.AnalysisSettings.RunEndTime, 2);
+            Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, Run.LastScanTime, 1);
+            Ms2QuartileDivisions = ExtractQuartileDivisionTimes(run, Run.LastScanTime, 2);
 
             return AssembleMetrics();
         }
@@ -45,7 +45,7 @@ namespace Prognosticator
             List<(double, double)> chromatogram = LoadChromatogram(run, msLevel);
 
             double chromatogramTotal = 0;
-            if (washTime == 0)
+            if (washTime == 0 || washTime == null)
                 chromatogramTotal = chromatogram.Sum(x => x.Item2);
             else
                 chromatogramTotal = chromatogram.Where(x => x.Item1 < washTime).Select(x => x.Item2).Sum();
@@ -90,10 +90,10 @@ namespace Prognosticator
                 { "QC:94", Run.Chromatograms.Ms2Bpc.AsHorizontalArrays() },
                 { "QC:93", Run.Chromatograms.CombinedTic.AsHorizontalArrays() },
                 { "QC:92", Run.Chromatograms.Ms1Tic.Sum(x => x.Item2) / Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) },
-                { "QC:91", Run.AnalysisSettings.RunEndTime / 2 - Ms1QuartileDivisions[1] },
-                { "QC:90", Run.AnalysisSettings.RunEndTime / 2 - Ms2QuartileDivisions[1] },
-                { "QC:83", ExtractQuartileDivisionSummedIntensities(Run, Run.AnalysisSettings.RunEndTime, 1) },
-                { "QC:82", ExtractQuartileDivisionSummedIntensities(Run, Run.AnalysisSettings.RunEndTime, 2) }
+                { "QC:91", Run.LastScanTime / 2 - Ms1QuartileDivisions[1] },
+                { "QC:90", Run.LastScanTime / 2 - Ms2QuartileDivisions[1] },
+                { "QC:83", ExtractQuartileDivisionSummedIntensities(Run,Run.LastScanTime, 1) },
+                { "QC:82", ExtractQuartileDivisionSummedIntensities(Run, Run.LastScanTime, 2) }
             };
 
             if (Run.AnalysisSettings.IrtLibrary != null && Run.IRTHits.Count > 0)

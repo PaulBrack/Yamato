@@ -160,7 +160,6 @@ namespace SwaMe.Desktop
                 IrtMassTolerance = Decimal.ToDouble(irtToleranceUpDown.Value),
                 CacheSpectraToDisk = CacheToDiskCheckBox.Checked,
                 MinimumIntensity = Decimal.ToInt32(MinIrtIntensityUpDown.Value),
-                RunEndTime = 0,
                 TempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
             };
 

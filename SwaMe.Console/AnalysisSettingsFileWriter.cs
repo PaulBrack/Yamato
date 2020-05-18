@@ -29,8 +29,7 @@ namespace Yamato.Console
             string[] phraseToWrite = { "MassTolerance", Convert.ToString(run.AnalysisSettings.MassTolerance), "RtTolerance", Convert.ToString(run.AnalysisSettings.RtTolerance),
                                         "IrtLibrary",string.IsNullOrEmpty(Convert.ToString(run.AnalysisSettings.IrtLibrary)) ? "None" : Convert.ToString(run.AnalysisSettings.IrtLibrary), "IrtMassTolerance",Convert.ToString(run.AnalysisSettings.IrtMassTolerance),
                                         "IrtMinIntensity",Convert.ToString(run.AnalysisSettings.IrtMinIntensity),"IrtMinPeptides",Convert.ToString(run.AnalysisSettings.IrtMinPeptides),
-                                        "CacheSpectraToDisk",Convert.ToString(run.AnalysisSettings.CacheSpectraToDisk),"MinimumIntensity",Convert.ToString(run.AnalysisSettings.MinimumIntensity),
-                                        "RunEndTime",Convert.ToString(run.AnalysisSettings.RunEndTime)};
+                                        "CacheSpectraToDisk",Convert.ToString(run.AnalysisSettings.CacheSpectraToDisk),"MinimumIntensity",Convert.ToString(run.AnalysisSettings.MinimumIntensity)};
 
             streamWriter.Write(string.Join(Environment.NewLine, phraseToWrite));
             streamWriter.Close();
@@ -49,8 +48,7 @@ namespace Yamato.Console
             string[] phraseToWrite = { "MassTolerance", Convert.ToString(run.AnalysisSettings.MassTolerance), "RtTolerance", Convert.ToString(run.AnalysisSettings.RtTolerance),
                                         "IrtLibrary",string.IsNullOrEmpty(Convert.ToString(run.AnalysisSettings.IrtLibrary)) ? "None" : Convert.ToString(run.AnalysisSettings.IrtLibrary), "IrtMassTolerance",Convert.ToString(run.AnalysisSettings.IrtMassTolerance),
                                         "IrtMinIntensity",Convert.ToString(run.AnalysisSettings.IrtMinIntensity),"IrtMinPeptides",Convert.ToString(run.AnalysisSettings.IrtMinPeptides),
-                                        "CacheSpectraToDisk",Convert.ToString(run.AnalysisSettings.CacheSpectraToDisk),"MinimumIntensity",Convert.ToString(run.AnalysisSettings.MinimumIntensity),
-                                        "RunEndTime",Convert.ToString(run.AnalysisSettings.RunEndTime)};
+                                        "CacheSpectraToDisk",Convert.ToString(run.AnalysisSettings.CacheSpectraToDisk),"MinimumIntensity",Convert.ToString(run.AnalysisSettings.MinimumIntensity)};
 
             streamWriter.Write(string.Join(Environment.NewLine, phraseToWrite));
             streamWriter.Close();

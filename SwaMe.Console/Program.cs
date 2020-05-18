@@ -57,7 +57,6 @@ namespace Yamato.Console
                     IrtMassTolerance = options.IrtMassTolerance,
                     CacheSpectraToDisk = options.Cache,
                     MinimumIntensity = options.MinimumIntensity,
-                    RunEndTime = options.RunEndTime,
                     TempFolder = Path.Combine(options.TempFolder, Guid.NewGuid().ToString())
                 };
 
@@ -196,9 +195,6 @@ namespace Yamato.Console
 
         [Option("maxThreads", Required = false, HelpText = "The maximum number of worker threads. Set as zero for default system max.")]
         public int MaxThreads { get; set; } = 0;
-
-        [Option("runEndTime", Required = false, HelpText = "The time during the run to stop calculating metrics (e.g. when the wash begins)")]
-        public int? RunEndTime { get; set; } = null;
 
         [Option("tempFolder", Required = false, HelpText = "The temp folder SwaMe will use. Defaults to the temp path defined by TMP or TEMP on Windows, or TMPPTH on Linux. This folder must already exist and SwaMe must be able to read and write to it.")]
         public string TempFolder { get; set; } = Path.GetTempPath();
