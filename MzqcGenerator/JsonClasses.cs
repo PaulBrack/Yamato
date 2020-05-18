@@ -10,9 +10,16 @@ namespace MzqcGenerator
 
         public class FileFormat
         {
-            public string cvRef = "MS";
-            public string accession = "MS:1000584";
-            public string name = "mzML format";
+            public string cvRef;
+            public string accession;
+            public string name;
+
+            public FileFormat(string cvRef, string accession, string name)
+            {
+                this.cvRef = cvRef;
+                this.accession = accession;
+                this.name = name;
+            }
         }
 
 
@@ -107,18 +114,11 @@ namespace MzqcGenerator
             public string version { get; set; }
         }
 
-        public class CV
-        {
-            public NUV QC { get; set; }
-            public NUV MS { get; set; }
-            public NUV UO { get; set; }
-        }
-
         public class MzQC
         {
-            public string version = "0.0.11";
+            public string version { get; set; }
             public List<RunQuality> runQuality { get; set; }
-            public CV cv { get; set; }
+            public IDictionary<string, NUV> cv { get; set; }
         }
 
 #pragma warning restore IDE1006 // Naming Styles
