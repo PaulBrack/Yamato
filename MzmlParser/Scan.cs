@@ -1,5 +1,6 @@
-﻿using ProtoBuf;
-using System;
+﻿#nullable enable
+
+using ProtoBuf;
 using System.Collections.Generic;
 using System.IO;
 
@@ -10,35 +11,36 @@ namespace MzmlParser
 
         public Scan(bool cacheSpectraToDisk, string tempDirectory) 
         {
-            this.CacheSpectraToDisk = cacheSpectraToDisk;
-            this.TempDirectory = tempDirectory;
+            CacheSpectraToDisk = cacheSpectraToDisk;
+            TempDirectory = tempDirectory;
         }
 
         public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density, string tempDirectory)
         {
-            this.CacheSpectraToDisk = cacheSpectraToDisk;
-            this.IsolationWindowLowerOffset = isolationWindowLowerOffset;
-            this.IsolationWindowUpperOffset = isolationWindowUpperOffset;
-            this.ScanStartTime = scanStartTime;
-            this.MsLevel = msLevel;
-            this.Density = density;
-            this.TempDirectory = tempDirectory;
+            CacheSpectraToDisk = cacheSpectraToDisk;
+            IsolationWindowLowerOffset = isolationWindowLowerOffset;
+            IsolationWindowUpperOffset = isolationWindowUpperOffset;
+            ScanStartTime = scanStartTime;
+            MsLevel = msLevel;
+            Density = density;
+            TempDirectory = tempDirectory;
         }
 
         public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density, int cycle, double totalIonCurrent, string tempDirectory)
         {
-            this.CacheSpectraToDisk = cacheSpectraToDisk;
-            this.IsolationWindowLowerOffset = isolationWindowLowerOffset;
-            this.IsolationWindowUpperOffset = isolationWindowUpperOffset;
-            this.ScanStartTime = scanStartTime;
-            this.MsLevel = msLevel;
-            this.Density = density;
-            this.TotalIonCurrent = totalIonCurrent;
-            this.Cycle = cycle;
-            this.TempDirectory = tempDirectory;
+            CacheSpectraToDisk = cacheSpectraToDisk;
+            IsolationWindowLowerOffset = isolationWindowLowerOffset;
+            IsolationWindowUpperOffset = isolationWindowUpperOffset;
+            ScanStartTime = scanStartTime;
+            MsLevel = msLevel;
+            Density = density;
+            TotalIonCurrent = totalIonCurrent;
+            Cycle = cycle;
+            TempDirectory = tempDirectory;
         }
+
         public bool CacheSpectraToDisk { get; set; }
-        public string Base64IntensityArray { get; set; }
+        public string? Base64IntensityArray { get; set; }
         public int Cycle { get; set; }
         public int? MsLevel { get; set; }
         public double BasePeakIntensity { get; set; }
@@ -55,13 +57,13 @@ namespace MzmlParser
         public double ProportionChargeStateOne { get; set; }
         public string TempDirectory { get; set;  }
 
-        private Spectrum m_Spectrum;
+        private Spectrum? m_Spectrum;
 
         public string ScanId
         {
             get
             {
-                return String.Format("{0}_{1}_{2}", MsLevel, Cycle, IsolationWindowTargetMz);
+                return string.Format("{0}_{1}_{2}", MsLevel, Cycle, IsolationWindowTargetMz);
             }
         }
 
@@ -69,20 +71,17 @@ namespace MzmlParser
         {
             get
             {
-                return Path.Combine(TempDirectory, String.Format("Yamato_{0}.tempscan", ScanId));
+                return Path.Combine(TempDirectory, string.Format("Yamato_{0}.tempscan", ScanId));
             }
         }
-        public Spectrum Spectrum
+        public Spectrum? Spectrum
         {
             get
             {
                 if (CacheSpectraToDisk)
                 {
-                    using (var file = File.OpenRead(TempFileName))
-                    {
-                        var x = (Spectrum)Serializer.Deserialize(typeof(Spectrum), file);
-                        return x;
-                    }
+                    using var file = File.OpenRead(TempFileName);
+                    return (Spectrum)Serializer.Deserialize(typeof(Spectrum), file);
                 }
                 else
                 {
@@ -93,10 +92,8 @@ namespace MzmlParser
             {
                 if (CacheSpectraToDisk)
                 {
-                    using (var file = File.Create(TempFileName))
-                    {
-                        Serializer.Serialize(file, value);
-                    }
+                    using var file = File.Create(TempFileName);
+                    Serializer.Serialize(file, value);
                 }
                 else
                 {
@@ -123,7 +120,7 @@ namespace MzmlParser
     public class Spectrum
     {
         [ProtoMember(1)]
-        public virtual IList<SpectrumPoint> SpectrumPoints { get; set; }
+        public virtual IList<SpectrumPoint>? SpectrumPoints { get; set; }
     }
 
     public class ScanAndTempProperties
@@ -134,8 +131,8 @@ namespace MzmlParser
         }
 
         public Scan Scan { get; set; }
-        public string Base64IntensityArray { get; set; }
-        public string Base64MzArray { get; set; }
+        public string? Base64IntensityArray { get; set; }
+        public string? Base64MzArray { get; set; }
         public bool IntensityZlibCompressed { get; set; }
         public bool MzZlibCompressed { get; set; }
         public int IntensityBitLength { get; set; }
