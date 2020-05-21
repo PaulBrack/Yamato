@@ -5,9 +5,6 @@ using System.Linq;
 
 namespace MzmlParser.Test
 {
-
-
-
     [TestClass]
     public class MzmlReaderTest
     {
@@ -25,8 +22,8 @@ namespace MzmlParser.Test
         [ClassInitialize]
         public static void Initialize(TestContext _)
         {
-            ScanAndRunFactory factory = new ScanAndRunFactory(analysisSettings);
-            run = new MzmlReader<Scan, Run<Scan>>(factory, factory).LoadMzml(Path.Combine("mzmls", "test.mzml"));
+            var reader = new Pipeliner();
+            run = reader.LoadMzml(Path.Combine("mzmls", "test.mzml"), analysisSettings);
         }
 
         [TestMethod]
@@ -141,7 +138,5 @@ namespace MzmlParser.Test
             Assert.AreEqual(399.5, run.Ms2Scans.OrderBy(x => x.ScanStartTime).First().IsolationWindowLowerBoundary);
             Assert.AreEqual(743.5, run.Ms2Scans.OrderBy(x => x.ScanStartTime).Last().IsolationWindowLowerBoundary);
         }
-
-
     }
 }
