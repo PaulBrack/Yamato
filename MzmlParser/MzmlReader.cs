@@ -323,9 +323,6 @@ namespace MzmlParser
 
         private void AddScanToRun(TScan scan, TRun run)
         {
-            scan.IsolationWindowLowerBoundary = scan.IsolationWindowTargetMz - scan.IsolationWindowLowerOffset;
-            scan.IsolationWindowUpperBoundary = scan.IsolationWindowTargetMz + scan.IsolationWindowUpperOffset;
-
             if (scan.MsLevel == 1)
             {
                 lock (run.Ms1Scans)

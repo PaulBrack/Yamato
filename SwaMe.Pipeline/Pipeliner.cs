@@ -174,6 +174,9 @@ namespace SwaMe.Pipeline
 
         void IScanConsumer<Scan, Run<Scan>>.Notify(Scan scan, float[] mzs, float[] intensities, Run<Scan> run)
         {
+            scan.IsolationWindowLowerBoundary = scan.IsolationWindowTargetMz - scan.IsolationWindowLowerOffset;
+            scan.IsolationWindowUpperBoundary = scan.IsolationWindowTargetMz + scan.IsolationWindowUpperOffset;
+
             if (intensities.Count() == 0)
             {
                 intensities = FillZeroArray(intensities);
