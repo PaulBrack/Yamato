@@ -2,7 +2,7 @@
 
 namespace MzmlParser
 {
-    public class ScanAndTempProperties<TScan>
+    internal class ScanAndTempProperties<TScan>
         where TScan: IScan
     {
         public ScanAndTempProperties(IScanFactory<TScan> scanFactory)

@@ -9,7 +9,7 @@ namespace MzmlParser
     /// A useful container for some base64-encoded data and the information on how to decode it.
     /// </summary>
     /// <remarks>Immutable</remarks>
-    public sealed class Base64StringAndDecodingHints
+    internal sealed class Base64StringAndDecodingHints
     {
         public Base64StringAndDecodingHints(string base64Data, Compression compression, Bitness bitness)
         {
