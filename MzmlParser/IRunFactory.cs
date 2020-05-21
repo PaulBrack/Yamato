@@ -1,4 +1,6 @@
-﻿namespace MzmlParser
+﻿#nullable enable
+
+namespace MzmlParser
 {
     public interface IRunFactory<TScan, TRun>
         where TScan: IScan
