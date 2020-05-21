@@ -1,10 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MzmlParser;
 using SwaMe;
-using System;
+using SwaMe.Pipeline;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using static SwaMe.RTGrouper;
 
 namespace MzqcGenerator.Test
@@ -32,7 +29,7 @@ namespace MzqcGenerator.Test
             Peaksym = 0.9
         };
         //Run
-        Run iRTrun = new Run()
+        Run<Scan> iRTrun = new Run<Scan>()
         {
             IRTPeaks = { iRTPeak1, iRTPeak2 },
             SourceFileNames = { "File1", "File2" }
@@ -54,7 +51,7 @@ namespace MzqcGenerator.Test
         { };
 
         //run
-        private static Run RunWithoutIRT = new Run()
+        private static Run<Scan> RunWithoutIRT = new Run<Scan>()
         {
             SourceFileNames = { "File1", "File2" },
             SourceFileChecksums = { "aaa", "bbb" },

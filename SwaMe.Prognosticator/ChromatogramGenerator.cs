@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MzmlParser;
 using NLog;
+using SwaMe.Pipeline;
 
 namespace Prognosticator
 {
     public static class ChromatogramGenerator
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        public static Run CreateAllChromatograms(Run run)
+        public static Run<Scan> CreateAllChromatograms(Run<Scan> run)
         {
             run.Chromatograms.Ms1Tic = ExtractMs1TotalIonChromatogram(run);
             run.Chromatograms.Ms2Tic = ExtractMs2TotalIonChromatogram(run);
@@ -19,27 +19,27 @@ namespace Prognosticator
             return run;
         }
 
-        public static List<(double, double)> ExtractMs1TotalIonChromatogram(Run run)
+        public static List<(double, double)> ExtractMs1TotalIonChromatogram(Run<Scan> run)
         {
-            return run.Ms1Scans.Select(x => (x.ScanStartTime, x.TotalIonCurrent)).ToList();
+            return run.Ms1Scans.Select(x => (x.ScanStartTime, x.TotalIonCurrent)).OrderBy(tuple => tuple.ScanStartTime).ToList();
         }
 
-        public static List<(double, double)> ExtractMs2TotalIonChromatogram(Run run)
+        public static List<(double, double)> ExtractMs2TotalIonChromatogram(Run<Scan> run)
         {
-            return run.Ms2Scans.GroupBy(x => x.Cycle).Select(x => new ValueTuple<double, double>(x.First().ScanStartTime, x.Select(y => y.TotalIonCurrent).Sum())).OrderBy(x => x.Item1).ToList();
+            return run.Ms2Scans.GroupBy(x => x.Cycle).Select(x => new ValueTuple<double, double>(x.Min(scan => scan.ScanStartTime), x.Select(y => y.TotalIonCurrent).Sum())).OrderBy(x => x.Item1).ToList();
         }
 
-        public static List<(double, double)> ExtractMs1BasePeakChromatogram(Run run)
+        public static List<(double, double)> ExtractMs1BasePeakChromatogram(Run<Scan> run)
         {
-            return run.Ms1Scans.Select(x => (x.ScanStartTime, x.BasePeakIntensity)).ToList();
+            return run.Ms1Scans.Select(x => (x.ScanStartTime, x.BasePeakIntensity)).OrderBy(tuple => tuple.ScanStartTime).ToList();
         }
 
-        public static List<(double, double)> ExtractMs2BasePeakChromatogram(Run run)
+        public static List<(double, double)> ExtractMs2BasePeakChromatogram(Run<Scan> run)
         {
             return run.Ms2Scans.GroupBy(x => x.Cycle).Select(x => new ValueTuple<double, double>(x.First().ScanStartTime, x.Select(y => y.BasePeakIntensity).Max())).OrderBy(x => x.Item1).ToList();
         }
 
-        public static List<(double, double, double)> CreateCombinedChromatogram(Run run)
+        public static List<(double, double, double)> CreateCombinedChromatogram(Run<Scan> run)
         {
             if (run.Chromatograms.Ms1Tic.Count == run.Chromatograms.Ms2Tic.Count)
                 return run.Chromatograms.Ms1Tic.Select((x, i) => new ValueTuple<double, double, double>(x.Item1, x.Item2, run.Chromatograms.Ms2Tic[i].Item2)).ToList();

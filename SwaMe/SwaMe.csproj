@@ -13,8 +13,8 @@
   <ItemGroup>
     <ProjectReference Include="..\CrawdadSharp\CrawdadSharp\CrawdadSharp.csproj" />
     <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
-    <ProjectReference Include="..\MzmlParser\MzmlParser.csproj" />
     <ProjectReference Include="..\MzqcGenerator\MzqcGenerator.csproj" />
+    <ProjectReference Include="..\SwaMe.Pipeline\SwaMe.Pipeline.csproj" />
   </ItemGroup>
 
 </Project>

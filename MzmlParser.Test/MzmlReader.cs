@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using SwaMe.Pipeline;
 using System.IO;
 using System.Linq;
 
@@ -11,7 +11,7 @@ namespace MzmlParser.Test
     [TestClass]
     public class MzmlReaderTest
     {
-        private static Run run;
+        private static Run<Scan> run;
 
         private static readonly AnalysisSettings analysisSettings = new AnalysisSettings()
         {
@@ -23,9 +23,10 @@ namespace MzmlParser.Test
         };
 
         [ClassInitialize]
-        public static void Initialize(TestContext t)
+        public static void Initialize(TestContext _)
         {
-            run = new MzmlReader().LoadMzml(Path.Combine("mzmls", "test.mzml"), analysisSettings);
+            ScanAndRunFactory factory = new ScanAndRunFactory(analysisSettings);
+            run = new MzmlReader<Scan, Run<Scan>>(factory, factory).LoadMzml(Path.Combine("mzmls", "test.mzml"));
         }
 
         [TestMethod]

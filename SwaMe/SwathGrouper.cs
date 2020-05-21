@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using SwaMe.Pipeline;
 
 namespace SwaMe
 {
@@ -40,12 +41,13 @@ namespace SwaMe
                 this.SwathProportionPredictedSingleChargeAvg = SwathProportionPredictedSingleChargeAvg;
             }
         }
-        public SwathMetrics GroupBySwath(MzmlParser.Run run)
+        public SwathMetrics GroupBySwath(Run<Scan> run)
         {
             
             //Create list of target isolationwindows to serve as swathnumber
             List<double> swathTargets = new List<double>();
-            swathTargets = run.Ms2Scans.OrderBy(y=>y.ScanStartTime).Select(x => x.IsolationWindowTargetMz).Distinct().ToList();
+            // Force ordering of swathTargets so that our tests don't depend on the order that Distinct() happens to impose.
+            swathTargets = run.Ms2Scans.Select(x => x.IsolationWindowTargetMz).Distinct().OrderBy(x => x).ToList();
             double totalTIC = 0;
             foreach (var scan in run.Ms2Scans)
             {
@@ -72,12 +74,12 @@ namespace SwaMe
 
                 double TICthisSwath = 0;
 
-                var orderedMS2Scans = run.Ms2Scans.OrderBy(s => s.ScanStartTime)
-                    .Where(x => x.MsLevel == 2 && x.IsolationWindowTargetMz == swathTargets[swathNumber]);
+                var orderedMS2Scans = run.Ms2Scans
+                    .Where(x => x.IsolationWindowTargetMz == swathTargets[swathNumber]); // Turns out ordering is not required; users of this either don't care about order or sort their own results.
                 foreach (var scan in orderedMS2Scans)
                 {
                     mzTargetRange.Add(scan.IsolationWindowUpperOffset + scan.IsolationWindowLowerOffset);
-                    TICthisSwath = TICthisSwath + scan.TotalIonCurrent;
+                    TICthisSwath += scan.TotalIonCurrent;
                     swDensity.Add(scan.Density);
                     TotalSwathProportionPredictedSingleCharge.Add(scan.ProportionChargeStateOne); //The chargestate one's we pick up is where there is a match for M+1. Therefore we need to double it to add the M.
                     track++;
@@ -91,7 +93,7 @@ namespace SwaMe
                 swDensity.Sort();
                 swDensity50.Add(Math.Truncate(Math.Ceiling(swDensity.Average())));
                 if (swDensity.Count > 4)
-                    swDensityIQR.Add(Math.Truncate(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity))));
+                    swDensityIQR.Add(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity)));
                 else
                     swDensityIQR.Add(default);
                 swDensity.Clear();

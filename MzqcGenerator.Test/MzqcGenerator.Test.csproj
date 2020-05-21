@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MzmlParser\MzmlParser.csproj" />
     <ProjectReference Include="..\SwaMe\SwaMe.csproj" />
   </ItemGroup>
 

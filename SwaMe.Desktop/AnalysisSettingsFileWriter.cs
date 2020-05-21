@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MzmlParser;
+using SwaMe.Pipeline;
 
 namespace SwaMe.Desktop
 {
     public class AnalysisSettingsFileWriter
     {
-        public void WriteASFile(Run run, string dateTime, List<string> fileNames) //Multiple files
+        public void WriteASFile(Run<Scan> run, string dateTime, List<string> fileNames) //Multiple files
         {
             string originalDirectory = Directory.GetCurrentDirectory().ToString();
             Directory.SetCurrentDirectory(Directory.GetParent(Directory.GetParent(originalDirectory).ToString()).ToString());
@@ -36,7 +36,7 @@ namespace SwaMe.Desktop
             Directory.SetCurrentDirectory(originalDirectory);
         }
 
-        public void WriteASFile(Run run, string dateTime, string fileName)//Only one file
+        public void WriteASFile(Run<Scan> run, string dateTime, string fileName)//Only one file
         {
             string ASFile;
             ASFile = dateTime + "_AnalysisSettings_" + Path.GetFileNameWithoutExtension(fileName) + ".txt";

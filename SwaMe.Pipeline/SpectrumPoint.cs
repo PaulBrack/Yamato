@@ -2,7 +2,7 @@
 
 using ProtoBuf;
 
-namespace MzmlParser
+namespace SwaMe.Pipeline
 {
     /// <summary>
     /// A point in the 2-dimensional LC-MS space of retention time and m/z, recording intensity at this coordinate.

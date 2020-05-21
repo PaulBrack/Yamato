@@ -14,8 +14,4 @@
     <PackageReference Include="protobuf-net" Version="2.4.6" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\LibraryParser\LibraryParser.csproj" />
-  </ItemGroup>
-
 </Project>

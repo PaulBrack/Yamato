@@ -1,17 +1,16 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MzmlParser;
 using System.IO;
+using SwaMe.Pipeline;
 
 namespace SwaMe.Test
 {
     [TestClass]
     public class MetricGeneratorTests
     {
-        private static Run Emptyms2scansRun;
-        private static Run Contains5ms2ScansRun;
+        private static Run<Scan> Emptyms2scansRun;
+        private static Run<Scan> Contains5ms2ScansRun;
         private static MetricGenerator MetricGenerator;
 
         [TestInitialize]
@@ -43,32 +42,32 @@ namespace SwaMe.Test
                 BpkRTs = new List<double>() { 2.5 },
                 Spectrum = new List<SpectrumPoint>() { spectrumpoint1, spectrumpoint2 }
             };
-            Contains5ms2ScansRun = new Run
+            Contains5ms2ScansRun = new Run<Scan>
             {
                 AnalysisSettings = new AnalysisSettings
                 {
                     RtTolerance = 2.5
                 },
-                Ms2Scans = new ConcurrentBag<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5 },
                 LastScanTime = 70,
                 StartTime = 2.5
             };
+            Contains5ms2ScansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5 });
 
 
             Contains5ms2ScansRun.BasePeaks.Add(basePeak1);
             Contains5ms2ScansRun.SourceFileNames.Add(" ");
             Contains5ms2ScansRun.SourceFileChecksums.Add(" ");
 
-            Emptyms2scansRun = new Run
+            Emptyms2scansRun = new Run<Scan>
             {
                 AnalysisSettings = new AnalysisSettings
                 {
                     RtTolerance = 2.5
                 },
-                Ms2Scans = new ConcurrentBag<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan6 },//6 does not have upper and lower offsets
                 LastScanTime = 0,
                 StartTime = 1000000
             };
+            Emptyms2scansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan6 }); //6 does not have upper and lower offsets
 
             Emptyms2scansRun.BasePeaks.Add(basePeak1);
             Emptyms2scansRun.SourceFileNames.Add(" ");

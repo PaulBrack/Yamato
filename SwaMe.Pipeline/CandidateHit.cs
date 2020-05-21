@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace MzmlParser
+namespace SwaMe.Pipeline
 {
     public class CandidateHit
     {

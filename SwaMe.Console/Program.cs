@@ -5,7 +5,7 @@ using NLog;
 using LibraryParser;
 using System.Linq;
 using System.IO;
-using MzmlParser;
+using SwaMe.Pipeline;
 
 namespace Yamato.Console
 {
@@ -45,15 +45,7 @@ namespace Yamato.Console
                     Logger.Error("Number of divisions must be within the range 1 - 100. You have input: {0}", options.Division);
                     throw new ArgumentOutOfRangeException();
                 }
-                bool irt = !String.IsNullOrEmpty(options.IRTFile);
-
-                MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader
-                {
-                    ParseBinaryData = options.ParseBinaryData ?? true,
-                    Threading = options.Threading ?? true,
-                    MaxQueueSize = options.MaxQueueSize,
-                    MaxThreads = options.MaxThreads
-                };
+                bool irt = !string.IsNullOrEmpty(options.IRTFile);
 
                 // stdin (denoted by null) is always considered readable; anything else needs a check (#99)
                 if (null != options.InputFile)
@@ -74,7 +66,14 @@ namespace Yamato.Console
                 if (analysisSettings.CacheSpectraToDisk && !Directory.Exists(analysisSettings.TempFolder))
                     Directory.CreateDirectory(analysisSettings.TempFolder);
 
-                if (!String.IsNullOrEmpty(options.IRTFile))
+                Pipeliner pipeliner = new Pipeliner()
+                {
+                    Threading = options.Threading ?? true,
+                    MaxQueueSize = options.MaxQueueSize,
+                    MaxThreads = options.MaxThreads
+                };
+
+                if (!string.IsNullOrEmpty(options.IRTFile))
                 {
                     irt = true;
                     if (options.IRTFile.ToLower().EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
@@ -89,7 +88,7 @@ namespace Yamato.Console
                         analysisSettings.IrtLibrary = svReader.LoadLibrary(options.IRTFile);
                     }
                 }
-                MzmlParser.Run run = mzmlParser.LoadMzml(options.InputFile, analysisSettings);
+                using Run<Scan> run = pipeliner.LoadMzml(options.InputFile, analysisSettings);
 
                 Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt);
@@ -104,7 +103,6 @@ namespace Yamato.Console
                 if (analysisSettings.CacheSpectraToDisk)
                 {
                     Logger.Trace("Deleting temp files...");
-                    mzmlParser.DeleteTempFiles(run);
                     Directory.Delete(analysisSettings.TempFolder);
                 }
                 Logger.Trace("Done!");
@@ -131,7 +129,7 @@ namespace Yamato.Console
             }
             catch (IOException)
             {
-                Logger.Error(String.Format("Unable to open the file: {0}.", inputFilePath));
+                Logger.Error(string.Format("Unable to open the file: {0}.", inputFilePath));
                 throw;
             }
         }
@@ -171,14 +169,11 @@ namespace Yamato.Console
         [Option('m', "masstolerance", Required = false, HelpText = "mass tolerance in daltons. This will be used to distinguish which peaks are part of the same chromatogram. Similarly with iRT peptide searching, this is the tolerance that will allow two values to be considered the same peak.")]
         public float MassTolerance { get; set; } = 0.05F;
 
-        [Option('p', "parsebinarydata", Required = false, HelpText = "whether binary data will be parsed")]
-        public bool? ParseBinaryData { get; set; } = true;
-
         [Option('t', "threading", Required = false, HelpText = "whether threading is used")]
         public bool? Threading { get; set; } = true;
 
         [Option('r', "irtFile", Required = false, HelpText = "iRT file path")]
-        public String IRTFile { get; set; } = null;
+        public string IRTFile { get; set; } = null;
 
         [Option("irttolerance", Required = false, HelpText = "iRT mass tolerance")]
         public double IrtMassTolerance { get; set; } = 0.005;

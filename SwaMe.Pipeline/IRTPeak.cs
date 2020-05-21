@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using LibraryParser;
 
-namespace MzmlParser
+namespace SwaMe.Pipeline
 {
     public class IRTPeak
     {

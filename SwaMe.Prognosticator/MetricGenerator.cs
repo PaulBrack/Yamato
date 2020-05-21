@@ -1,4 +1,4 @@
-﻿using MzmlParser;
+﻿using SwaMe.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +10,9 @@ namespace Prognosticator
     {
         public double[] Ms1QuartileDivisions { get; private set; }
         public double[] Ms2QuartileDivisions { get; private set; }
-        public Run Run { get; private set; }
+        public Run<Scan> Run { get; private set; }
 
-        public Dictionary<string, dynamic> GenerateMetrics(Run run)
+        public Dictionary<string, dynamic> GenerateMetrics(Run<Scan> run)
         {
             Run = Prognosticator.ChromatogramGenerator.CreateAllChromatograms(run);
             Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, Run.LastScanTime, 1);
@@ -21,11 +21,11 @@ namespace Prognosticator
             return AssembleMetrics();
         }
 
-        private static double[] ExtractQuartileDivisionSummedIntensities(Run run, double? washTime, int msLevel)
+        private static double[] ExtractQuartileDivisionSummedIntensities(Run<Scan> run, double? washTime, int msLevel)
         {
             List<(double, double)> chromatogram = LoadChromatogram(run, msLevel);
 
-            List<Double> quartileDivisionSummedIntensities = new List<double>();
+            List<double> quartileDivisionSummedIntensities = new List<double>();
 
             double runEndTime = washTime ?? run.LastScanTime;
 
@@ -40,7 +40,7 @@ namespace Prognosticator
             return quartileDivisionSummedIntensities.Select(x => x / total).ToArray();
         }
 
-        private static double[] ExtractQuartileDivisionTimes(Run run, double? washTime, int msLevel)
+        private static double[] ExtractQuartileDivisionTimes(Run<Scan> run, double? washTime, int msLevel)
         {
             List<(double, double)> chromatogram = LoadChromatogram(run, msLevel);
 
@@ -65,7 +65,7 @@ namespace Prognosticator
             return quartileDivisionTimes;
         }
 
-        private static List<(double, double)> LoadChromatogram(Run run, int msLevel)
+        private static List<(double, double)> LoadChromatogram(Run<Scan> run, int msLevel)
         {
             List<(double, double)> chromatogram;
 
@@ -136,9 +136,9 @@ namespace Prognosticator
         static double GetTriangularNumber(double[] arr)
         {
             int n = arr.Count();
-            int i, j = 1, k = 1;
+            int j = 1, k = 1;
             double result = 0;
-            for (i = 1; i <= n; i++)
+            for (int i = 1; i <= n; i++)
             {
                 j += 1; 
                 k += j; 
