@@ -137,7 +137,7 @@ namespace MzmlParser
 
         public void ReadSpectrum(XmlReader reader, TRun run)
         {
-            ScanAndTempProperties<TScan> scanAndTempProperties = new ScanAndTempProperties<TScan>(ScanFactory);
+            TScan scan = ScanFactory.CreateScan();
 
             //The cycle number is within a kvp string in the following format: "sample=1 period=1 cycle=1 experiment=1"
             //
@@ -153,8 +153,8 @@ namespace MzmlParser
             {
                 if (!string.IsNullOrEmpty(reader.GetAttribute("id")) && !string.IsNullOrEmpty(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle"))))
                 {
-                    scanAndTempProperties.Scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle")).Split('=').Last());
-                    if (scanAndTempProperties.Scan.Cycle != 0)//Some wiffs don't have that info so let's check
+                    scan.Cycle = int.Parse(reader.GetAttribute("id").Split(' ').DefaultIfEmpty("0").Single(x => x.Contains("cycle")).Split('=').Last());
+                    if (scan.Cycle != 0)//Some wiffs don't have that info so let's check
                         CycleInfoInID = true;
                 }
             }
@@ -163,6 +163,7 @@ namespace MzmlParser
             double previousTargetMz = 0;
             int currentCycle = 0;
             bool hasAtLeastOneMS1 = false;
+            ScanAndTempProperties<TScan> scanAndTempProperties = new ScanAndTempProperties<TScan>(scan);
             while (reader.Read() && !cvParamsRead)
             {
                 if (reader.IsStartElement())
@@ -172,24 +173,24 @@ namespace MzmlParser
                         switch (reader.GetAttribute("accession"))
                         {
                             case "MS:1000511":
-                                scanAndTempProperties.Scan.MsLevel = int.Parse(reader.GetAttribute("value"));
+                                scan.MsLevel = int.Parse(reader.GetAttribute("value"));
                                 break;
                             case "MS:1000285":
-                                scanAndTempProperties.Scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000016":
-                                scanAndTempProperties.Scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                run.StartTime = Math.Min(run.StartTime, scanAndTempProperties.Scan.ScanStartTime);
-                                run.LastScanTime = Math.Max(run.LastScanTime, scanAndTempProperties.Scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
+                                scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
+                                run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
                                 break;
                             case "MS:1000829":
-                                scanAndTempProperties.Scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000828":
-                                scanAndTempProperties.Scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                scan.IsolationWindowLowerOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                             case "MS:1000827":
-                                scanAndTempProperties.Scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
+                                scan.IsolationWindowTargetMz = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 break;
                         }
                     }
@@ -197,36 +198,36 @@ namespace MzmlParser
                     {
                         GetBinaryData(reader, scanAndTempProperties);
                     }
-                    if (scanAndTempProperties.Scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
+                    if (scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
                     {
-                        scanAndTempProperties.Scan.MsLevel = reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId ? 1 : 2;
+                        scan.MsLevel = reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId ? 1 : 2;
                     }
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                 {
                     if (!CycleInfoInID)
                     {
-                        if (scanAndTempProperties.Scan.MsLevel == 1)
+                        if (scan.MsLevel == 1)
                         {
                             currentCycle++;
-                            scanAndTempProperties.Scan.Cycle = currentCycle;
+                            scan.Cycle = currentCycle;
                             hasAtLeastOneMS1 = true;
                         }
                         //if there is ScanAndTempProperties ms1:
                         else if (hasAtLeastOneMS1)
                         {
-                            scanAndTempProperties.Scan.Cycle = currentCycle;
+                            scan.Cycle = currentCycle;
                         }
                         //if there is no ms1:
                         else
                         {
-                            if (previousTargetMz >= scanAndTempProperties.Scan.IsolationWindowTargetMz)
+                            if (previousTargetMz >= scan.IsolationWindowTargetMz)
                                 currentCycle++;
-                            scanAndTempProperties.Scan.Cycle = currentCycle;
+                            scan.Cycle = currentCycle;
                         }
                     }
 
-                    previousTargetMz = scanAndTempProperties.Scan.IsolationWindowTargetMz;
+                    previousTargetMz = scan.IsolationWindowTargetMz;
 
                     if (parseBinaryData)
                     {

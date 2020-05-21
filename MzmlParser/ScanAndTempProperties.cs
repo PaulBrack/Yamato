@@ -5,12 +5,12 @@ namespace MzmlParser
     internal class ScanAndTempProperties<TScan>
         where TScan: IScan
     {
-        public ScanAndTempProperties(IScanFactory<TScan> scanFactory)
+        public ScanAndTempProperties(TScan scan)
         {
-            Scan = scanFactory.CreateScan();
+            Scan = scan;
         }
 
-        public TScan Scan { get; set; }
+        public TScan Scan { get; }
         public Base64StringAndDecodingHints? Intensities { get; set; }
         public Base64StringAndDecodingHints? Mzs { get; set; }
     }
