@@ -9,7 +9,7 @@ namespace SwaMe.Pipeline
 {
     public static class IrtPeptideMatcher
     {
-        private static CountdownEvent cde = new CountdownEvent(1);
+        private static readonly CountdownEvent cde = new CountdownEvent(1);
         public static CancellationToken _cancellationToken { get; set; }
 
 

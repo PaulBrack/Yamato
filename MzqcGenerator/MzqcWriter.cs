@@ -151,16 +151,14 @@ namespace MzqcGenerator
         /// <param name="path">The path to the output file to be opened, or null to send to stdout</param>
         public void WriteMzqc(string path, JsonClasses.MzQC metrics)
         {
-            using (TextWriter file = null == path ? Console.Out : File.CreateText(path))
+            using TextWriter file = null == path ? Console.Out : File.CreateText(path);
+            file.Write("{ \"mzQC\":");
+            JsonSerializer serializer = new JsonSerializer()
             {
-                file.Write("{ \"mzQC\":");
-                JsonSerializer serializer = new JsonSerializer()
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                };
-                serializer.Serialize(file, metrics);
-                file.Write("}");
-            }
+                NullValueHandling = NullValueHandling.Ignore
+            };
+            serializer.Serialize(file, metrics);
+            file.Write("}");
         }
 
         private JsonClasses.Unit ToUnit(string cvRef, string id) => ToUnit(cvLibrary.GetById(cvRef), id);

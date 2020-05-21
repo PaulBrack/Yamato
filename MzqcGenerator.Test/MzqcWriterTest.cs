@@ -14,22 +14,23 @@ namespace MzqcGenerator.Test
         /// </summary>
         /// 
         //IRTPeaks
-        private static IRTPeak iRTPeak1 = new IRTPeak()
+        private static readonly IRTPeak iRTPeak1 = new IRTPeak()
         {
             Mz = 550,
             RetentionTime = 20,
             FWHM = 18,
             Peaksym = 0.5
         };
-        private static IRTPeak iRTPeak2 = new IRTPeak()
+        private static readonly IRTPeak iRTPeak2 = new IRTPeak()
         {
             Mz = 825,
             RetentionTime = 30,
             FWHM = 30,
             Peaksym = 0.9
         };
+
         //Run
-        Run<Scan> iRTrun = new Run<Scan>()
+        private static readonly Run<Scan> iRTrun = new Run<Scan>()
         {
             IRTPeaks = { iRTPeak1, iRTPeak2 },
             SourceFileNames = { "File1", "File2" }
@@ -37,21 +38,21 @@ namespace MzqcGenerator.Test
 
 
         //SwathMetrics
-        private static List<double> SwathTargets = new List<double>() { 550, 1050 };
-        private static List<int> NumOfSwathPerGroup = new List<int>() { 5, 5 };
-        private static List<double> MzRange = new List<double>() { 5, 18 };
-        private static List<double> TICs = new List<double>() { 20500, 40000 };
-        private static List<double> SwDensity50 = new List<double>() { 2, 8 };
-        private static List<double?> SwDensityIQR = new List<double?>() { 1, 2 };
-        private static List<double> SwathProportionOfTotalTIC = new List<double>() { 0.20, 0.80 };
-        private static List<double> SwathProportionPredictedSingleChargeAvg = new List<double>() { 0.30, 0.70 };
+        private static readonly List<double> SwathTargets = new List<double>() { 550, 1050 };
+        private static readonly List<int> NumOfSwathPerGroup = new List<int>() { 5, 5 };
+        private static readonly List<double> MzRange = new List<double>() { 5, 18 };
+        private static readonly List<double> TICs = new List<double>() { 20500, 40000 };
+        private static readonly List<double> SwDensity50 = new List<double>() { 2, 8 };
+        private static readonly List<double?> SwDensityIQR = new List<double?>() { 1, 2 };
+        private static readonly List<double> SwathProportionOfTotalTIC = new List<double>() { 0.20, 0.80 };
+        private static readonly List<double> SwathProportionPredictedSingleChargeAvg = new List<double>() { 0.30, 0.70 };
 
-        private static SwathGrouper.SwathMetrics swathMetrics = new SwathGrouper.SwathMetrics(SwathTargets, 1000, NumOfSwathPerGroup, MzRange, TICs, SwDensity50, SwDensityIQR,
+        private static readonly SwathGrouper.SwathMetrics swathMetrics = new SwathGrouper.SwathMetrics(SwathTargets, 1000, NumOfSwathPerGroup, MzRange, TICs, SwDensity50, SwDensityIQR,
             SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg)
         { };
 
         //run
-        private static Run<Scan> RunWithoutIRT = new Run<Scan>()
+        private static readonly Run<Scan> RunWithoutIRT = new Run<Scan>()
         {
             SourceFileNames = { "File1", "File2" },
             SourceFileChecksums = { "aaa", "bbb" },
@@ -59,22 +60,22 @@ namespace MzqcGenerator.Test
         };
 
         //RTMetrics
-        private static List<double> MS1TICTotal = new List<double>() { 1000, 3000 };
-        private static List<double> MS2TICTotal = new List<double>() { 2000, 4000 };
-        private static List<double> CycleTime = new List<double>() { 2, 4 };
-        private static List<double> TICchange50List = new List<double>() { 450, 650 };
-        private static List<double> TICchangeIQRList = new List<double>() { 21, 51 };
-        private static List<int> MS1Density = new List<int>() { 5, 5 };
-        private static List<int> MS2Density = new List<int>() { 6, 5 };
-        private static List<double> Peakwidths = new List<double>() { 20, 40 };
-        private static List<double> TailingFactor = new List<double>() { 30, 60 };
-        private static List<double> PeakPrecision = new List<double>() { 33, 66 };
-        private static List<double> MS1PeakPrecision = new List<double>() { 36, 68 };
-        private static List<double> PeakCapacity = new List<double>() { 44, 120 };
-        private static List<string> segmentBoundaries = new List<string>() { "2.5_3.3", "3.3_4.0" };
+        private static readonly List<double> MS1TICTotal = new List<double>() { 1000, 3000 };
+        private static readonly List<double> MS2TICTotal = new List<double>() { 2000, 4000 };
+        private static readonly List<double> CycleTime = new List<double>() { 2, 4 };
+        private static readonly List<double> TICchange50List = new List<double>() { 450, 650 };
+        private static readonly List<double> TICchangeIQRList = new List<double>() { 21, 51 };
+        private static readonly List<int> MS1Density = new List<int>() { 5, 5 };
+        private static readonly List<int> MS2Density = new List<int>() { 6, 5 };
+        private static readonly List<double> Peakwidths = new List<double>() { 20, 40 };
+        private static readonly List<double> TailingFactor = new List<double>() { 30, 60 };
+        private static readonly List<double> PeakPrecision = new List<double>() { 33, 66 };
+        private static readonly List<double> MS1PeakPrecision = new List<double>() { 36, 68 };
+        private static readonly List<double> PeakCapacity = new List<double>() { 44, 120 };
+        private static readonly List<string> segmentBoundaries = new List<string>() { "2.5_3.3", "3.3_4.0" };
 
 
-        private static RTMetrics RTMetrics = new RTMetrics(MS1TICTotal, MS2TICTotal, CycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, TailingFactor,
+        private static readonly RTMetrics RTMetrics = new RTMetrics(MS1TICTotal, MS2TICTotal, CycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, TailingFactor,
             PeakCapacity, PeakPrecision, MS1PeakPrecision, segmentBoundaries)
         { };
 
