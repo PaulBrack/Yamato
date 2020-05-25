@@ -66,7 +66,7 @@ namespace Yamato.Console
                 if (analysisSettings.CacheSpectraToDisk && !Directory.Exists(analysisSettings.TempFolder))
                     Directory.CreateDirectory(analysisSettings.TempFolder);
 
-                Pipeliner pipeliner = new Pipeliner()
+                using Pipeliner pipeliner = new Pipeliner()
                 {
                     Threading = options.Threading ?? true,
                     MaxQueueSize = options.MaxQueueSize,

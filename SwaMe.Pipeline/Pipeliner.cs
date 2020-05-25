@@ -12,7 +12,7 @@ namespace SwaMe.Pipeline
     /// Orchestrates the guts of the SwaMe pipeline.
     /// </summary>
     /// <remarks>This code mostly came out of MzmlReader when it was refactored.</remarks>
-    public class Pipeliner : IScanConsumer<Scan, Run<Scan>>
+    public class Pipeliner : IScanConsumer<Scan, Run<Scan>>, IDisposable
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly CountdownEvent cde = new CountdownEvent(1);
@@ -31,14 +31,18 @@ namespace SwaMe.Pipeline
         public Run<Scan> LoadMzml(string path, AnalysisSettings analysisSettings)
         {
             ScanAndRunFactory factory = new ScanAndRunFactory(analysisSettings);
-            MzmlReader<Scan, Run<Scan>> parser = new MzmlReader<Scan, Run<Scan>>(factory, factory)
+            Run<Scan> run;
+            using (MzmlReader<Scan, Run<Scan>> parser = new MzmlReader<Scan, Run<Scan>>(factory, factory)
             {
                 Threading = Threading,
                 MaxThreads = MaxThreads,
                 MaxQueueSize = MaxQueueSize
-            };
-            parser.Register(this);
-            Run<Scan> run = parser.LoadMzml(path);
+            })
+            {
+                parser.Register(this);
+                run = parser.LoadMzml(path);
+            }
+
             run.MissingScans = 0;
 
             logger.Debug("Run length {0}", run.LastScanTime - run.StartTime);
@@ -279,5 +283,32 @@ namespace SwaMe.Pipeline
             if (irt)
                 FindIrtPeptideCandidates(scan, run, spectrum);
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    cde.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+        #endregion
     }
 }

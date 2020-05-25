@@ -22,7 +22,7 @@ namespace MzmlParser.Test
         [ClassInitialize]
         public static void Initialize(TestContext _)
         {
-            var reader = new Pipeliner();
+            using var reader = new Pipeliner();
             run = reader.LoadMzml(Path.Combine("mzmls", "test.mzml"), analysisSettings);
         }
 

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace MzmlParser
 {
-    public class MzmlReader<TScan, TRun>
+    public class MzmlReader<TScan, TRun> : IDisposable
         where TScan: IScan
         where TRun: IRun<TScan>
     {
@@ -342,5 +342,29 @@ namespace MzmlParser
             else
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    cde.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+        #endregion
     }
 }
