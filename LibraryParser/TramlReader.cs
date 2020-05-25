@@ -1,10 +1,8 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
-using System.Linq;
 
 namespace LibraryParser
 {

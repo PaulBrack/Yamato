@@ -1,17 +1,14 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using SwaMe.Pipeline;
 using System.IO;
 using System.Linq;
 
 namespace MzmlParser.Test
 {
-
-
-
     [TestClass]
     public class MzmlReaderTest
     {
-        private static Run run;
+        private static Run<Scan> run;
 
         private static readonly AnalysisSettings analysisSettings = new AnalysisSettings()
         {
@@ -23,9 +20,10 @@ namespace MzmlParser.Test
         };
 
         [ClassInitialize]
-        public static void Initialize(TestContext t)
+        public static void Initialize(TestContext _)
         {
-            run = new MzmlReader().LoadMzml(Path.Combine("mzmls", "test.mzml"), analysisSettings);
+            using var reader = new Pipeliner();
+            run = reader.LoadMzml(Path.Combine("mzmls", "test.mzml"), analysisSettings);
         }
 
         [TestMethod]
@@ -140,7 +138,5 @@ namespace MzmlParser.Test
             Assert.AreEqual(399.5, run.Ms2Scans.OrderBy(x => x.ScanStartTime).First().IsolationWindowLowerBoundary);
             Assert.AreEqual(743.5, run.Ms2Scans.OrderBy(x => x.ScanStartTime).Last().IsolationWindowLowerBoundary);
         }
-
-
     }
 }

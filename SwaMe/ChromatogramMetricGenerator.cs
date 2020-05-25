@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.Interpolation;
-using MzmlParser;
-using NLog;
+using SwaMe.Pipeline;
 
 namespace SwaMe
 {
@@ -14,7 +13,7 @@ namespace SwaMe
         CrawdadSharp.CrawdadPeakFinder cPF;
         List<CrawdadSharp.CrawdadPeak> crawPeaks;
 
-        public void GenerateChromatogram(Run run)
+        public void GenerateChromatogram(Run<Scan> run)
         {
             //Crawdad
             foreach (BasePeak basepeak in run.BasePeaks)
@@ -74,7 +73,7 @@ namespace SwaMe
             }
         }
 
-        public void GenerateiRTChromatogram(Run run)
+        public void GenerateiRTChromatogram(Run<Scan> run)
         {
 
             foreach (IRTPeak irtpeak in run.IRTPeaks)
@@ -135,14 +134,14 @@ namespace SwaMe
                     {
                         if (currentintensity > 0)
                         {
-                            if (starttimesList[currentintensity] == placetobe) { placetobe = placetobe + 0.01; }
+                            if (starttimesList[currentintensity] == placetobe) { placetobe += 0.01; }
                             double newIntensity = interpolation.Interpolate(placetobe);
                             intensityList.Insert(currentintensity, newIntensity);
                             starttimesList.Insert(currentintensity, placetobe);
                         }
                         else
                         {
-                            if (starttimesList[currentintensity] == placetobe) { placetobe = placetobe - 0.01; }
+                            if (starttimesList[currentintensity] == placetobe) { placetobe -= 0.01; }
                             double newIntensity = interpolation.Interpolate(placetobe);
                             intensityList.Insert(currentintensity, newIntensity);
                             starttimesList.Insert(currentintensity, placetobe);

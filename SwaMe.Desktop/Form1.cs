@@ -1,16 +1,12 @@
 ﻿using LibraryParser;
-using MzmlParser;
 using NLog;
 using NLog.Config;
+using SwaMe.Pipeline;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -132,41 +128,40 @@ namespace SwaMe.Desktop
 
             int division;
             if (rtDivisionUpDown.Value < 100 && rtDivisionUpDown.Value > 0)
-                division = Decimal.ToInt32(rtDivisionUpDown.Value);
+                division = decimal.ToInt32(rtDivisionUpDown.Value);
             else
             {
                 logger.Error("Number of divisions must be within the range 1 - 100. You have input: {0}", rtDivisionUpDown.Value);
                 throw new ArgumentOutOfRangeException();
             }
-            bool irt = !String.IsNullOrEmpty(irtFilePath);
+            bool irt = !string.IsNullOrEmpty(irtFilePath);
 
-            MzmlParser.MzmlReader mzmlParser = new MzmlParser.MzmlReader
+            Pipeliner pipeliner = new Pipeliner()
             {
-                ParseBinaryData = true,
                 Threading = true,
-                MaxQueueSize = Decimal.ToInt32(MaxQueueUpDown.Value),
-                MaxThreads = Decimal.ToInt32(MaxThreadsUpDown.Value),
-                _cancellationToken = _cts.Token
+                MaxQueueSize = decimal.ToInt32(MaxQueueUpDown.Value),
+                MaxThreads = decimal.ToInt32(MaxThreadsUpDown.Value),
+                CancellationToken = _cts.Token
             };
 
             CheckFileIsReadableOrComplain(inputFilePath);
 
             AnalysisSettings analysisSettings = new AnalysisSettings()
             {
-                MassTolerance = Decimal.ToDouble(BasePeakMassToleranceUpDown.Value),
-                RtTolerance = Decimal.ToDouble(BasePeakRtToleranceUpDown.Value),
-                IrtMinIntensity = Decimal.ToDouble(MinIrtIntensityUpDown.Value),
-                IrtMinPeptides = Decimal.ToInt32(irtPeptidesUpDown.Value),
-                IrtMassTolerance = Decimal.ToDouble(irtToleranceUpDown.Value),
+                MassTolerance = decimal.ToDouble(BasePeakMassToleranceUpDown.Value),
+                RtTolerance = decimal.ToDouble(BasePeakRtToleranceUpDown.Value),
+                IrtMinIntensity = decimal.ToDouble(MinIrtIntensityUpDown.Value),
+                IrtMinPeptides = decimal.ToInt32(irtPeptidesUpDown.Value),
+                IrtMassTolerance = decimal.ToDouble(irtToleranceUpDown.Value),
                 CacheSpectraToDisk = CacheToDiskCheckBox.Checked,
-                MinimumIntensity = Decimal.ToInt32(MinIrtIntensityUpDown.Value),
+                MinimumIntensity = decimal.ToInt32(MinIrtIntensityUpDown.Value),
                 TempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
             };
 
             if (analysisSettings.CacheSpectraToDisk && !Directory.Exists(analysisSettings.TempFolder))
                 Directory.CreateDirectory(analysisSettings.TempFolder);
 
-            if (!String.IsNullOrEmpty(irtFilePath))
+            if (!string.IsNullOrEmpty(irtFilePath))
             {
                 irt = true;
                 if (irtFilePath.ToLower().EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
@@ -181,33 +176,30 @@ namespace SwaMe.Desktop
                     analysisSettings.IrtLibrary = svReader.LoadLibrary(irtFilePath);
                 }
             }
-            MzmlParser.Run run = mzmlParser.LoadMzml(inputFilePath, analysisSettings);
-            AnalysisSettingsFileWriter Aw = new AnalysisSettingsFileWriter();
-            if (inputFiles.Count() > 1 && lastFile)//multiple files and this is the last
+            using (Run<Scan> run = pipeliner.LoadMzml(inputFilePath, analysisSettings))
             {
-                Aw.WriteASFile(run, dateTime, inputFiles);
+                AnalysisSettingsFileWriter Aw = new AnalysisSettingsFileWriter();
+                if (inputFiles.Count() > 1 && lastFile)//multiple files and this is the last
+                {
+                    Aw.WriteASFile(run, dateTime, inputFiles);
+                }
+                else //only one file
+                {
+                    Aw.WriteASFile(run, dateTime, inputFilePath);
+                }
+
+                logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt);
+                var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
+
+                var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
+
+
+                new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("", run, metrics, inputFilePath, analysisSettings);
+                logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
             }
-            else //only one file
-            {
-                Aw.WriteASFile(run, dateTime, inputFilePath);
-            }
-
-            logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-            var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt);
-            var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
-
-            var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
-
-
-            new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("", run, metrics, inputFilePath, analysisSettings);
-            logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-
             if (analysisSettings.CacheSpectraToDisk)
-            {
-                logger.Trace("Deleting temp files...");
-                mzmlParser.DeleteTempFiles(run);
                 Directory.Delete(analysisSettings.TempFolder);
-            }
             logger.Trace("Done!");
             LogManager.Shutdown();
         }

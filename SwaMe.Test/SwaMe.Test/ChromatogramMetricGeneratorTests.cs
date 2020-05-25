@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MzmlParser;
-using System.Collections.Concurrent;
+using SwaMe.Pipeline;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,8 +8,8 @@ namespace SwaMe.Test
     [TestClass]
     public class ChromatogramMetricGeneratorTest
     {
-        private static Run EmptyBasePeakRun;
-        private static Run Basepeak1Run;
+        private static Run<Scan> EmptyBasePeakRun;
+        private static Run<Scan> Basepeak1Run;
         private static ChromatogramMetricGenerator BasePeak1ChromatogramGenerator;
         private static ChromatogramMetricGenerator EmptyCMG;
 
@@ -18,14 +17,14 @@ namespace SwaMe.Test
         public void Initialize()
         {
 
-            EmptyBasePeakRun = new Run
+            EmptyBasePeakRun = new Run<Scan>
             {
                 AnalysisSettings = new AnalysisSettings
                 {
                     RtTolerance = 2.5
                 }
             };
-            Basepeak1Run = new Run
+            Basepeak1Run = new Run<Scan>
             {
                 AnalysisSettings = new AnalysisSettings
                 {
@@ -46,11 +45,11 @@ namespace SwaMe.Test
                 Spectrum = new List<SpectrumPoint>() { }
             };
 
-            Basepeak1Run.BasePeaks = new ConcurrentBag<BasePeak>() { basePeak1 };
+            Basepeak1Run.BasePeaks.Add(basePeak1);
             BasePeak1ChromatogramGenerator = new ChromatogramMetricGenerator();
             BasePeak1ChromatogramGenerator.GenerateChromatogram(Basepeak1Run);
 
-            EmptyBasePeakRun.BasePeaks = new ConcurrentBag<BasePeak>() {EmptyBasePeak};
+            EmptyBasePeakRun.BasePeaks.Add(EmptyBasePeak);
             EmptyCMG = new ChromatogramMetricGenerator();
             EmptyCMG.GenerateChromatogram(EmptyBasePeakRun);
 

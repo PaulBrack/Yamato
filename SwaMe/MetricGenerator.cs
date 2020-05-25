@@ -1,7 +1,7 @@
-using MzmlParser;
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
+using SwaMe.Pipeline;
 
 namespace SwaMe
 {
@@ -13,9 +13,9 @@ namespace SwaMe
         public List<int> Density;
         public SwathGrouper.SwathMetrics SwathMetrics { get; private set; }
         public RTGrouper.RTMetrics RtMetrics { get; private set; }
-        public Run Run { get; private set; }
+        public Run<Scan> Run { get; private set; }
 
-        public Dictionary<string, dynamic> GenerateMetrics(Run run, int division, bool irt)
+        public Dictionary<string, dynamic> GenerateMetrics(Run<Scan> run, int division, bool irt)
         {
             Run = run;
             if (run.LastScanTime != 0 && run.StartTime != 1000000)

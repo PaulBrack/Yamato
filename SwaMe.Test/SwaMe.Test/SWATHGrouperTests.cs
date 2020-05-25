@@ -1,16 +1,15 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MzmlParser;
+using SwaMe.Pipeline;
 
 namespace SwaMe.Test
 {
     [TestClass]
     public class SWATHGrouperTests
     {
-        private static Run ms2andms1Run;
+        private static Run<Scan> ms2andms1Run;
         private static SwathGrouper swathGrouper;
         public SwathGrouper.SwathMetrics result = new SwathGrouper.SwathMetrics();
 
@@ -212,18 +211,17 @@ namespace SwaMe.Test
             basePeak2.FullWidthBaselines.Add(1);
 
             //Runs:
-            ms2andms1Run = new Run
+            ms2andms1Run = new Run<Scan>
             {
                 AnalysisSettings = new AnalysisSettings
                 {
                     RtTolerance = 2.5
                 },
-                Ms2Scans = new ConcurrentBag<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5, ms2scan6, ms2scan7, ms2scan8, ms2scan9, ms2scan10 },
-                Ms1Scans = new List<Scan>() { ms1scan1, ms1scan2, ms1scan3 },
                 LastScanTime = 100,
                 StartTime = 0
             };
-
+            ms2andms1Run.Ms2Scans.AddRange(new Scan[] { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5, ms2scan6, ms2scan7, ms2scan8, ms2scan9, ms2scan10 });
+            ms2andms1Run.Ms1Scans.AddRange(new Scan[] { ms1scan1, ms1scan2, ms1scan3 });
 
             ms2andms1Run.BasePeaks.Add(basePeak1);
             ms2andms1Run.BasePeaks.Add(basePeak2);
@@ -257,7 +255,8 @@ namespace SwaMe.Test
         [TestMethod]
         public void swathTargetsCorrect()
         {
-            List<double> correctTargets = new List<double>() { 1050, 550 };
+            // Targets should come out of SwathGrouper sorted in ascending order.
+            List<double> correctTargets = new List<double>() { 550, 1050 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.swathTargets, correctTargets));
         }
         [TestMethod]
@@ -275,25 +274,25 @@ namespace SwaMe.Test
         [TestMethod]
         public void TICsCorrect()
         {
-            List<double> correctTICs = new List<double>() { 38050, 20050 };
+            List<double> correctTICs = new List<double>() { 20050, 38050 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.TICs, correctTICs));
         }
         [TestMethod]
         public void swDensity50Correct()
         {
-            List<double> correctswDensity50 = new List<double>() { 17, 4 };
+            List<double> correctswDensity50 = new List<double>() { 4, 17 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.swDensity50, correctswDensity50));
         }
         [TestMethod]
         public void swDensityIQRCorrect()
         {
-            List<double?> correctswDensityIQR = new List<double?>() { 16, 1 };
+            List<double?> correctswDensityIQR = new List<double?>() { 1, 16 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.swDensityIQR, correctswDensityIQR));
         }
         [TestMethod]
         public void SwathProportionOfTotalTICCorrect()
         {
-            List<double> correctSwathProportionOfTotalTIC = new List<double>() { 0.65490533562822717, 0.34509466437177283 };
+            List<double> correctSwathProportionOfTotalTIC = new List<double>() { 0.34509466437177283, 0.65490533562822717 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.SwathProportionOfTotalTIC, correctSwathProportionOfTotalTIC));
         }
 

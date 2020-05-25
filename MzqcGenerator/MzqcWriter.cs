@@ -1,7 +1,7 @@
 using CVLibrarian;
-using MzmlParser;
 using Newtonsoft.Json;
 using NLog;
+using SwaMe.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -84,7 +84,7 @@ namespace MzqcGenerator
         }
 
         /// <param name="outputFileName">The path to the output file to be opened, or null to send to stdout</param>
-        public void BuildMzqcAndWrite(string outputFileName, Run run, Dictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
+        public void BuildMzqcAndWrite(string outputFileName, Run<Scan> run, Dictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
         {
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
@@ -151,16 +151,14 @@ namespace MzqcGenerator
         /// <param name="path">The path to the output file to be opened, or null to send to stdout</param>
         public void WriteMzqc(string path, JsonClasses.MzQC metrics)
         {
-            using (TextWriter file = null == path ? Console.Out : File.CreateText(path))
+            using TextWriter file = null == path ? Console.Out : File.CreateText(path);
+            file.Write("{ \"mzQC\":");
+            JsonSerializer serializer = new JsonSerializer()
             {
-                file.Write("{ \"mzQC\":");
-                JsonSerializer serializer = new JsonSerializer()
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                };
-                serializer.Serialize(file, metrics);
-                file.Write("}");
-            }
+                NullValueHandling = NullValueHandling.Ignore
+            };
+            serializer.Serialize(file, metrics);
+            file.Write("}");
         }
 
         private JsonClasses.Unit ToUnit(string cvRef, string id) => ToUnit(cvLibrary.GetById(cvRef), id);

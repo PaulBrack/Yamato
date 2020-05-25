@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
+using SwaMe.Pipeline;
 
 namespace SwaMe
 {
@@ -50,7 +51,7 @@ namespace SwaMe
 
         }
 
-        public RTMetrics DivideByRT(MzmlParser.Run run, int division, double rtDuration)
+        public RTMetrics DivideByRT(Run<Scan> run, int division, double rtDuration)
         {
             double rtSegment = rtDuration / division;
             rtSegs = new double[division];
@@ -66,7 +67,7 @@ namespace SwaMe
             }
                 
             //dividing basepeaks into segments
-            foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
+            foreach (BasePeak basepeak in run.BasePeaks)
             {
                 //Check to see in which RTsegment this basepeak is:
                 foreach (double rt in basepeak.BpkRTs)
@@ -87,7 +88,7 @@ namespace SwaMe
             }
             double experimentWideMS2TICSquared = 0;
             //dividing ms2scans into segments of RT
-            foreach (MzmlParser.Scan scan in run.Ms2Scans)
+            foreach (Scan scan in run.Ms2Scans)
             {
                 //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
                 //We assign to the segmentdivider below. So if >a and <b, it is assigned to segment a.
@@ -105,7 +106,7 @@ namespace SwaMe
             }
 
             //dividing ms1scans into segments of RT
-            foreach (MzmlParser.Scan scan in run.Ms1Scans)
+            foreach (Scan scan in run.Ms1Scans)
             {
                 if (scan.ScanStartTime > rtSegs.Last())//If the scan is after the last segment divider, it falls into the last segment
                     scan.RTsegment = rtSegs.Count() - 1;
@@ -168,7 +169,7 @@ namespace SwaMe
                 List<double> peakSymTemp = new List<double>();
                 List<double> fullWidthBaselinesTemp = new List<double>();
                 List<double> peakPrecisionTemp = new List<double>();
-                foreach (MzmlParser.BasePeak basepeak in run.BasePeaks)
+                foreach (BasePeak basepeak in run.BasePeaks)
                 {
                     for (int i = 0; i < basepeak.RTsegments.Count(); i++)
                     {
@@ -193,7 +194,7 @@ namespace SwaMe
                 List<int> ms1DensityTemp = new List<int>();
                 List<double> ms1PeakPrecisionTemp = new List<double>();
 
-                foreach (MzmlParser.Scan scan in run.Ms1Scans.OrderBy(x=>x.ScanStartTime))
+                foreach (Scan scan in run.Ms1Scans.OrderBy(x=>x.ScanStartTime))
                 {
                     if (scan.RTsegment == segment)
                     {
@@ -259,6 +260,3 @@ namespace SwaMe
         }
     }
 }
-
-
-

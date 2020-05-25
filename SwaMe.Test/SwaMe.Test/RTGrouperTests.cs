@@ -1,17 +1,16 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MzmlParser;
+using SwaMe.Pipeline;
 
 namespace SwaMe.Test
 {
     [TestClass]
    public class RTGrouperTests
     {
-        private static Run Ms2andms1Run;
-        private static Run Emptyms2scansRun;
+        private static Run<Scan> Ms2andms1Run;
+        private static Run<Scan> Emptyms2scansRun;
         private static RTGrouper RTGrouper;
         public RTGrouper.RTMetrics Result = new RTGrouper.RTMetrics();
        [TestInitialize]
@@ -102,17 +101,17 @@ namespace SwaMe.Test
             basePeak2.FullWidthBaselines.Add(1);
 
             //Runs:
-            Ms2andms1Run = new Run
+            Ms2andms1Run = new Run<Scan>
             {
                 AnalysisSettings = new AnalysisSettings
                 {
                     RtTolerance = 2.5
                 },
-                Ms2Scans = new ConcurrentBag<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5, ms2scan6, ms2scan7, ms2scan8 },
-                Ms1Scans = new List<Scan>() { ms1scan1, ms1scan2, ms1scan3 },
                 LastScanTime = 100,
                 StartTime = 0
             };
+            Ms2andms1Run.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5, ms2scan6, ms2scan7, ms2scan8 });
+            Ms2andms1Run.Ms1Scans.AddRange(new List<Scan>() { ms1scan1, ms1scan2, ms1scan3 });
 
 
             Ms2andms1Run.BasePeaks.Add(basePeak1);
@@ -120,16 +119,16 @@ namespace SwaMe.Test
             Ms2andms1Run.SourceFileNames.Add(" ");
             Ms2andms1Run.SourceFileChecksums.Add(" ");
 
-            Emptyms2scansRun = new Run
+            Emptyms2scansRun = new Run<Scan>
             {
                 AnalysisSettings = new AnalysisSettings
                 {
                     RtTolerance = 2.5
                 },
-                Ms2Scans = new ConcurrentBag<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan9 },//9 does not have upper and lower offsets
                 LastScanTime = 0,
                 StartTime = 1000000
             };
+            Emptyms2scansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan9 }); //9 does not have upper and lower offsets
 
             Emptyms2scansRun.BasePeaks.Add(basePeak1);
             Emptyms2scansRun.SourceFileNames.Add(" ");

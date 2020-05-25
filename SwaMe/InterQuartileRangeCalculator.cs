@@ -10,7 +10,7 @@ namespace SwaMe
             if (list.Count < 5) 
             {
             throw new ArgumentException(String.Format("{0} is too few list items to calculate IQR", list.Count),
-                                      "list");
+                                      nameof(list));
             }
             // Note list must already be sorted.
             int length = list.Count;
@@ -25,7 +25,7 @@ namespace SwaMe
             if (list.Count < 5)
             {
                 throw new ArgumentException(String.Format("{0} is too few list items to calculate IQR", list.Count),
-                                          "list");
+                                          nameof(list));
             }
             int length = list.Count;
             int Q1 = list[length / 4];

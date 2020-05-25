@@ -1,37 +1,31 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 using LibraryParser;
 
-namespace MzmlParser
+namespace SwaMe.Pipeline
 {
     public class IRTPeak
     {
         public double Mz { get; set; }
         public double Intensity { get; set; }
-        public List<Library.Transition> AssociatedTransitions;
+        public List<Library.Transition> AssociatedTransitions = new List<Library.Transition>();
         public double RetentionTime { get; set; }
         public double ExpectedRetentionTime { get; set; }
-        public List<SpectrumPoint> Spectrum { get; set; }
+        public List<SpectrumPoint> Spectrum { get; set; } = new List<SpectrumPoint>();
         public double FWHM;
         public double Peaksym;
-        public List<double> TransitionRTs { get; set; }
-        public SpectrumPoint BasePeak;
-        public List<PossiblePeak> PossPeaks;
+        public List<double> TransitionRTs { get; set; } = new List<double>();
+        public SpectrumPoint? BasePeak;
+        public List<PossiblePeak> PossPeaks = new List<PossiblePeak>();
         public double DotProduct;
-
-        public IRTPeak()
-        {
-            AssociatedTransitions = new List<Library.Transition>();
-            Spectrum = new List<SpectrumPoint>();
-            TransitionRTs = new List<double>();
-            PossPeaks = new List<PossiblePeak>();
-        }
     }
 
     public class PossiblePeak
     {
         public double DotProduct;
-        public SpectrumPoint BasePeak;
-        public List<List<SpectrumPoint>> Alltransitions;
+        public SpectrumPoint? BasePeak;
+        public List<List<SpectrumPoint>>? AllTransitions;
         public int MatchingTransitions = 0;
     }
 

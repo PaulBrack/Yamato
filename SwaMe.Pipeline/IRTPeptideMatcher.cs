@@ -5,15 +5,15 @@ using System;
 using LibraryParser;
 using System.Collections.Generic;
 
-namespace MzmlParser
+namespace SwaMe.Pipeline
 {
     public static class IrtPeptideMatcher
     {
-        private static CountdownEvent cde = new CountdownEvent(1);
+        private static readonly CountdownEvent cde = new CountdownEvent(1);
         public static CancellationToken _cancellationToken { get; set; }
 
 
-        public static void ChooseIrtPeptides(Run run)
+        public static void ChooseIrtPeptides(Run<Scan> run)
         {
             var chosenCandidates = new ConcurrentBag<CandidateHit>();
             foreach (string peptideSequence in run.IRTHits.Select(x => x.PeptideSequence).Distinct())
@@ -25,7 +25,7 @@ namespace MzmlParser
             AddIrtSpectra(run);
         }
 
-        private static void AddIrtSpectra(Run run)
+        private static void AddIrtSpectra(Run<Scan> run)
         {
             foreach (CandidateHit candidateHit in run.IRTHits)
             {
@@ -50,7 +50,7 @@ namespace MzmlParser
 
         }
 
-        private static void FindIrtSpectra(Run run, CandidateHit candidateHit)
+        private static void FindIrtSpectra(Run<Scan> run, CandidateHit candidateHit)
         {
             var matchingScans = run.Ms2Scans.Where(x => Math.Abs(x.ScanStartTime - candidateHit.RetentionTime) < run.AnalysisSettings.RtTolerance/*
                                && candidateHit.PrecursorTargetMz > x.IsolationWindowLowerBoundary
@@ -88,7 +88,7 @@ namespace MzmlParser
             cde.Signal();
         }
 
-        private static CandidateHit ChoosePeptideCandidate(Run run, string peptideSequence)
+        private static CandidateHit ChoosePeptideCandidate(Run<Scan> run, string peptideSequence)
         {
 
 
