@@ -32,6 +32,9 @@ namespace MzmlParser
         private readonly IList<IScanConsumer<TScan, TRun>> scanConsumers = new List<IScanConsumer<TScan, TRun>>();
 
         public CancellationToken CancellationToken { get; set; }
+        /// <summary>
+        /// If null, no queuing is taking place (i.e. Threading is false).
+        /// </summary>
         private ThrottlingConcurrentConsumerQueue<ScanAndTempProperties<TScan, TRun>>? queue;
 
         private bool parseBinaryData;
