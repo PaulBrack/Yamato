@@ -197,7 +197,7 @@ namespace Yamato.Console
         public int MinimumIntensity { get; set; } = 100;
 
         [Option("maxQueueSize", Required = false, HelpText = "The maximum number of threads to queue. When the number is met, the parser will pause")]
-        public int MaxQueueSize { get; set; } = 1000;
+        public int MaxQueueSize { get; set; } = 100;
 
         [Option("maxThreads", Required = false, HelpText = "The maximum number of worker threads. Set as zero for default system max.")]
         public int MaxThreads { get; set; } = 0;

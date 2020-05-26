@@ -32,16 +32,14 @@ namespace SwaMe.Pipeline
         {
             ScanAndRunFactory factory = new ScanAndRunFactory(analysisSettings);
             Run<Scan> run;
-            using (MzmlReader<Scan, Run<Scan>> parser = new MzmlReader<Scan, Run<Scan>>(factory, factory)
+            MzmlReader<Scan, Run<Scan>> parser = new MzmlReader<Scan, Run<Scan>>(factory, factory)
             {
                 Threading = Threading,
                 MaxThreads = MaxThreads,
                 MaxQueueSize = MaxQueueSize
-            })
-            {
-                parser.Register(this);
-                run = parser.LoadMzml(path);
-            }
+            };
+            parser.Register(this);
+            run = parser.LoadMzml(path);
 
             run.MissingScans = 0;
 

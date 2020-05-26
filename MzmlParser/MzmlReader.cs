@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace MzmlParser
 {
-    public class MzmlReader<TScan, TRun> : IDisposable
+    public class MzmlReader<TScan, TRun>
         where TScan: IScan
         where TRun: IRun<TScan>
     {
@@ -27,16 +27,19 @@ namespace MzmlParser
 
         public bool Threading { get; set; }
         public int MaxQueueSize { get; set; } = 1000;
-        public int MaxThreads { get; set; } = 0;
+        public int MaxThreads { get; set; } = 4;
 
         private readonly IList<IScanConsumer<TScan, TRun>> scanConsumers = new List<IScanConsumer<TScan, TRun>>();
 
         public CancellationToken CancellationToken { get; set; }
+        /// <summary>
+        /// If null, no queuing is taking place (i.e. Threading is false).
+        /// </summary>
+        private ThrottlingConcurrentConsumerQueue<ScanAndTempProperties<TScan, TRun>>? queue;
 
         private bool parseBinaryData;
 
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private readonly CountdownEvent cde = new CountdownEvent(1);
         private string? SurveyScanReferenceableParamGroupId; //This is the referenceableparamgroupid for the survey scan
 
         public void Register(IScanConsumer<TScan, TRun> scanConsumer)
@@ -47,25 +50,23 @@ namespace MzmlParser
         /// <param name="path">The path to the input file to be opened, or null to read from stdin</param>
         public TRun LoadMzml(string path)
         {
-            if (MaxThreads != 0)
-                ThreadPool.SetMaxThreads(MaxThreads, MaxThreads);
             TRun run = RunFactory.CreateRun();
             run.StartTime = 100;
             run.LastScanTime = 0;
             parseBinaryData = scanConsumers.Any(scanConsumer => scanConsumer.RequiresBinaryData);
 
+            if (Threading)
+                queue = new ThrottlingConcurrentConsumerQueue<ScanAndTempProperties<TScan, TRun>>(ProcessScan, ToLogicalCores(MaxThreads), MaxQueueSize);
             ReadMzml(path, run);
-
-            cde.Signal();
-            while(cde.CurrentCount > 1)
-            {
-                if (CancellationToken.IsCancellationRequested)
-                    throw new OperationCanceledException("Reading MZML was cancelled");
-
-                Thread.Sleep(500);
-            }
-            cde.Wait();
+            if (null != queue)
+                queue.WaitForAllTasksToComplete();
             return run;
+        }
+
+        /// <remarks>TODO: Tweak the default. Peter suspects this isn't a bad approximation for most systems as they'll need a little in reserve for the XML parser and system tasks, and the rest of the processing is utterly CPU-bound rather than I/O-bound.</remarks>
+        private int ToLogicalCores(int maxThreads)
+        {
+            return maxThreads > 0 ? maxThreads : Environment.ProcessorCount;
         }
 
         /// <param name="path">The path to the input file to be opened, or null to read from stdin</param>
@@ -163,7 +164,7 @@ namespace MzmlParser
             double previousTargetMz = 0;
             int currentCycle = 0;
             bool hasAtLeastOneMS1 = false;
-            ScanAndTempProperties<TScan> scanAndTempProperties = new ScanAndTempProperties<TScan>(scan);
+            ScanAndTempProperties<TScan, TRun> scanAndTempProperties = new ScanAndTempProperties<TScan, TRun>(scan, run);
             while (reader.Read() && !cvParamsRead)
             {
                 if (reader.IsStartElement())
@@ -229,31 +230,22 @@ namespace MzmlParser
 
                     previousTargetMz = scan.IsolationWindowTargetMz;
 
-                    if (parseBinaryData)
-                    {
-                        if (Threading)
-                        {
-                            cde.AddCount();
-                            while (cde.CurrentCount > MaxQueueSize)
-                                Thread.Sleep(1000);
-
-                            ThreadPool.QueueUserWorkItem(state => ParseBase64Data(scanAndTempProperties, run));
-                        }
-                        else
-                        {
-                            ParseBase64Data(scanAndTempProperties, run);
-                        }
-                    }
-                    else
-                    {
-                        AddScanToRun(scanAndTempProperties.Scan, run);
-                    }
+                    ProcessScanThreadedOrNot(scanAndTempProperties);
                     cvParamsRead = true;
                 }
             }
         }
 
-        private static void GetBinaryData(XmlReader reader, ScanAndTempProperties<TScan> scan)
+        private void ProcessScanThreadedOrNot(ScanAndTempProperties<TScan, TRun> scanAndTempProperties)
+        {
+            AddScanToRun(scanAndTempProperties.Scan, scanAndTempProperties.Run);
+            if (null == queue)
+                ProcessScan(scanAndTempProperties);
+            else
+                queue.Enqueue(scanAndTempProperties);
+        }
+
+        private static void GetBinaryData(XmlReader reader, ScanAndTempProperties<TScan, TRun> scan)
         {
             string base64 = string.Empty;
             Bitness bitness = Bitness.NotSet;
@@ -310,16 +302,12 @@ namespace MzmlParser
             }
         }
 
-        private void ParseBase64Data(ScanAndTempProperties<TScan> scanAndTempProperties, TRun run)
+        private void ProcessScan(ScanAndTempProperties<TScan, TRun> scanAndTempProperties)
         {
             float[]? intensities = parseBinaryData ? scanAndTempProperties.Intensities?.ExtractFloatArray() : null;
             float[]? mzs = parseBinaryData ? scanAndTempProperties.Mzs?.ExtractFloatArray() : null;
             foreach (var scanConsumer in scanConsumers)
-                scanConsumer.Notify(scanAndTempProperties.Scan, mzs, intensities, run);
-            AddScanToRun(scanAndTempProperties.Scan, run);
-
-            if (Threading)
-                cde.Signal();
+                scanConsumer.Notify(scanAndTempProperties.Scan, mzs, intensities, scanAndTempProperties.Run);
         }
 
         private void AddScanToRun(TScan scan, TRun run)
@@ -342,29 +330,5 @@ namespace MzmlParser
             else
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    cde.Dispose();
-                }
-
-                disposedValue = true;
-            }
-        }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-        }
-        #endregion
     }
 }
