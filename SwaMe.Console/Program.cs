@@ -112,6 +112,8 @@ namespace Yamato.Console
             catch (Exception ex)
             {
                 Logger.Fatal(ex, "An unexpected error occured");
+                Logger.Fatal(ex.Message);
+                Logger.Fatal(ex.StackTrace);
                 LogManager.Shutdown();
                 Environment.Exit(1);
             }
