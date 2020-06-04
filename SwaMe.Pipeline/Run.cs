@@ -18,7 +18,11 @@ namespace SwaMe.Pipeline
         public string? CompletionTime { get; set; }
         public List<TScan> Ms1Scans { get; } = new List<TScan>();
         public List<TScan> Ms2Scans { get; } = new List<TScan>();
-        public ConcurrentBag<BasePeak> BasePeaks { get; } = new ConcurrentBag<BasePeak>();
+        /// <remarks>
+        /// BEWARE: BasePeaks has concurrent read-calculate-write access.  If writing, please lock on the BasePeaks object.
+        /// It is not a concurrent datatype because read-calculate-write accesses are not amenable to being defended in that way.
+        /// </remarks>
+        public List<BasePeak> BasePeaks { get; } = new List<BasePeak>();
         public Chromatograms Chromatograms { get; } = new Chromatograms();
         public List<(double, double)>? IsolationWindows { get; set; }
         public int MissingScans { get; set; }
