@@ -156,7 +156,12 @@ namespace SwaMe.Pipeline
                     var matching = spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - bp.Mz) <= run.AnalysisSettings.MassTolerance);
 
                     if (matching != null)
-                        bp.Spectrum.Add(matching.OrderByDescending(x => x.Intensity).FirstOrDefault());
+                    {
+                        lock (bp.Spectrum)
+                        {
+                            bp.Spectrum.Add(matching.OrderByDescending(x => x.Intensity).FirstOrDefault());
+                        }
+                    }
                 }
             }
             cde.Signal();
