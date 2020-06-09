@@ -243,43 +243,65 @@ namespace SwaMe.Pipeline
             float basepeakIntensity;
             if (intensities.Count() > 0)
             {
+                // TODO: This approach requires two scans across intensities plus converting intensities to a List; is there a simpler approach involving a single scan in a for-next loop?
                 basepeakIntensity = intensities.Max();
                 int maxIndex = intensities.ToList().IndexOf(basepeakIntensity);
                 double mz = mzs[maxIndex];
 
-                if (run.BasePeaks.Count(x => Math.Abs(x.Mz - mz) < run.AnalysisSettings.MassTolerance) < 1)//If a basepeak with this mz doesn't exist yet add it
-                {
-                    BasePeak bp = new BasePeak(mz, scan.ScanStartTime, basepeakIntensity);
-                    run.BasePeaks.Add(bp);
-                }
-                else //we do have a match, now lets figure out if they fall within the rtTolerance
-                {
-                    //find out which basepeak
-                    foreach (BasePeak thisbp in run.BasePeaks.Where(x => Math.Abs(x.Mz - mz) < run.AnalysisSettings.MassTolerance))
-                    {
-                        bool found = false;
-                        for (int rt = 0; rt < thisbp.BpkRTs.Count(); rt++)
-                        {
-                            if (Math.Abs(thisbp.BpkRTs[rt] - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance)//this is part of a previous basepeak, or at least considered to be 
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found)//This is considered to be a new instance
-                        {
-                            thisbp.BpkRTs.Add(scan.ScanStartTime);
-                            thisbp.Intensities.Add(basepeakIntensity);
-                        }
-                    }
-                }
+                AtomicallyRecordBasePeakAndRT(new DoubleSpectrumPoint(basepeakIntensity, mz, scan.ScanStartTime), run);
             }
-            else { basepeakIntensity = 0; }
+            else
+            {
+                basepeakIntensity = 0;
+            }
             //Extract info for Basepeak chromatograms
 
             bool irt = run.AnalysisSettings.IrtLibrary != null;
             if (irt)
                 FindIrtPeptideCandidates(scan, run, spectrum);
+        }
+
+        /// <summary>
+        /// Atomically test-and-set the BasePeak(s) and BpkRT(s) that we're going to use for this point.
+        /// This may involve creating a new BasePeak, or a new BpkRt inside one or more existing BasePeaks.
+        /// </summary>
+        private static void AtomicallyRecordBasePeakAndRT(DoubleSpectrumPoint point, Run<Scan> run)
+        {
+            BasePeak[] candidates;
+            lock (run.BasePeaks)
+            {
+                candidates = run.BasePeaks.Where(x => Math.Abs(x.Mz - point.Mz) < run.AnalysisSettings.MassTolerance).ToArray();
+                if (0 == candidates.Length)
+                {
+                    // No basepeak with this mz exists yet, so add it
+                    run.BasePeaks.Add(new BasePeak(point.Mz, point.RetentionTime, point.Intensity));
+                    return;
+                }
+            }
+
+            // If we get here, we have one or more matches within our mass tolerance.  Ensure there's a BpkRt in each match that's within rtTolerance of this scan.
+            // Because we're doing this in each BasePeak match, rather than picking a "best" candidate, we don't need to do this inside the lock on all BasePeaks;
+            // we just need to ensure that no other thread can be checking BpkRTs for the same candidate at the same time.
+            foreach (BasePeak candidate in candidates)
+            {
+                bool found = false;
+                lock (candidate)
+                {
+                    foreach (double rt in candidate.BpkRTs)
+                    {
+                        if (Math.Abs(rt - point.RetentionTime) < run.AnalysisSettings.RtTolerance) // This is considered to be part of a previous basepeak
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) // No matching BpkRt in this BasePeak, so add one.
+                    {
+                        candidate.BpkRTs.Add(point.RetentionTime);
+                        candidate.Intensities.Add(point.Intensity);
+                    }
+                }
+            }
         }
 
         #region IDisposable Support

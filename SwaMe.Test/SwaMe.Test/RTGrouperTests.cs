@@ -154,7 +154,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void RtsegmentsAllocatedToFirstBasePeakCorrect()
         {
-            Assert.AreEqual(Ms2andms1Run.BasePeaks.ElementAt(0).RTsegments.ElementAt(0), 1);
+            Assert.AreEqual(Ms2andms1Run.BasePeaks.ElementAt(0).RTsegments.ElementAt(0), 2);
         }
         /// <remarks>
         /// RTSegs is correctly allocated to basepeaks - second.
@@ -162,7 +162,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void rtsegmentsAllocatedToSecondBasePeakCorrect()
         {
-            Assert.AreEqual(Ms2andms1Run.BasePeaks.ElementAt(1).RTsegments.ElementAt(0), 2);
+            Assert.AreEqual(Ms2andms1Run.BasePeaks.ElementAt(1).RTsegments.ElementAt(0), 1);
         }
         /// <remarks>
         /// RTSegs is correctly allocated to scans - first.
