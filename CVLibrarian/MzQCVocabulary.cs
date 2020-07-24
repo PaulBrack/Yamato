@@ -38,6 +38,8 @@ namespace CVLibrarian
                 new Term(vocabulary, "QC:21", "SwaMe metric: MS1Density"),
                 new Term(vocabulary, "QC:22", "SwaMe metric: MS2TICTotal"),
                 new Term(vocabulary, "QC:23", "SwaMe metric: MS1TICTotal"),
+                new Term(vocabulary, "QC:25", "QuaMeter metric: StartTimeStamp"),
+                new Term(vocabulary, "QC:26", "SwaMe metric: MissingScans"),
 
                 new Term(vocabulary, "QC:99", "Prognosticator Metric: MS1TICQuartiles"),
                 new Term(vocabulary, "QC:98", "Prognosticator Metric: MS2TICQuartiles"),

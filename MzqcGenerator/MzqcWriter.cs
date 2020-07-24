@@ -30,6 +30,7 @@ namespace MzqcGenerator
             JsonClasses.Unit Mz = ToUnit(ms, "MS:1000040");
             JsonClasses.Unit Ratio = ToUnit(uo, "UO:0010006"); // TODO: What's the difference between this and UO:0000190?
             JsonClasses.Unit Second = ToUnit(uo, "UO:0000010");
+            JsonClasses.Unit DateTime = ToUnit(ms, "XXXXXXXXXXXXXX"); // Completely incorrect, but for want of a better unit in the meantime.
 
             QualityParametersByAccession = new JsonClasses.QualityParameters[]
             {
@@ -59,6 +60,8 @@ namespace MzqcGenerator
                 ToQualityParameters(qc, "QC:21", Count),
                 ToQualityParameters(qc, "QC:22", Count),
                 ToQualityParameters(qc, "QC:23", Count),
+                ToQualityParameters(qc, "QC:25", DateTime), //So starttimestamp is one of the QuaMeter metrics that don't have a ref in mzQC dev working group yet. I am still completely unsure of what the unit will become, since neither UO nor MS has a datetime unit. It is the starttimestamp stated in the mzml.
+                ToQualityParameters(qc, "QC:26", Count),
 
                 ToQualityParameters(qc, "QC:99", Count),
                 ToQualityParameters(qc, "QC:98", Count),
