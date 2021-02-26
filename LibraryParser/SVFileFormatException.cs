@@ -10,15 +10,18 @@ namespace LibraryParser
     internal class SVFileFormatException : Exception
     {
         public string Path { get; set; }
+
         public SVFileFormatException()
         {
         }
 
-        public SVFileFormatException(string message) : base(message)
+        public SVFileFormatException(string message)
+            : base(message)
         {
         }
 
-        public SVFileFormatException(string message, string path) : base(message)
+        public SVFileFormatException(string message, string path)
+            : base(message)
         {
             Path = path;
         }
