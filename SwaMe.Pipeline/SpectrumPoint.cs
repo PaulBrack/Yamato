@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using ProtoBuf;
+using System;
 
 namespace SwaMe.Pipeline
 {
@@ -8,6 +9,8 @@ namespace SwaMe.Pipeline
     /// A point in the 2-dimensional LC-MS space of retention time and m/z, recording intensity at this coordinate.
     /// </summary>
     /// <remarks>
+    /// Immutable value type.
+    /// 
     /// Arguably, this should be a struct, for ease of memory management and pointer dereferencing within the VM.
     /// It's arguable because the class reduces copying overhead of arrays, so the optimisation depends on the exact use case.
     /// 
@@ -20,10 +23,6 @@ namespace SwaMe.Pipeline
     [ProtoContract]
     public class SpectrumPoint
     {
-        public SpectrumPoint()
-        {
-        }
-
         public SpectrumPoint(float intensity, float mz, float retentionTime)
         {
             Intensity = intensity;
@@ -31,22 +30,49 @@ namespace SwaMe.Pipeline
             RetentionTime = retentionTime;
         }
 
-        /// <remarks>Depending on the use of this class, this may be raw retention time or iRT. Within MzmlParser, it's raw and in minutes.</remarks>
         [ProtoMember(1)]
-        public float RetentionTime { get; set; }
+        public float Intensity { get; }
 
         /// <summary>
         /// Mass over charge, in Daltons.
         /// </summary>
         [ProtoMember(2)]
-        public float Mz { get; set; }
+        public float Mz { get; }
 
+        /// <remarks>Depending on the use of this class, this may be raw retention time or iRT. Within MzmlParser, it's raw and in minutes.</remarks>
         [ProtoMember(3)]
-        public float Intensity { get; set; }
+        public float RetentionTime { get; }
 
         public override string ToString()
         {
             return $"{GetType().Name}(RetentionTime={RetentionTime}, Mz={Mz}, Intensity={Intensity})";
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Intensity, Mz, RetentionTime);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is SpectrumPoint rhs && Equals(rhs);
+        }
+
+        public static bool operator ==(SpectrumPoint a, SpectrumPoint b)
+        {
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(SpectrumPoint a, SpectrumPoint b)
+        {
+            return !(a == b);
+        }
+
+        public bool Equals(SpectrumPoint rhs)
+        {
+            return Intensity == rhs.Intensity
+                && Mz == rhs.Mz
+                && RetentionTime == rhs.RetentionTime;
         }
     }
 }
