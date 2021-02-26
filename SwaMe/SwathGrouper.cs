@@ -10,19 +10,14 @@ namespace SwaMe
     {
         public SwathMetrics GroupBySwath(Run<Scan> run)
         {
-            
-            //Create list of target isolationwindows to serve as swathnumber
-            List<double> swathTargets = new List<double>();
+            // Create list of target isolationwindows to serve as swathnumber
             // Force ordering of swathTargets so that our tests don't depend on the order that Distinct() happens to impose.
-            swathTargets = run.Ms2Scans.Select(x => x.IsolationWindowTargetMz).Distinct().OrderBy(x => x).ToList();
+            double[] swathTargets = run.Ms2Scans.Select(x => x.IsolationWindowTargetMz.Value).Distinct().OrderBy(x => x).ToArray();
             double totalTIC = 0;
             foreach (var scan in run.Ms2Scans)
-            {
                 totalTIC += scan.TotalIonCurrent;
-            }
 
             //Loop through every swath of a certain swathNumber:
-
             List<int> numOfSwathPerGroup = new List<int>();
             List<double> TICs = new List<double>();
             List<double> swDensity = new List<double>();
@@ -35,7 +30,7 @@ namespace SwaMe
             List<double> SwathProportionPredictedSingleChargeAvg = new List<double>();
 
 //Loop through all the swaths of the same number and add to
-            for (int swathNumber = 0; swathNumber < swathTargets.Count(); swathNumber++)
+            for (int swathNumber = 0; swathNumber < swathTargets.Length; swathNumber++)
             {
                 int track = 0;
 
@@ -67,15 +62,11 @@ namespace SwaMe
                 mzTargetRange.Clear();
             }
 
-            for (int num = 0; num < swathTargets.Count(); num++)
-            {
+            for (int num = 0; num < swathTargets.Length; num++)
                 SwathProportionOfTotalTIC.Add(TICs[num] / totalTIC);
-            }
 
-            SwathMetrics swathMetrics = new SwathMetrics(swathTargets, totalTIC, numOfSwathPerGroup, averageMzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
-            return swathMetrics;
+            return new SwathMetrics(swathTargets, totalTIC, numOfSwathPerGroup, averageMzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
         }
-
     }
    
 }
