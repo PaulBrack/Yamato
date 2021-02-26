@@ -1,4 +1,4 @@
-﻿using LibraryParser;
+using LibraryParser;
 using MzmlParser;
 using NLog;
 using System;
@@ -28,7 +28,7 @@ namespace SwaMe.Pipeline
         bool IScanConsumer<Scan, Run<Scan>>.RequiresBinaryData => true;
 
         /// <param name="path">The path to the input file to be opened, or null to read from stdin</param>
-        public Run<Scan> LoadMzml(string path, AnalysisSettings analysisSettings)
+        public Run<Scan> LoadMzmlAndRunPipeline(string path, AnalysisSettings analysisSettings)
         {
             ScanAndRunFactory factory = new ScanAndRunFactory(analysisSettings);
             Run<Scan> run;

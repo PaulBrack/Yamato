@@ -88,7 +88,7 @@ namespace Yamato.Console
                         analysisSettings.IrtLibrary = svReader.LoadLibrary(options.IRTFile);
                     }
                 }
-                using Run<Scan> run = pipeliner.LoadMzml(options.InputFile, analysisSettings);
+                using Run<Scan> run = pipeliner.LoadMzmlAndRunPipeline(options.InputFile, analysisSettings);
 
                 Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt);
