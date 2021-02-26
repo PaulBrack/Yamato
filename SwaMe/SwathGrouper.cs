@@ -8,39 +8,6 @@ namespace SwaMe
 {
     public class SwathGrouper
     {
-        //This method groups all of the swaths of the same number together and generates the metrics that are reported per swath.
-        //It generates a tsvfile with the "Perswath" metrics in.
-        //It returns the number of swaths present in a full cycle.
-        public class SwathMetrics
-        {
-            public List<double> swathTargets;
-            public double totalTIC;
-            public List<int> numOfSwathPerGroup;
-            public List<double> mzRange;
-            public List<double> TICs;
-            public List<double> swDensity50;
-            public List<double?> swDensityIQR;
-            public List<double> SwathProportionOfTotalTIC;
-            public List<double> SwathProportionPredictedSingleChargeAvg;
-
-            public SwathMetrics()
-            {
-            }
-
-            public SwathMetrics(List<double> swathTargets, double totalTIC, List<int> numOfSwathPerGroup, List<double> mzRange, List<double> TICs, List<double> swDensity50, List<double?> swDensityIQR,
-            List<double> SwathProportionOfTotalTIC, List<double> SwathProportionPredictedSingleChargeAvg)
-            {
-                this.swathTargets = swathTargets;
-                this.totalTIC = totalTIC;
-                this.numOfSwathPerGroup = numOfSwathPerGroup;
-                this.mzRange = mzRange;
-                this.TICs = TICs;
-                this.swDensity50 = swDensity50;
-                this.swDensityIQR = swDensityIQR;
-                this.SwathProportionOfTotalTIC = SwathProportionOfTotalTIC;
-                this.SwathProportionPredictedSingleChargeAvg = SwathProportionPredictedSingleChargeAvg;
-            }
-        }
         public SwathMetrics GroupBySwath(Run<Scan> run)
         {
             
