@@ -1,4 +1,4 @@
-﻿using NLog;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -57,8 +57,7 @@ namespace LibraryParser
             }
             else
             {
-                library.ProteinList.Add(protein.Id, protein);
-                StoreUniprotIds(library, protein.Id);
+                protein.UniprotIds = ParseUniprotIds(protein.Id);
             }
         }
 
