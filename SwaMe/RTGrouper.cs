@@ -60,10 +60,10 @@ namespace SwaMe
             for (int i = 0; i < division; i++)
             {
                 rtSegs[i] = run.StartTime + rtSegment * i;
-                if(i>0)
-                    segmentBoundaries.Add(rtSegs[i-1]+"_"+ rtSegs[i]);//segmentBoundaries is a string denoting the startOfTheRTsegment_endOfTheRTsegment for reference
+                if (i > 0)
+                    segmentBoundaries.Add(rtSegs[i - 1] + "_" + rtSegs[i]);//segmentBoundaries is a string denoting the startOfTheRTsegment_endOfTheRTsegment for reference
                 else
-                    segmentBoundaries.Add(run.StartTime+"_"+ rtSegs[i]);
+                    segmentBoundaries.Add(run.StartTime + "_" + rtSegs[i]);
             }
                 
             //dividing basepeaks into segments
@@ -102,7 +102,7 @@ namespace SwaMe
                         if (scan.ScanStartTime > rtSegs[segmentboundary - 1] && scan.ScanStartTime < rtSegs[segmentboundary])// If the scan is larger than the previous boundary and smaller than this boundary, assign to the previous segment.
                             scan.RTsegment = segmentboundary - 1;
                     }
-                experimentWideMS2TICSquared += Math.Pow(scan.TotalIonCurrent,2);
+                experimentWideMS2TICSquared += Math.Pow(scan.TotalIonCurrent, 2);
             }
 
             //dividing ms1scans into segments of RT
@@ -129,7 +129,7 @@ namespace SwaMe
                 var temp = tempTic.ElementAt(i);
                 List<double> tempList = new List<double>();
                 for (int j = 1; j < temp.Count(); j++)
-                    tempList.Add(Math.Abs(temp.ElementAt(j) - temp.ElementAt(j - 1))/magnitude);//Normalised to TIC magnitude.
+                    tempList.Add(Math.Abs(temp.ElementAt(j) - temp.ElementAt(j - 1)) / magnitude);//Normalised to TIC magnitude.
                 tempList.Sort();
                 ticChange50List.Add(tempList.Average());
                 if (tempList.Count() > 4)
@@ -176,7 +176,7 @@ namespace SwaMe
                         if (basepeak.RTsegments[i] == segment)
                         {
                             //Each rtsegment should have all these values, but due to some of the peaks being decreased after release candidate 1, some basepeaks have rtsegments, but no datapoints. If min intensity is set high enough, this should never happen.
-                            if (basepeak.RTsegments.Count() == basepeak.FWHMs.Count() && basepeak.FWHMs.Count() == basepeak.Peaksyms.Count() && basepeak.FWHMs.Count()  == basepeak.Peaksyms.Count() && basepeak.FWHMs.Count()  == basepeak.Intensities.Count() && basepeak.FWHMs.Count() == basepeak.FullWidthBaselines.Count())
+                            if (basepeak.RTsegments.Count() == basepeak.FWHMs.Count() && basepeak.FWHMs.Count() == basepeak.Peaksyms.Count() && basepeak.FWHMs.Count() == basepeak.Peaksyms.Count() && basepeak.FWHMs.Count() == basepeak.Intensities.Count() && basepeak.FWHMs.Count() == basepeak.FullWidthBaselines.Count())
                             {
                                 peakWidthsTemp.Add(basepeak.FWHMs[i]);
                                 peakSymTemp.Add(basepeak.Peaksyms[i]);
@@ -194,7 +194,7 @@ namespace SwaMe
                 List<int> ms1DensityTemp = new List<int>();
                 List<double> ms1PeakPrecisionTemp = new List<double>();
 
-                foreach (Scan scan in run.Ms1Scans.OrderBy(x=>x.ScanStartTime))
+                foreach (Scan scan in run.Ms1Scans.OrderBy(x => x.ScanStartTime))
                 {
                     if (scan.RTsegment == segment)
                     {
@@ -208,13 +208,13 @@ namespace SwaMe
                 //To get scan speed for both ms1 and ms2 we have to also scan through ms2:
                 if (run.Ms1Scans.Count() > 1)
                 {
-                    lastScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment==segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
+                    lastScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
                     firstScansOfCycle = run.Ms1Scans.Where(x => x.RTsegment == segment).Select(y => y.ScanStartTime).ToList();
                     
                 }
                 else
                 {
-                    lastScansOfCycle= run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
+                    lastScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
                     firstScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Min(y => y.ScanStartTime)).ToList();
                 }
                 minNumberMS1Or2 = Math.Min(lastScansOfCycle.Count(), firstScansOfCycle.Count());
@@ -222,9 +222,9 @@ namespace SwaMe
                 {
                     difference.Add(lastScansOfCycle[i] - firstScansOfCycle[i]);
                 }
-                cycleTime.Add(difference.Average()*60);
-                List<int> ms2DensityTemp = run.Ms2Scans.Where(x=>x.RTsegment==segment).Select(x=>x.Density).ToList();
-                double ms2TicTotalTemp = run.Ms2Scans.Where(x => x.RTsegment == segment).Select(x=>x.TotalIonCurrent).Sum();
+                cycleTime.Add(difference.Average() * 60);
+                List<int> ms2DensityTemp = run.Ms2Scans.Where(x => x.RTsegment == segment).Select(x => x.Density).ToList();
+                double ms2TicTotalTemp = run.Ms2Scans.Where(x => x.RTsegment == segment).Select(x => x.TotalIonCurrent).Sum();
 
                 if (peakWidthsTemp.Count > 0)
                 {
