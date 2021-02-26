@@ -53,7 +53,7 @@ namespace SwaMe
                 SwathProportionPredictedSingleChargeAvg.Add(TotalSwathProportionPredictedSingleCharge.Average());
                 TotalSwathProportionPredictedSingleCharge.Clear();
                 swDensity.Sort();
-                swDensity50.Add(Math.Truncate(Math.Ceiling(swDensity.Average())));
+                swDensity50.Add(Math.Ceiling(swDensity.Average()));
                 if (swDensity.Count > 4)
                     swDensityIQR.Add(Math.Ceiling(InterQuartileRangeCalculator.CalcIQR(swDensity)));
                 else
