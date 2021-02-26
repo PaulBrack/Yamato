@@ -8,7 +8,7 @@ namespace SwaMe
         /// <summary>
         /// Precondition: list must be sorted ascending.
         /// </summary>
-        public static double CalcIQR(List<double> list)
+        public static double CalcIQR(IList<double> list)
         {
             if (list.Count < 5)
                 throw new ArgumentException($"At least 5 list items required to calculate IQR, got {list.Count}", nameof(list));
@@ -22,7 +22,7 @@ namespace SwaMe
         /// <summary>
         /// Precondition: list must be sorted ascending.
         /// </summary>
-        public static int CalcIQR(List<int> list)
+        public static int CalcIQR(IList<int> list)
         {
             if (list.Count < 5)
                 throw new ArgumentException($"At least 5 list items required to calculate IQR, got {list.Count}", nameof(list));
