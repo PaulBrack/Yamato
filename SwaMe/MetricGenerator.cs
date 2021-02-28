@@ -92,7 +92,9 @@ namespace SwaMe
                 { "QC:21", RtMetrics.MS1Density },
                 { "QC:22", RtMetrics.MS2TicTotal },
                 { "QC:23", RtMetrics.MS1TicTotal },
-                { "QC:24", RtMetrics.TailingFactor }
+                { "QC:24", RtMetrics.TailingFactor },
+                { "QC:25", Run.StartTimeStamp},
+                { "QC:26", Run.MissingScans}
             };
         }
     }
