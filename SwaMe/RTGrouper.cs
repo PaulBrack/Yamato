@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,44 +13,52 @@ namespace SwaMe
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public double[] rtSegs;
+
+        /// <remarks>Immutable</remarks>
         public class RTMetrics
         {
+            public IList<double> Peakwidths { get; }
+            public IList<double> TailingFactor { get; }
+            public IList<double> PeakCapacity { get; }
+            public IList<double> PeakPrecision { get; }
+            public IList<double> MS1PeakPrecision { get; }
+            public IList<int> MS1Density { get; }
+            public IList<int> MS2Density { get; }
+            public IList<double> CycleTime { get; }
+            public IList<double> MS1TicTotal { get; }
+            public IList<double> MS2TicTotal { get; }
+            public IList<double> TicChange50List { get; }
+            public IList<double> TicChangeIqrList { get; }
+            public IList<string> SegmentBoundaries { get; }
 
-            public List<double> Peakwidths;
-            public List<double> TailingFactor;
-            public List<double> PeakCapacity;
-            public List<double> PeakPrecision;
-            public List<double> MS1PeakPrecision;
-            public List<int> MS1Density;
-            public List<int> MS2Density;
-            public List<double> CycleTime;
-            public List<double> MS1TicTotal;
-            public List<double> MS2TicTotal;
-            public List<double> TicChange50List;
-            public List<double> TicChangeIqrList;
-            public List<string> segmentBoundaries;
-
-            public RTMetrics()//This is just to be used in the unittests
+            public RTMetrics(IList<double> ms1TicTotal,
+                IList<double> ms2TicTotal,
+                IList<double> cycleTime,
+                IList<double> ticChange50List,
+                IList<double> ticChangeIQRList,
+                IList<int> ms1Density,
+                IList<int> ms2Density,
+                IList<double> peakWidths,
+                IList<double> tailingFactor,
+                IList<double> peakCapacity,
+                IList<double> peakPrecision,
+                IList<double> ms1PeakPrecision,
+                IList<string> segmentBoundaries)
             {
+                Peakwidths = peakWidths;
+                TailingFactor = tailingFactor;
+                PeakCapacity = peakCapacity;
+                PeakPrecision = peakPrecision;
+                MS1PeakPrecision = ms1PeakPrecision;
+                MS1Density = ms1Density;
+                MS2Density = ms2Density;
+                CycleTime = cycleTime;
+                MS1TicTotal = ms1TicTotal;
+                MS2TicTotal = ms2TicTotal;
+                TicChange50List = ticChange50List;
+                TicChangeIqrList = ticChangeIQRList;
+                SegmentBoundaries = segmentBoundaries;
             }
-
-            public RTMetrics(List<double> MS1TICTotal, List<double> MS2TICTotal, List<double> cycleTime, List<double> TICchange50List, List<double> TICchangeIQRList, List<int> MS1Density, List<int> MS2Density, List<double> Peakwidths, List<double> TailingFactor, List<double> PeakCapacity, List<double> PeakPrecision, List<double> MS1PeakPrecision, List<string> segmentBoundaries)
-            {
-                this.Peakwidths = Peakwidths;
-                this.TailingFactor = TailingFactor;
-                this.PeakCapacity = PeakCapacity;
-                this.PeakPrecision = PeakPrecision;
-                this.MS1PeakPrecision = MS1PeakPrecision;
-                this.MS1Density = MS1Density;
-                this.MS2Density = MS2Density;
-                this.CycleTime = cycleTime;
-                this.MS1TicTotal = MS1TICTotal;
-                this.MS2TicTotal = MS2TICTotal;
-                this.TicChange50List = TICchange50List;
-                this.TicChangeIqrList = TICchangeIQRList;
-                this.segmentBoundaries = segmentBoundaries;
-            }
-
         }
 
         public RTMetrics DivideByRT(Run<Scan> run, int division, double rtDuration)

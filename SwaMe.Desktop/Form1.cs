@@ -1,4 +1,4 @@
-﻿using LibraryParser;
+using LibraryParser;
 using NLog;
 using NLog.Config;
 using SwaMe.Pipeline;
@@ -189,13 +189,11 @@ namespace SwaMe.Desktop
                 }
 
                 logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-                var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt);
-                var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
+                IDictionary<string, dynamic> mergedRenderedMetrics = new Dictionary<string, dynamic>();
+                Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt));
+                Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator().GenerateMetrics(run));
 
-                var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
-
-
-                new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("", run, metrics, inputFilePath, analysisSettings);
+                new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite("", run, mergedRenderedMetrics, inputFilePath, analysisSettings);
                 logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
             }
             if (analysisSettings.CacheSpectraToDisk)

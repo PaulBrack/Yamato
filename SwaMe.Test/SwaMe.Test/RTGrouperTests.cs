@@ -9,10 +9,11 @@ namespace SwaMe.Test
     [TestClass]
    public class RTGrouperTests
     {
-        private static Run<Scan> Ms2andms1Run;
-        private static Run<Scan> Emptyms2scansRun;
-        private static RTGrouper RTGrouper;
-        public RTGrouper.RTMetrics Result = new RTGrouper.RTMetrics();
+        private Run<Scan> Ms2andms1Run;
+        private Run<Scan> Emptyms2scansRun;
+        private RTGrouper RTGrouper;
+        public RTGrouper.RTMetrics Result;
+
        [TestInitialize]
         public void Initialize()
         {

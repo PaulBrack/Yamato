@@ -82,8 +82,9 @@ namespace SwaMe.Test
         [TestMethod]
         public void RTDurationCorrectIfcontainsLastAndFirstScanTimes()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, false);
-            Assert.AreEqual(MetricGenerator.RTDuration, 67.5);
+            MetricGenerator metricGenerator = new MetricGenerator();
+            var metrics = metricGenerator.GenerateMetrics(contains5ms2ScansRun, 1, false);
+            Assert.AreEqual(metrics.RtDuration, 67.5);
         }
         /// <remarks>
         /// In the event that the last and first scan times were not able to be recorded, the RTDuration should be set to zero.
@@ -91,8 +92,9 @@ namespace SwaMe.Test
         [TestMethod]
         public void RTDurationZeroIfMissingLastScanTimeOrFirstScanTime()
         {
-            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, false);
-            Assert.AreEqual(MetricGenerator.RTDuration, 0);
+            MetricGenerator metricGenerator = new MetricGenerator();
+            var metrics = metricGenerator.GenerateMetrics(emptyms2scansRun, 1, false);
+            Assert.AreEqual(metrics.RtDuration, 0);
         }
         /// <remarks>
         /// The difference between the highest swath mz range (loweroffset + upperoffset) and the lowest swath mz range is calculated correctly.
@@ -100,8 +102,9 @@ namespace SwaMe.Test
         [TestMethod]
         public void swathSizeDifferenceCorrectIfOffsetsNotDefault()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, false);
-            Assert.AreEqual(MetricGenerator.swathSizeDifference, 8);
+            MetricGenerator metricGenerator = new MetricGenerator();
+            var metrics = metricGenerator.GenerateMetrics(contains5ms2ScansRun, 1, false);
+            Assert.AreEqual(metrics.SwathSizeDifference, 8);
         }
         /// <remarks>
         /// In the event that there were no swathsizes recorded in the run, the swathsize difference is set to zero.
@@ -109,8 +112,9 @@ namespace SwaMe.Test
         [TestMethod]
         public void swathSizeDifferenceZeroIfOffsetsAreDefault()
         {
-            MetricGenerator.GenerateMetrics(Emptyms2scansRun, 1, false);
-            Assert.AreEqual(MetricGenerator.swathSizeDifference, 0);
+            MetricGenerator metricGenerator = new MetricGenerator();
+            var metrics = metricGenerator.GenerateMetrics(emptyms2scansRun, 1, false);
+            Assert.AreEqual(metrics.SwathSizeDifference, 0);
         }
         /// <remarks>
         /// The list of the densities (total number of ions detected per scan) for ms2scans is calculated correctly.
@@ -118,10 +122,10 @@ namespace SwaMe.Test
         [TestMethod]
         public void DensityCorrect()
         {
-            MetricGenerator.GenerateMetrics(Contains5ms2ScansRun, 1, false);
+            MetricGenerator metricGenerator = new MetricGenerator();
+            var metrics = metricGenerator.GenerateMetrics(contains5ms2ScansRun, 1, false);
             List<int> correctDensity = new List<int>() { 2, 2, 4, 4, 5 };
-            Assert.IsTrue(Enumerable.SequenceEqual(MetricGenerator.Density, correctDensity));
+            Assert.IsTrue(Enumerable.SequenceEqual(metrics.MS2Density, correctDensity));
         }
-
     }
 }

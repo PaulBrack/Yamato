@@ -6,6 +6,7 @@ using LibraryParser;
 using System.Linq;
 using System.IO;
 using SwaMe.Pipeline;
+using System.Collections.Generic;
 
 namespace Yamato.Console
 {
@@ -91,13 +92,11 @@ namespace Yamato.Console
                 using Run<Scan> run = pipeliner.LoadMzmlAndRunPipeline(options.InputFile, analysisSettings);
 
                 Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-                var swameMetrics = new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt);
-                var progMetrics = new Prognosticator.MetricGenerator().GenerateMetrics(run);
+                    IDictionary<string, dynamic> mergedRenderedMetrics = new Dictionary<string, dynamic>();
+                    Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt));
+                    Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator().GenerateMetrics(run));
 
-                var metrics = swameMetrics.Union(progMetrics).ToDictionary(k => k.Key, v => v.Value);
-
-
-                new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite(options.OutputFile, run, metrics, options.InputFile, analysisSettings);
+                    new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite(options.OutputFile, run, mergedRenderedMetrics, options.InputFile, analysisSettings);
                 Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
                 if (analysisSettings.CacheSpectraToDisk)

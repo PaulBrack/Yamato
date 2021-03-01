@@ -244,7 +244,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void TotalTICCorrect()
         {
-            Assert.AreEqual(result.totalTIC, 58100);
+            Assert.AreEqual(result.TotalTIC, 58100);
         }
 
         [TestMethod]
@@ -252,21 +252,21 @@ namespace SwaMe.Test
         {
             // Targets should come out of SwathGrouper sorted in ascending order.
             List<double> correctTargets = new List<double>() { 550, 1050 };
-            Assert.IsTrue(Enumerable.SequenceEqual(result.swathTargets, correctTargets));
+            Assert.IsTrue(Enumerable.SequenceEqual(result.SwathTargets, correctTargets));
         }
 
         [TestMethod]
         public void NumOfSwathPerGroupCorrect()
         {
             List<int> correctnumOfSwathPerGroup = new List<int>() { 5, 5 };
-            Assert.IsTrue(Enumerable.SequenceEqual(result.numOfSwathPerGroup, correctnumOfSwathPerGroup));
+            Assert.IsTrue(Enumerable.SequenceEqual(result.NumOfSwathPerGroup, correctnumOfSwathPerGroup));
         }
 
         [TestMethod]
         public void MzTargetRangePerGroupCorrect()
         {
             List<double> correctmzTargetRange = new List<double>() {3.6, 3.6};
-            Assert.IsTrue(Enumerable.SequenceEqual(result.mzRange, correctmzTargetRange));
+            Assert.IsTrue(Enumerable.SequenceEqual(result.MzRange, correctmzTargetRange));
         }
 
         [TestMethod]
@@ -280,14 +280,14 @@ namespace SwaMe.Test
         public void SwDensity50Correct()
         {
             List<double> correctswDensity50 = new List<double>() { 4, 17 };
-            Assert.IsTrue(Enumerable.SequenceEqual(result.swDensity50, correctswDensity50));
+            Assert.IsTrue(Enumerable.SequenceEqual(result.SwDensity50, correctswDensity50));
         }
 
         [TestMethod]
         public void SwDensityIQRCorrect()
         {
             List<double?> correctswDensityIQR = new List<double?>() { 1, 16 };
-            Assert.IsTrue(Enumerable.SequenceEqual(result.swDensityIQR, correctswDensityIQR));
+            Assert.IsTrue(Enumerable.SequenceEqual(result.SwDensityIQR, correctswDensityIQR));
         }
 
         [TestMethod]

@@ -1,4 +1,4 @@
-﻿using SwaMe.Pipeline;
+using SwaMe.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace Prognosticator
         public double[] Ms2QuartileDivisions { get; private set; }
         public Run<Scan> Run { get; private set; }
 
-        public Dictionary<string, dynamic> GenerateMetrics(Run<Scan> run)
+        public IList<IMzqcMetrics> GenerateMetrics(Run<Scan> run)
         {
             Run = Prognosticator.ChromatogramGenerator.CreateAllChromatograms(run);
             Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, Run.LastScanTime, 1);
@@ -78,23 +78,25 @@ namespace Prognosticator
             return chromatogram;
         }
 
-        public Dictionary<string, dynamic> AssembleMetrics()
+        private IList<IMzqcMetrics> AssembleMetrics()
         {
-            var metrics = new Dictionary<string, dynamic>
+            IMzqcMetrics baseMetrics = new BaseMetrics()
             {
-                { "QC:99", Ms1QuartileDivisions },
-                { "QC:98", Ms2QuartileDivisions },
-                { "QC:97", Run.Chromatograms.Ms1Tic.AsHorizontalArrays() },
-                { "QC:96", Run.Chromatograms.Ms2Tic.AsHorizontalArrays() },
-                { "QC:95", Run.Chromatograms.Ms1Bpc.AsHorizontalArrays() },
-                { "QC:94", Run.Chromatograms.Ms2Bpc.AsHorizontalArrays() },
-                { "QC:93", Run.Chromatograms.CombinedTic.AsHorizontalArrays() },
-                { "QC:92", Run.Chromatograms.Ms1Tic.Sum(x => x.Item2) / Run.Chromatograms.Ms2Tic.Sum(x => x.Item2) },
-                { "QC:91", Run.LastScanTime / 2 - Ms1QuartileDivisions[1] },
-                { "QC:90", Run.LastScanTime / 2 - Ms2QuartileDivisions[1] },
-                { "QC:83", ExtractQuartileDivisionSummedIntensities(Run,Run.LastScanTime, 1) },
-                { "QC:82", ExtractQuartileDivisionSummedIntensities(Run, Run.LastScanTime, 2) }
+                MS1TICQuartiles = Ms1QuartileDivisions,
+                MS2TICQuartiles = Ms2QuartileDivisions,
+                MS1TIC = Run.Chromatograms.Ms1Tic.AsHorizontalArrays(),
+                MS2TIC = Run.Chromatograms.Ms2Tic.AsHorizontalArrays(),
+                MS1BPC = Run.Chromatograms.Ms1Bpc.AsHorizontalArrays(),
+                MS2BPC = Run.Chromatograms.Ms2Bpc.AsHorizontalArrays(),
+                CombinedTIC = Run.Chromatograms.CombinedTic.AsHorizontalArrays(),
+                MS1MS2Ratio = Run.Chromatograms.Ms1Tic.Sum(x => x.Item2) / Run.Chromatograms.Ms2Tic.Sum(x => x.Item2),
+                MS1WeightedMedianSkew = Run.LastScanTime / 2 - Ms1QuartileDivisions[1],
+                MS2WeightedMedianSkew = Run.LastScanTime / 2 - Ms2QuartileDivisions[1],
+                MS1TICQuartilesByRT = ExtractQuartileDivisionSummedIntensities(Run,Run.LastScanTime, 1),
+                MS2TICQuartilesByRT = ExtractQuartileDivisionSummedIntensities(Run, Run.LastScanTime, 2)
             };
+
+            IList<IMzqcMetrics> metrics = new List<IMzqcMetrics> { baseMetrics };
 
             if (Run.AnalysisSettings.IrtLibrary != null && Run.IRTHits.Count > 0)
             {
@@ -102,13 +104,17 @@ namespace Prognosticator
                 var orderedIrtPeptideSequences = libraryPeptides.Select(x => x.Sequence).ToList();
                 var orderedIrtHits = Run.IRTHits.OrderBy(x => orderedIrtPeptideSequences.IndexOf(x.PeptideSequence));
 
-                metrics.Add("QC:89", Run.IRTHits.Average(x => x.AverageMassErrorPpm));
-                metrics.Add("QC:88", Run.IRTHits.Max(x => x.AverageMassErrorPpm));
-                metrics.Add("QC:87", Run.IRTHits.Count() / Run.AnalysisSettings.IrtLibrary.PeptideList.Count);
-                metrics.Add("QC:86", orderedIrtHits);
-                metrics.Add("QC:85", Convert.ToDouble(Run.IRTHits.Count()) / Convert.ToDouble(Run.AnalysisSettings.IrtLibrary.PeptideList.Count));
-                metrics.Add("QC:84", Run.IRTHits.Select(x=> x.RetentionTime).Max() - Run.IRTHits.Select(x => x.RetentionTime).Min());
-                metrics.Add("QC:81", GetOrderednessAsPercent(orderedIrtHits.Select(x => x.RetentionTime).ToArray()));
+                IMzqcMetrics irtMetrics = new IrtMetrics()
+                {
+                    MeanIrtMassError = Run.IRTHits.Average(x => x.AverageMassErrorPpm),
+                    MaxIrtMassError = Run.IRTHits.Max(x => x.AverageMassErrorPpm),
+                    IrtPeptideFoundProportion = Run.IRTHits.Count() / Run.AnalysisSettings.IrtLibrary.PeptideList.Count,
+                    IrtPeptides = orderedIrtHits.ToList(),
+                    IrtPeptidesFound = Run.IRTHits.Count / (double)Run.AnalysisSettings.IrtLibrary.PeptideList.Count,
+                    IrtSpread = Run.IRTHits.Select(x => x.RetentionTime).Max() - Run.IRTHits.Select(x => x.RetentionTime).Min(),
+                    IrtOrderedness = GetOrderednessAsPercent(orderedIrtHits.Select(x => x.RetentionTime).ToArray())
+                };
+                metrics.Add(irtMetrics);
             }
            
             return metrics;
@@ -146,6 +152,70 @@ namespace Prognosticator
                     result = k;
             }
             return result;
+        }
+    }
+
+    public class BaseMetrics : IMzqcMetrics
+    {
+        public Run<Scan> Run { get; set; }
+
+        public double[] MS1TICQuartiles { get; set; }
+        public double[] MS2TICQuartiles { get; set; }
+        public double[][] MS1TIC { get; set; }
+        public double[][] MS2TIC { get; set; }
+        public double[][] MS1BPC { get; set; }
+        public double[][] MS2BPC { get; set; }
+        public double[][] CombinedTIC { get; set; }
+        public double MS1MS2Ratio { get; set; }
+        public double MS1WeightedMedianSkew { get; set; }
+        public double MS2WeightedMedianSkew { get; set; }
+        public double[] MS1TICQuartilesByRT { get; set; }
+        public double[] MS2TICQuartilesByRT { get; set; }
+
+        public IDictionary<string, dynamic> RenderableMetrics =>
+            new Dictionary<string, dynamic>()
+            {
+                { "QC:99", MS1TICQuartiles },
+                { "QC:98", MS2TICQuartiles },
+                { "QC:97", MS1TIC },
+                { "QC:96", MS2TIC },
+                { "QC:95", MS1BPC },
+                { "QC:94", MS2BPC },
+                { "QC:93", CombinedTIC },
+                { "QC:92", MS1MS2Ratio },
+                { "QC:91", MS1WeightedMedianSkew },
+                { "QC:90", MS2WeightedMedianSkew },
+                { "QC:83", MS1TICQuartilesByRT },
+                { "QC:82", MS2TICQuartilesByRT }
+            };
+    }
+
+    public class IrtMetrics : IMzqcMetrics
+    {
+        public double MeanIrtMassError { get; set; }
+        public double MaxIrtMassError { get; set; }
+        public double IrtPeptideFoundProportion { get; set; }
+        public IList<CandidateHit> IrtPeptides { get; set; }
+        public double IrtPeptidesFound { get; set; }
+        public double IrtSpread { get; set; }
+        public double IrtOrderedness { get; set; }
+
+
+        public IDictionary<string, dynamic> RenderableMetrics
+        {
+            get
+            {
+                return new Dictionary<string, dynamic>()
+                {
+                    { "QC:89", MeanIrtMassError },
+                    { "QC:88", MaxIrtMassError },
+                    { "QC:87", IrtPeptideFoundProportion },
+                    { "QC:86", IrtPeptides },
+                    { "QC:85", IrtPeptidesFound },
+                    { "QC:84", IrtSpread },
+                    { "QC:81", IrtOrderedness }
+                };
+            }
         }
     }
 }
