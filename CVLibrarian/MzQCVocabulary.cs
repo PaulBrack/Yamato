@@ -28,8 +28,6 @@ namespace CVLibrarian
                 new Term(vocabulary, "QC:13", "SwaMe metric: swDensityIQR"),
                 new Term(vocabulary, "QC:14", "SwaMe metric: Peakwidths"),
                 new Term(vocabulary, "QC:15", "SwaMe metric: PeakCapacity"),
-                new Term(vocabulary, "QC:24", "SwaMe metric: TailingFactor"),
-                new Term(vocabulary, "QC:XXXXXXXX", "SwaMe metric: MS2PeakPrecision"),
                 new Term(vocabulary, "QC:16", "SwaMe metric: MS1PeakPrecision"),
                 new Term(vocabulary, "QC:17", "SwaMe metric: DeltaTICAverage"),
                 new Term(vocabulary, "QC:18", "SwaMe metric: DeltaTICIQR"),
@@ -38,6 +36,8 @@ namespace CVLibrarian
                 new Term(vocabulary, "QC:21", "SwaMe metric: MS1Density"),
                 new Term(vocabulary, "QC:22", "SwaMe metric: MS2TICTotal"),
                 new Term(vocabulary, "QC:23", "SwaMe metric: MS1TICTotal"),
+                new Term(vocabulary, "QC:24", "SwaMe metric: TailingFactor"),
+                new Term(vocabulary, "QC:XXXXXXXX", "SwaMe metric: MS2PeakPrecision"),
 
                 new Term(vocabulary, "QC:99", "Prognosticator Metric: MS1TICQuartiles"),
                 new Term(vocabulary, "QC:98", "Prognosticator Metric: MS2TICQuartiles"),
