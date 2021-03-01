@@ -37,15 +37,8 @@ namespace SwaMe.Test
             var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
             var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
 
-            var basePeak1 = new BasePeak(150,2.5,150)
-            {
-                BpkRTs = new List<double>() { 2.5 },
-                Spectrum = new List<SpectrumPoint>() { spectrumpoint1, spectrumpoint2 }
-            };
-            var EmptyBasePeak = new BasePeak(1, 1, 1)
-            {
-                Spectrum = new List<SpectrumPoint>() { }
-            };
+            var basePeak1 = new BasePeak(150, 2.5, 150, spectrumpoint1, spectrumpoint2);
+            var EmptyBasePeak = new BasePeak(1, 1, 1);
 
             Basepeak1Run.BasePeaks.Add(basePeak1);
             BasePeak1LastRetentionTimesAndIntensities = new ChromatogramMetricGenerator().GenerateChromatogram(Basepeak1Run);
