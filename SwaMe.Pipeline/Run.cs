@@ -29,10 +29,16 @@ namespace SwaMe.Pipeline
         public string? FilePropertiesAccession { get; set; }
         public ConcurrentBag<IRTPeak> IRTPeaks { get; set; } = new ConcurrentBag<IRTPeak>();
         public ConcurrentBag<CandidateHit> IRTHits { get; set; } = new ConcurrentBag<CandidateHit>();
-        public AnalysisSettings? AnalysisSettings { get; set; }
+        public AnalysisSettings AnalysisSettings { get; }
         public string? StartTimeStamp { get; set; }
         public string? ID { get; set; }
 
+        public Run(AnalysisSettings analysisSettings)
+        {
+            AnalysisSettings = analysisSettings;
+        }
+
+        /// <summary>
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

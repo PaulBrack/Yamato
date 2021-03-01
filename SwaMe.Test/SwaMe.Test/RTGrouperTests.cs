@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,14 +8,14 @@ using SwaMe.Pipeline;
 namespace SwaMe.Test
 {
     [TestClass]
-   public class RTGrouperTests
+    public class RTGrouperTests
     {
         private Run<Scan> Ms2andms1Run;
         private Run<Scan> Emptyms2scansRun;
         private RTGrouper RTGrouper;
         public RTGrouper.RTMetrics Result;
 
-       [TestInitialize]
+        [TestInitialize]
         public void Initialize()
         {
             string tempPath = Path.GetTempPath();
@@ -92,12 +92,8 @@ namespace SwaMe.Test
             basePeak2.FullWidthBaselines.Add(1);
 
             //Runs:
-            Ms2andms1Run = new Run<Scan>
+            Ms2andms1Run = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
             {
-                AnalysisSettings = new AnalysisSettings
-                {
-                    RtTolerance = 2.5
-                },
                 LastScanTime = 100,
                 StartTime = 0
             };
@@ -110,12 +106,8 @@ namespace SwaMe.Test
             Ms2andms1Run.SourceFileNames.Add(" ");
             Ms2andms1Run.SourceFileChecksums.Add(" ");
 
-            Emptyms2scansRun = new Run<Scan>
+            Emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
             {
-                AnalysisSettings = new AnalysisSettings
-                {
-                    RtTolerance = 2.5
-                },
                 LastScanTime = 0,
                 StartTime = 1000000
             };
@@ -133,7 +125,7 @@ namespace SwaMe.Test
         /// RTSegments is correctly calculated.
         /// </remarks>
         [TestMethod]
-        public void RtSegsCorrect() 
+        public void RtSegsCorrect()
         {
             double[] correctsegments = { 0, 50 };
             Assert.IsTrue(Enumerable.SequenceEqual(RTGrouper.rtSegs, correctsegments));
@@ -179,7 +171,7 @@ namespace SwaMe.Test
         /// TIC Change from one scan to the next chronological scan is correctly calculated.
         /// </remarks>
         [TestMethod]
-        public void TICChangeCorrect() 
+        public void TICChangeCorrect()
         {
             List<double> correctTICChangeList = new List<double>() { 0.4112602937765108, 0.45553110066628605 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.TicChange50List, correctTICChangeList));

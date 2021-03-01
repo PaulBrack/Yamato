@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SwaMe.Pipeline;
@@ -18,21 +18,8 @@ namespace SwaMe.Test
         [TestInitialize]
         public void Initialize()
         {
-
-            EmptyBasePeakRun = new Run<Scan>
-            {
-                AnalysisSettings = new AnalysisSettings
-                {
-                    RtTolerance = 2.5
-                }
-            };
-            Basepeak1Run = new Run<Scan>
-            {
-                AnalysisSettings = new AnalysisSettings
-                {
-                    RtTolerance = 2.5
-                }
-            };
+            EmptyBasePeakRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 });
+            Basepeak1Run = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 });
 
             var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
             var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
@@ -93,7 +80,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void BasepeakFWHMsCorrectIfOneBasePeak()
         {
-            var correctFWHM = 50.666656494140625; 
+            var correctFWHM = 50.666656494140625;
             Assert.AreEqual(correctFWHM, Basepeak1Run.BasePeaks[0].FWHMs[0]);
         }
 

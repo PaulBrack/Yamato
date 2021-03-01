@@ -30,7 +30,7 @@ namespace MzqcGenerator.Test
         };
 
         //Run
-        private static readonly Run<Scan> iRTrun = new Run<Scan>()
+        private static readonly Run<Scan> iRTrun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
         {
             IRTPeaks = { iRTPeak1, iRTPeak2 },
             SourceFileNames = { "File1", "File2" }
@@ -52,7 +52,7 @@ namespace MzqcGenerator.Test
         { };
 
         //run
-        private static readonly Run<Scan> RunWithoutIRT = new Run<Scan>()
+        private static readonly Run<Scan> RunWithoutIRT = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
         {
             SourceFileNames = { "File1", "File2" },
             SourceFileChecksums = { "aaa", "bbb" },

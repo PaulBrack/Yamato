@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -199,12 +199,8 @@ namespace SwaMe.Test
             basePeak2.FullWidthBaselines.Add(1);
 
             //Runs:
-            ms2andms1Run = new Run<Scan>
+            ms2andms1Run = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
             {
-                AnalysisSettings = new AnalysisSettings
-                {
-                    RtTolerance = 2.5
-                },
                 LastScanTime = 100,
                 StartTime = 0
             };

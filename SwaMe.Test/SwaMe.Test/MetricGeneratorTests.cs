@@ -15,9 +15,8 @@ namespace SwaMe.Test
     [TestClass]
     public class MetricGeneratorTests
     {
-        private static Run<Scan> Emptyms2scansRun;
-        private static Run<Scan> Contains5ms2ScansRun;
-        private static MetricGenerator MetricGenerator;
+        private Run<Scan> emptyms2scansRun;
+        private Run<Scan> contains5ms2ScansRun;
 
         [TestInitialize]
         public void Initialize()
@@ -39,17 +38,8 @@ namespace SwaMe.Test
             var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
             var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
 
-            var basePeak1 = new BasePeak(150, 2.5, 150)
+            contains5ms2ScansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
             {
-                BpkRTs = new List<double>() { 2.5 },
-                Spectrum = new List<SpectrumPoint>() { spectrumpoint1, spectrumpoint2 }
-            };
-            Contains5ms2ScansRun = new Run<Scan>
-            {
-                AnalysisSettings = new AnalysisSettings
-                {
-                    RtTolerance = 2.5
-                },
                 LastScanTime = 70,
                 StartTime = 2.5
             };
@@ -60,12 +50,8 @@ namespace SwaMe.Test
             Contains5ms2ScansRun.SourceFileNames.Add(" ");
             Contains5ms2ScansRun.SourceFileChecksums.Add(" ");
 
-            Emptyms2scansRun = new Run<Scan>
+            emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
             {
-                AnalysisSettings = new AnalysisSettings
-                {
-                    RtTolerance = 2.5
-                },
                 LastScanTime = 0,
                 StartTime = 1000000
             };
