@@ -29,7 +29,7 @@ namespace SwaMe
             List<double> TotalSwathProportionPredictedSingleCharge = new List<double>();
             List<double> SwathProportionPredictedSingleChargeAvg = new List<double>();
 
-//Loop through all the swaths of the same number and add to
+            // Loop through all the swaths of the same number and add to
             for (int swathNumber = 0; swathNumber < swathTargets.Length; swathNumber++)
             {
                 int track = 0;
@@ -68,5 +68,4 @@ namespace SwaMe
             return new SwathMetrics(swathTargets, totalTIC, numOfSwathPerGroup, averageMzTargetRange, TICs, swDensity50, swDensityIQR, SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg);
         }
     }
-   
 }

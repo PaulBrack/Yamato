@@ -19,94 +19,94 @@ namespace Yamato.Console
             try
             {
                 Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
-            {
-                // An inputfile of "-" on the command line denotes stdin, for which we use null internally.
-                if ("-".Equals(options.InputFile, StringComparison.Ordinal))
-                    options.InputFile = null;
-                // An outputfile of "-" on the command line denotes stdout, for which we use null internally.
-                if ("-".Equals(options.OutputFile, StringComparison.Ordinal))
-                    options.OutputFile = null;
-
-                if (options.Verbose)
-                    SetVerboseLogging();
-
-                if (null == options.InputFile)
-                    Logger.Info("Loading file: {0}", options.InputFile);
-                else
-                    Logger.Info("Reading mzML from standard input");
-
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-
-                int division;
-                if (options.Division < 100 && options.Division > 0)
-                    division = options.Division;
-                else
                 {
-                    Logger.Error("Number of divisions must be within the range 1 - 100. You have input: {0}", options.Division);
-                    throw new ArgumentOutOfRangeException();
-                }
-                bool irt = !string.IsNullOrEmpty(options.IRTFile);
+                    // An inputfile of "-" on the command line denotes stdin, for which we use null internally.
+                    if ("-".Equals(options.InputFile, StringComparison.Ordinal))
+                        options.InputFile = null;
+                    // An outputfile of "-" on the command line denotes stdout, for which we use null internally.
+                    if ("-".Equals(options.OutputFile, StringComparison.Ordinal))
+                        options.OutputFile = null;
 
-                // stdin (denoted by null) is always considered readable; anything else needs a check (#99)
-                if (null != options.InputFile)
-                    CheckFileIsReadableOrComplain(options.InputFile);
+                    if (options.Verbose)
+                        SetVerboseLogging();
 
-                AnalysisSettings analysisSettings = new AnalysisSettings()
-                {
-                    MassTolerance = options.MassTolerance,
-                    RtTolerance = options.RtTolerance,
-                    IrtMinIntensity = options.IrtMinIntensity,
-                    IrtMinPeptides = options.IrtMinTransitions,
-                    IrtMassTolerance = options.IrtMassTolerance,
-                    CacheSpectraToDisk = options.Cache,
-                    MinimumIntensity = options.MinimumIntensity,
-                    TempFolder = Path.Combine(options.TempFolder, Guid.NewGuid().ToString())
-                };
+                    if (null == options.InputFile)
+                        Logger.Info("Loading file: {0}", options.InputFile);
+                    else
+                        Logger.Info("Reading mzML from standard input");
 
-                if (analysisSettings.CacheSpectraToDisk && !Directory.Exists(analysisSettings.TempFolder))
-                    Directory.CreateDirectory(analysisSettings.TempFolder);
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
 
-                using Pipeliner pipeliner = new Pipeliner()
-                {
-                    Threading = options.Threading ?? true,
-                    MaxQueueSize = options.MaxQueueSize,
-                    MaxThreads = options.MaxThreads
-                };
-
-                if (!string.IsNullOrEmpty(options.IRTFile))
-                {
-                    irt = true;
-                    if (options.IRTFile.ToLower().EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
+                    int division;
+                    if (options.Division < 100 && options.Division > 0)
+                        division = options.Division;
+                    else
                     {
-                        TraMLReader traMLReader = new TraMLReader();
-                        analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
-
+                        Logger.Error("Number of divisions must be within the range 1 - 100. You have input: {0}", options.Division);
+                        throw new ArgumentOutOfRangeException();
                     }
-                    else if (options.IRTFile.ToLower().EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.ToLower().EndsWith("csv", StringComparison.InvariantCultureIgnoreCase))
+                    bool irt = !string.IsNullOrEmpty(options.IRTFile);
+
+                    // stdin (denoted by null) is always considered readable; anything else needs a check (#99)
+                    if (null != options.InputFile)
+                        CheckFileIsReadableOrComplain(options.InputFile);
+
+                    AnalysisSettings analysisSettings = new AnalysisSettings()
                     {
-                        SVReader svReader = new SVReader();
-                        analysisSettings.IrtLibrary = svReader.LoadLibrary(options.IRTFile);
-                    }
-                }
-                using Run<Scan> run = pipeliner.LoadMzmlAndRunPipeline(options.InputFile, analysisSettings);
+                        MassTolerance = options.MassTolerance,
+                        RtTolerance = options.RtTolerance,
+                        IrtMinIntensity = options.IrtMinIntensity,
+                        IrtMinPeptides = options.IrtMinTransitions,
+                        IrtMassTolerance = options.IrtMassTolerance,
+                        CacheSpectraToDisk = options.Cache,
+                        MinimumIntensity = options.MinimumIntensity,
+                        TempFolder = Path.Combine(options.TempFolder, Guid.NewGuid().ToString())
+                    };
 
-                Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                    if (analysisSettings.CacheSpectraToDisk && !Directory.Exists(analysisSettings.TempFolder))
+                        Directory.CreateDirectory(analysisSettings.TempFolder);
+
+                    using Pipeliner pipeliner = new Pipeliner()
+                    {
+                        Threading = options.Threading ?? true,
+                        MaxQueueSize = options.MaxQueueSize,
+                        MaxThreads = options.MaxThreads
+                    };
+
+                    if (!string.IsNullOrEmpty(options.IRTFile))
+                    {
+                        irt = true;
+                        if (options.IRTFile.ToLower().EndsWith("traml", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            TraMLReader traMLReader = new TraMLReader();
+                            analysisSettings.IrtLibrary = traMLReader.LoadLibrary(options.IRTFile);
+
+                        }
+                        else if (options.IRTFile.ToLower().EndsWith("tsv", StringComparison.InvariantCultureIgnoreCase) || options.IRTFile.ToLower().EndsWith("csv", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            SVReader svReader = new SVReader();
+                            analysisSettings.IrtLibrary = svReader.LoadLibrary(options.IRTFile);
+                        }
+                    }
+                    using Run<Scan> run = pipeliner.LoadMzmlAndRunPipeline(options.InputFile, analysisSettings);
+
+                    Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     IDictionary<string, dynamic> mergedRenderedMetrics = new Dictionary<string, dynamic>();
                     Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt));
                     Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator().GenerateMetrics(run));
 
                     new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite(options.OutputFile, run, mergedRenderedMetrics, options.InputFile, analysisSettings);
-                Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
+                    Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
-                if (analysisSettings.CacheSpectraToDisk)
-                {
-                    Logger.Trace("Deleting temp files...");
-                    Directory.Delete(analysisSettings.TempFolder);
-                }
-                Logger.Trace("Done!");
+                    if (analysisSettings.CacheSpectraToDisk)
+                    {
+                        Logger.Trace("Deleting temp files...");
+                        Directory.Delete(analysisSettings.TempFolder);
+                    }
+                    Logger.Trace("Done!");
 
-            });
+                });
             }
             catch (Exception ex)
             {
@@ -118,7 +118,6 @@ namespace Yamato.Console
             }
             LogManager.Shutdown();
             Environment.Exit(0);
-
         }
 
         private static void CheckFileIsReadableOrComplain(string inputFilePath)

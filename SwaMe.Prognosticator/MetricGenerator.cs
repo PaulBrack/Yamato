@@ -1,4 +1,4 @@
-using SwaMe.Pipeline;
+﻿using SwaMe.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace Prognosticator
 
         public IList<IMzqcMetrics> GenerateMetrics(Run<Scan> run)
         {
-            Run = Prognosticator.ChromatogramGenerator.CreateAllChromatograms(run);
+            Run = ChromatogramGenerator.CreateAllChromatograms(run);
             Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, Run.LastScanTime, 1);
             Ms2QuartileDivisions = ExtractQuartileDivisionTimes(run, Run.LastScanTime, 2);
 

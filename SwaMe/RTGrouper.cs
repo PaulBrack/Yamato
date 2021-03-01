@@ -10,8 +10,7 @@ namespace SwaMe
 {
     public class RTGrouper
     {
-
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         public double[] rtSegs;
 
         /// <remarks>Immutable</remarks>
@@ -75,7 +74,7 @@ namespace SwaMe
                 else
                     segmentBoundaries.Add(run.StartTime + "_" + rtSegs[i]);
             }
-                
+
             //dividing basepeaks into segments
             foreach (BasePeak basepeak in run.BasePeaks)
             {
@@ -102,7 +101,7 @@ namespace SwaMe
             {
                 //if the scan starttime falls into the rtsegment, give it the correct rtsegment number
                 //We assign to the segmentdivider below. So if >a and <b, it is assigned to segment a.
-                
+
                 if (scan.ScanStartTime > rtSegs.Last())//If the scan is after the last segment divider, it falls into the last segment
                     scan.RTsegment = rtSegs.Count() - 1;
                 else if (rtSegs.Count() > 1 && scan.ScanStartTime < rtSegs[1])//If the scan is before the second segment divider it should fall in the first segment. (assuming that the user has selected to have more than one segment)
@@ -146,7 +145,7 @@ namespace SwaMe
                 {
                     ticChangeIqrList.Add(InterQuartileRangeCalculator.CalcIQR(tempList));
                 }
-                else 
+                else
                 {
                     logger.Error("There are only {0} MS2Scans in this segment, which is too few to calculate the IQR of the TIC Change. This value has been set to zero.", tempTic.Count());
                     ticChangeIqrList.Add(0);
@@ -220,7 +219,7 @@ namespace SwaMe
                 {
                     lastScansOfCycle = run.Ms2Scans.Where(x => x.RTsegment == segment).GroupBy(g => g.Cycle).Select(x => x.Max(y => y.ScanStartTime)).ToList();
                     firstScansOfCycle = run.Ms1Scans.Where(x => x.RTsegment == segment).Select(y => y.ScanStartTime).ToList();
-                    
+
                 }
                 else
                 {

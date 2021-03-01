@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MzmlParser;
 using SwaMe.Pipeline;
 
 namespace SwaMe.Test
@@ -70,8 +71,6 @@ namespace SwaMe.Test
                 BasePeakIntensity = 5000,
                 BasePeakMz = 150
             };
-
-
 
             //BasePeaks:
             var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);

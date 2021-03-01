@@ -47,7 +47,7 @@ namespace MzqcGenerator.Test
         private static readonly List<double> SwathProportionOfTotalTIC = new List<double>() { 0.20, 0.80 };
         private static readonly List<double> SwathProportionPredictedSingleChargeAvg = new List<double>() { 0.30, 0.70 };
 
-        private static readonly SwathGrouper.SwathMetrics swathMetrics = new SwathGrouper.SwathMetrics(SwathTargets, 1000, NumOfSwathPerGroup, MzRange, TICs, SwDensity50, SwDensityIQR,
+        private static readonly SwathMetrics swathMetrics = new SwathMetrics(SwathTargets, 1000, NumOfSwathPerGroup, MzRange, TICs, SwDensity50, SwDensityIQR,
             SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg)
         { };
 
@@ -89,6 +89,7 @@ namespace MzqcGenerator.Test
 
             new MzqcWriter().BuildMzqcAndWrite("test.json", RunWithoutIRT, metrics, "", null);
         }
+
         /*
         /// <remarks>
         ///Writes a .json file for the iRT metrics with a run that includes iRTpeaks with all the necessary info and then reads it back in to verify it.
@@ -103,9 +104,7 @@ namespace MzqcGenerator.Test
             List<string> correctText = new List<string>();
             correctText.Add(correctLine);
             Assert.IsTrue(Enumerable.SequenceEqual(fileText, correctText));
-
         }
-
     */
     }
 }

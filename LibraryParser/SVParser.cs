@@ -5,15 +5,15 @@ using System.IO;
 using System.Linq;
 using System.Globalization;
 
-/* This class is meant to read seperated value files such as tsv/csv that contain iRT peptide information. A template will be provided with the correct 
+/* This class is meant to read separated value files such as tsv/csv that contain iRT peptide information. A template will be provided with the correct 
  headings (same naming convention as OpenMS, tutorial handout 2016 - section 6.4, page 51 {https://www.openms.de/wp-content/uploads/2016/02/handout1.pdf}). 
  It is populated with Biognosys 11 irt peptides to illustrate the concept.
  
- The purpose is to accomdate users that may have a different file format than TraML, for example the Biognosys iRT Kit reference sheet or another format that they
- would prefer to copy to csv rather than TraML. Support is also built in for the Microsoft Excel South African language issue, where excel uses commas
- as decimal points if your country is set to South African. It then seperates the columns using a semi-colon rather than a comma.
+ The purpose is to accomodate users that may have a different file format than TraML, for example the Biognosys iRT Kit reference sheet or another format that they
+ would prefer to copy to csv rather than TraML. Support is also built in for the Microsoft Excel South African language issue, where Excel uses commas
+ as decimal points if your country is set to South African. It then separates the columns using a semicolon rather than a comma.
 
- Please note that a TraML file with a more precise indication of the expected retention time will give closer proximation to the retention times picked up for each peptide by Skyline.
+ Please note that a TraML file with a more precise indication of the expected retention time will give closer approximation to the retention times picked up for each peptide by Skyline.
  
  Marina - 13092019*/
 

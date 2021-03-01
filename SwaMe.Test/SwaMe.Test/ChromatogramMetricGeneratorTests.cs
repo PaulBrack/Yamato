@@ -50,7 +50,6 @@ namespace SwaMe.Test
         /// <remarks>
         /// Intensities correctly interpolated and smoothed if there is at least one basepeak in the data fed to the function.
         /// </remarks>
-
         [TestMethod]
         public void IntensitiesCorrectIfOneBasePeak()
         {

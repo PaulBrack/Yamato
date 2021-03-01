@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MzmlParser;
 using SwaMe.Pipeline;
 
 namespace SwaMe.Test
@@ -11,7 +12,7 @@ namespace SwaMe.Test
     {
         private static Run<Scan> ms2andms1Run;
         private static SwathGrouper swathGrouper;
-        public SwathGrouper.SwathMetrics result = new SwathGrouper.SwathMetrics();
+        public SwathMetrics result;
 
         [TestInitialize]
         public void Initialize()

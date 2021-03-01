@@ -123,7 +123,7 @@ namespace MzmlParser
                                 run.SourceFileChecksums.Add(reader.GetAttribute("value"));
                                 run.FilePropertiesAccession = "MS:1000569";
                                 break;
-                            case "MS:1000747"://Optional for the conversion process, but included in mzQC
+                            case "MS:1000747": // Optional for the conversion process, but included in mzQC
                                 run.CompletionTime = reader.GetAttribute("value");
                                 break;
                         }
@@ -312,8 +312,12 @@ namespace MzmlParser
 
         private void ProcessScan(ScanAndTempProperties<TScan, TRun> scanAndTempProperties)
         {
-            float[]? intensities = parseBinaryData ? scanAndTempProperties.Intensities?.ExtractFloatArray() : null;
-            float[]? mzs = parseBinaryData ? scanAndTempProperties.Mzs?.ExtractFloatArray() : null;
+            float[]? intensities = parseBinaryData
+                ? scanAndTempProperties.Intensities?.ExtractFloatArray()
+                : null;
+            float[]? mzs = parseBinaryData
+                ? scanAndTempProperties.Mzs?.ExtractFloatArray()
+                : null;
             foreach (var scanConsumer in scanConsumers)
                 scanConsumer.Notify(scanAndTempProperties.Scan, mzs, intensities, scanAndTempProperties.Run);
         }
