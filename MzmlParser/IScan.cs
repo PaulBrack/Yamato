@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System;
 
@@ -10,11 +10,15 @@ namespace MzmlParser
     public interface IScan : IDisposable
     {
         int Cycle { get; set; }
-        double IsolationWindowLowerOffset { get; set; }
-        double IsolationWindowTargetMz { get; set; }
-        double IsolationWindowUpperOffset { get; set; }
-        int? MsLevel { get; set; }
+        TandemMsLevel MsLevel { get; set; }
         double ScanStartTime { get; set; }
         double TotalIonCurrent { get; set; }
+    }
+
+    public enum TandemMsLevel
+    {
+        NotSet = 0,
+        Ms1 = 1,
+        Ms2 = 2
     }
 }

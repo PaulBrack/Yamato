@@ -17,18 +17,18 @@ namespace SwaMe.Test
         public void Initialize()
         {
             string tempPath = Path.GetTempPath();
-            Scan ms2scan1 = new Scan(false,1,1,0,2,2,1,100.00, tempPath) {};
-            Scan ms2scan2 = new Scan(false, 1, 1, 20, 2, 2, 1,100000.02, tempPath) {};
-            Scan ms2scan3 = new Scan(false, 5, 5, 30, 2, 4, 2,30, tempPath) {};
-            Scan ms2scan4 = new Scan(false, 5, 5, 32, 2, 4, 2, 20010.33, tempPath) {};
-            Scan ms2scan5 = new Scan(false, 5, 5, 34, 2, 4, 2, 50.33, tempPath) {};
-            Scan ms2scan6 = new Scan(false, 1, 1, 35, 2, 4, 2, 4000, tempPath) {};
-            Scan ms2scan7= new Scan(false, 1, 1, 70, 2, 5, 3, 60000, tempPath) {};
-            Scan ms2scan8 = new Scan(false, 1, 1, 70, 2, 5, 3, 6000, tempPath) {};
+            Scan ms2scan1 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 100.00, tempPath);
+            Scan ms2scan2 = new Scan(false, 1, 1, 20, TandemMsLevel.Ms2, 2, 1, 100000.02, tempPath);
+            Scan ms2scan3 = new Scan(false, 5, 5, 30, TandemMsLevel.Ms2, 4, 2, 30, tempPath);
+            Scan ms2scan4 = new Scan(false, 5, 5, 32, TandemMsLevel.Ms2, 4, 2, 20010.33, tempPath);
+            Scan ms2scan5 = new Scan(false, 5, 5, 34, TandemMsLevel.Ms2, 4, 2, 50.33, tempPath);
+            Scan ms2scan6 = new Scan(false, 1, 1, 35, TandemMsLevel.Ms2, 4, 2, 4000, tempPath);
+            Scan ms2scan7 = new Scan(false, 1, 1, 70, TandemMsLevel.Ms2, 5, 3, 60000, tempPath);
+            Scan ms2scan8 = new Scan(false, 1, 1, 70, TandemMsLevel.Ms2, 5, 3, 6000, tempPath);
             Scan ms2scan9 = new Scan(false, tempPath)
             {
                 ScanStartTime = 0,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 5,
                 TotalIonCurrent = 8000
             };
@@ -38,7 +38,7 @@ namespace SwaMe.Test
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 0,
-                MsLevel = 1,
+                MsLevel = TandemMsLevel.Ms1,
                 Density = 2,
                 Cycle = 1,
                 TotalIonCurrent = 1000,
@@ -50,7 +50,7 @@ namespace SwaMe.Test
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,
                 ScanStartTime = 30,
-                MsLevel = 1,
+                MsLevel = TandemMsLevel.Ms1,
                 Density = 4,
                 Cycle = 2,
                 TotalIonCurrent = 3050,
@@ -62,7 +62,7 @@ namespace SwaMe.Test
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,
                 ScanStartTime = 70,
-                MsLevel = 1,
+                MsLevel = TandemMsLevel.Ms1,
                 Density = 4,
                 Cycle = 3,
                 TotalIonCurrent = 3050,

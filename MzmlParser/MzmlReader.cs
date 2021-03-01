@@ -174,7 +174,7 @@ namespace MzmlParser
                         switch (reader.GetAttribute("accession"))
                         {
                             case "MS:1000511":
-                                scan.MsLevel = int.Parse(reader.GetAttribute("value"));
+                                scan.MsLevel = ToTandemMsLevel(int.Parse(reader.GetAttribute("value")));
                                 break;
                             case "MS:1000285":
                                 scan.TotalIonCurrent = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
@@ -199,16 +199,16 @@ namespace MzmlParser
                     {
                         GetBinaryData(reader, scanAndTempProperties);
                     }
-                    if (scan.MsLevel == null && reader.LocalName == "referenceableParamGroupRef")
+                    else if (scan.MsLevel == TandemMsLevel.NotSet && reader.LocalName == "referenceableParamGroupRef")
                     {
-                        scan.MsLevel = reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId ? 1 : 2;
+                        scan.MsLevel = reader.GetAttribute("ref") == SurveyScanReferenceableParamGroupId ? TandemMsLevel.Ms1 : TandemMsLevel.Ms2;
                     }
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                 {
                     if (!CycleInfoInID)
                     {
-                        if (scan.MsLevel == 1)
+                        if (scan.MsLevel == TandemMsLevel.Ms1)
                         {
                             currentCycle++;
                             scan.Cycle = currentCycle;
@@ -235,6 +235,14 @@ namespace MzmlParser
                 }
             }
         }
+
+        private TandemMsLevel ToTandemMsLevel(int rawLevel) =>
+            rawLevel switch
+            {
+                1 => TandemMsLevel.Ms1,
+                2 => TandemMsLevel.Ms2,
+                _ => throw new ArgumentOutOfRangeException(nameof(rawLevel), rawLevel, "Expect level 1 or 2 when parsing scan level")
+            };
 
         private void ProcessScanThreadedOrNot(ScanAndTempProperties<TScan, TRun> scanAndTempProperties)
         {
@@ -312,20 +320,14 @@ namespace MzmlParser
 
         private void AddScanToRun(TScan scan, TRun run)
         {
-            if (scan.MsLevel == 1)
+            if (scan.MsLevel == TandemMsLevel.Ms1)
             {
                 lock (run.Ms1Scans)
                     run.Ms1Scans.Add(scan);
             }
-            else if (scan.MsLevel == 2)
+            else if (scan.MsLevel == TandemMsLevel.Ms2)
             {
-                lock (run.Ms2Scans)
-                {
-                    run.Ms2Scans.Add(scan);
-                    // Check made thread-safe Peter Crowther 2020-05-21.
-                    if (run.Ms2Scans.Count % 10000 == 0)
-                        logger.Info("{0} MS2 scans read", run.Ms2Scans.Count);
-                }
+                int scanCount = run.SafelyAddMs2Scan(scan);
             }
             else
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");

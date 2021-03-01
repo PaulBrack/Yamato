@@ -28,7 +28,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 550,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 0,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 2,
                 Cycle = 1,
                 TotalIonCurrent = 1000
@@ -41,7 +41,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 550,
                 IsolationWindowUpperOffset = 5,
                 ScanStartTime = 30,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 4,
                 Cycle = 2,
                 TotalIonCurrent = 3050
@@ -54,7 +54,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 550,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 35,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 4,
                 Cycle = 3,
                 TotalIonCurrent = 4000
@@ -65,7 +65,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 550,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 70,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 5,
                 Cycle = 4,
                 TotalIonCurrent = 6000
@@ -76,7 +76,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 550,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 70.002,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 5,
                 Cycle = 5,
                 TotalIonCurrent = 6000
@@ -87,7 +87,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 1050,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 0,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 2,
                 Cycle = 1,
                 TotalIonCurrent = 1000
@@ -100,7 +100,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 1050,
                 IsolationWindowUpperOffset = 5,
                 ScanStartTime = 30,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 4,
                 Cycle = 2,
                 TotalIonCurrent = 3050
@@ -113,7 +113,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 1050,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 35,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 40,
                 Cycle = 3,
                 TotalIonCurrent = 4000
@@ -124,7 +124,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 1050,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 70,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 20,
                 Cycle = 4,
                 TotalIonCurrent = 20000
@@ -135,7 +135,7 @@ namespace SwaMe.Test
                 IsolationWindowTargetMz = 1050,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 70.002,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 18,
                 Cycle = 5,
                 TotalIonCurrent = 10000
@@ -146,7 +146,7 @@ namespace SwaMe.Test
                 IsolationWindowLowerOffset = 1,
                 IsolationWindowUpperOffset = 1,
                 ScanStartTime = 0,
-                MsLevel = 1,
+                MsLevel = TandemMsLevel.Ms1,
                 Density = 2,
                 Cycle = 1,
                 TotalIonCurrent = 1000,
@@ -158,7 +158,7 @@ namespace SwaMe.Test
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,
                 ScanStartTime = 30,
-                MsLevel = 1,
+                MsLevel = TandemMsLevel.Ms1,
                 Density = 4,
                 Cycle = 2,
                 TotalIonCurrent = 3050,
@@ -170,7 +170,7 @@ namespace SwaMe.Test
                 IsolationWindowLowerOffset = 5,
                 IsolationWindowUpperOffset = 5,
                 ScanStartTime = 70,
-                MsLevel = 1,
+                MsLevel = TandemMsLevel.Ms1,
                 Density = 4,
                 Cycle = 3,
                 TotalIonCurrent = 3050,

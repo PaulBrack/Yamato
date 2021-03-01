@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
@@ -22,15 +22,15 @@ namespace SwaMe.Test
 
             string tempPath = Path.GetTempPath();
 
-            Scan ms2scan1 = new Scan(false, 1, 1, 0, 2, 2, 1, 1000, tempPath);
-            Scan ms2scan2 = new Scan(false, 1, 1, 0, 2, 2, 1, 5000, tempPath);
-            Scan ms2scan3 = new Scan(false, 5, 5, 0, 2, 4, 1, 1000, tempPath);
-            Scan ms2scan4 = new Scan(false, 1, 1, 0, 2, 4, 2, 51000, tempPath);
-            Scan ms2scan5 = new Scan(false, 1, 1, 0, 2, 5, 2, 1000, tempPath);
+            Scan ms2scan1 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 1000, tempPath);
+            Scan ms2scan2 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 5000, tempPath);
+            Scan ms2scan3 = new Scan(false, 5, 5, 0, TandemMsLevel.Ms2, 4, 1, 1000, tempPath);
+            Scan ms2scan4 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 4, 2, 51000, tempPath);
+            Scan ms2scan5 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 5, 2, 1000, tempPath);
             Scan ms2scan6 = new Scan(false, tempPath)
             {
                 ScanStartTime = 0,
-                MsLevel = 2,
+                MsLevel = TandemMsLevel.Ms2,
                 Density = 5
             };
 

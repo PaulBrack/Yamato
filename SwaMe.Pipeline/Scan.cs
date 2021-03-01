@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using MzmlParser;
 using ProtoBuf;
@@ -15,7 +15,7 @@ namespace SwaMe.Pipeline
             TempDirectory = tempDirectory;
         }
 
-        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density, string? tempDirectory)
+        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, TandemMsLevel msLevel, int density, string? tempDirectory)
         {
             CacheSpectraToDisk = cacheSpectraToDisk;
             IsolationWindowLowerOffset = isolationWindowLowerOffset;
@@ -26,7 +26,7 @@ namespace SwaMe.Pipeline
             TempDirectory = tempDirectory;
         }
 
-        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, int msLevel, int density, int cycle, double totalIonCurrent, string tempDirectory)
+        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, TandemMsLevel msLevel, int density, int cycle, double totalIonCurrent, string tempDirectory)
         {
             CacheSpectraToDisk = cacheSpectraToDisk;
             IsolationWindowLowerOffset = isolationWindowLowerOffset;
@@ -42,7 +42,7 @@ namespace SwaMe.Pipeline
         public bool CacheSpectraToDisk { get; set; }
         public string? Base64IntensityArray { get; set; }
         public int Cycle { get; set; }
-        public int? MsLevel { get; set; }
+        public TandemMsLevel MsLevel { get; set; }
         public double BasePeakIntensity { get; set; }
         public double BasePeakMz { get; set; }
         public double TotalIonCurrent { get; set; }
