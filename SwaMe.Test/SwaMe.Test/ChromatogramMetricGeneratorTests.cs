@@ -54,6 +54,7 @@ namespace SwaMe.Test
             EmptyCMG.GenerateChromatogram(EmptyBasePeakRun);
 
         }
+
         /// <remarks>
         /// Intensities correctly interpolated and smoothed if there is at least one basepeak in the data fed to the function.
         /// </remarks>
@@ -76,7 +77,7 @@ namespace SwaMe.Test
         }
 
         /// <remarks>
-        /// Starttimes correctly interpolated and smoothed if there is at least one basepeak in the data fed to the function.
+        /// Start times correctly interpolated and smoothed if there is at least one basepeak in the data fed to the function.
         /// </remarks>
         [TestMethod]
         public void StartTimesCorrectIfOneBasePeak()
@@ -99,10 +100,10 @@ namespace SwaMe.Test
         /// FWHMS correctly calculated if there is at least one basepeak in the data fed to the function.
         /// </remarks>
         [TestMethod]
-        public void  BasepeakFWHMsCorrectIfOneBasePeak()
+        public void BasepeakFWHMsCorrectIfOneBasePeak()
         {
             var correctFWHM = 50.666656494140625; 
-            Assert.AreEqual(correctFWHM, Basepeak1Run.BasePeaks.ElementAt(0).FWHMs.ElementAt(0));
+            Assert.AreEqual(correctFWHM, Basepeak1Run.BasePeaks[0].FWHMs[0]);
         }
 
         /// <remarks>
@@ -111,8 +112,8 @@ namespace SwaMe.Test
         [TestMethod]
         public void BasepeakFWHMsZeroIfBasePeakSpectrumEmpty()
         {
-            var correctFWHM =0;
-            Assert.AreEqual(correctFWHM, EmptyBasePeakRun.BasePeaks.ElementAt(0).FWHMs.ElementAt(0));
+            var correctFWHM = 0;
+            Assert.AreEqual(correctFWHM, EmptyBasePeakRun.BasePeaks[0].FWHMs[0]);
         }
 
         /// <remarks>
@@ -122,7 +123,7 @@ namespace SwaMe.Test
         public void BasepeakPeakSymsCorrectIfOneBasePeak()
         {
             var correctPeakSym = 0.50498342514038086;
-            Assert.AreEqual(correctPeakSym, Basepeak1Run.BasePeaks.ElementAt(0).Peaksyms.ElementAt(0));
+            Assert.AreEqual(correctPeakSym, Basepeak1Run.BasePeaks[0].Peaksyms[0]);
         }
 
         /// <remarks>
@@ -132,7 +133,7 @@ namespace SwaMe.Test
         public void BasepeakPeaksymsZeroIfBasePeakSpectrumEmpty()
         {
             var correctPeakSym = 0;
-            Assert.AreEqual(correctPeakSym, EmptyBasePeakRun.BasePeaks.ElementAt(0).Peaksyms.ElementAt(0));
+            Assert.AreEqual(correctPeakSym, EmptyBasePeakRun.BasePeaks[0].Peaksyms[0]);
         }
 
         /// <remarks>
@@ -141,8 +142,8 @@ namespace SwaMe.Test
         [TestMethod]
         public void BasepeakFullWidthAtBaselineCorrectIfOneBasePeak()
         {
-            var correctFullWidthAtBaseline =  96.266693115234375;
-            Assert.AreEqual(correctFullWidthAtBaseline, Basepeak1Run.BasePeaks.ElementAt(0).FullWidthBaselines.ElementAt(0));
+            var correctFullWidthAtBaseline = 96.266693115234375;
+            Assert.AreEqual(correctFullWidthAtBaseline, Basepeak1Run.BasePeaks[0].FullWidthBaselines[0]);
         }
 
         /// <remarks>
@@ -152,7 +153,7 @@ namespace SwaMe.Test
         public void BasepeakFullWidthAtBaselineZeroIfBasePeakSpectrumEmpty()
         {
             var correctFullWidthAtBaseline = 0;
-            Assert.AreEqual(correctFullWidthAtBaseline, EmptyBasePeakRun.BasePeaks.ElementAt(0).FullWidthBaselines.ElementAt(0));
+            Assert.AreEqual(correctFullWidthAtBaseline, EmptyBasePeakRun.BasePeaks[0].FullWidthBaselines[0]);
         }
     }
 }

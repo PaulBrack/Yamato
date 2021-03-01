@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -73,15 +73,9 @@ namespace SwaMe.Test
 
 
             //BasePeaks:
-            var spectrumpoint1 = new SpectrumPoint(2000,150,2.58F){};
-            var spectrumpoint2 = new SpectrumPoint(3000,150.01F,3.00F){};
-            var spectrumpoint3 = new SpectrumPoint(3000,150.01F,60F){};
-            var basePeak1 = new BasePeak(150, 2.5, 150)
-            {
-                BpkRTs = new List<double>() { 2.5 },
-                Spectrum = new List<SpectrumPoint>() { spectrumpoint1, spectrumpoint2 },
-                Mz = 150
-            };
+            var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
+            var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
+            var spectrumpoint3 = new SpectrumPoint(3000, 150.01F, 60F);
             basePeak1.RTsegments.Add(2);
             basePeak1.FWHMs.Add(1);
             basePeak1.FWHMs.Add(2);
@@ -136,7 +130,6 @@ namespace SwaMe.Test
 
             RTGrouper = new RTGrouper();
             Result = RTGrouper.DivideByRT(Ms2andms1Run, 2, 100);
-            
         }
 
         /// <remarks>
@@ -145,41 +138,46 @@ namespace SwaMe.Test
         [TestMethod]
         public void RtSegsCorrect() 
         {
-            double[] correctsegments = {0,50};
+            double[] correctsegments = { 0, 50 };
             Assert.IsTrue(Enumerable.SequenceEqual(RTGrouper.rtSegs, correctsegments));
         }
+
         /// <remarks>
         /// RTSegs is correctly allocated to basepeaks - first.
         /// </remarks>
         [TestMethod]
         public void RtsegmentsAllocatedToFirstBasePeakCorrect()
         {
-            Assert.AreEqual(Ms2andms1Run.BasePeaks.ElementAt(0).RTsegments.ElementAt(0), 2);
+            Assert.AreEqual(Ms2andms1Run.BasePeaks[0].RTsegments[0], 2);
         }
+
         /// <remarks>
         /// RTSegs is correctly allocated to basepeaks - second.
         /// </remarks>
         [TestMethod]
-        public void rtsegmentsAllocatedToSecondBasePeakCorrect()
+        public void RtsegmentsAllocatedToSecondBasePeakCorrect()
         {
-            Assert.AreEqual(Ms2andms1Run.BasePeaks.ElementAt(1).RTsegments.ElementAt(0), 1);
+            Assert.AreEqual(Ms2andms1Run.BasePeaks[1].RTsegments[0], 1);
         }
+
         /// <remarks>
         /// RTSegs is correctly allocated to scans - first.
         /// </remarks>
         [TestMethod]
-        public void rtsegmentsAllocatedToFirstScanCorrect()
+        public void RtsegmentsAllocatedToFirstScanCorrect()
         {
-            Assert.AreEqual(Ms2andms1Run.Ms2Scans.OrderBy(x=>x.ScanStartTime).ElementAt(0).RTsegment, 0);
+            Assert.AreEqual(Ms2andms1Run.Ms2Scans.OrderBy(x => x.ScanStartTime).ElementAt(0).RTsegment, 0);
         }
+
         /// <remarks>
         /// RTSegs is correctly allocated to scans - fifth (This scan is part of the second RTsegment).
         /// </remarks>
         [TestMethod]
-        public void rtsegmentsAllocatedToFifthScanCorrect()
+        public void RtsegmentsAllocatedToFifthScanCorrect()
         {
             Assert.AreEqual(Ms2andms1Run.Ms2Scans.OrderBy(x => x.ScanStartTime).ElementAt(7).RTsegment, 1);
         }
+
         /// <remarks>
         /// TIC Change from one scan to the next chronological scan is correctly calculated.
         /// </remarks>
@@ -189,6 +187,7 @@ namespace SwaMe.Test
             List<double> correctTICChangeList = new List<double>() { 0.4112602937765108, 0.45553110066628605 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.TicChange50List, correctTICChangeList));
         }
+
         /// <remarks>
         /// TICChangeIQR from one scan to the next is correctly calculated.
         /// </remarks>
@@ -198,6 +197,7 @@ namespace SwaMe.Test
             List<double> correctTICChangeIQRList = new List<double>() { 0.6743549129237949, 0 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.TicChangeIqrList, correctTICChangeIQRList));
         }
+
         /// <remarks>
         /// MS2TICTotal for each segment is correctly calculated.
         /// </remarks>
@@ -207,6 +207,7 @@ namespace SwaMe.Test
             List<double> correctMS2TICTotalList = new List<double>() { 124190.68000000001, 66000 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.MS2TicTotal, correctMS2TICTotalList));
         }
+
         /// <remarks>
         /// CycleTime for each segment is correctly calculated.
         /// </remarks>
@@ -216,6 +217,7 @@ namespace SwaMe.Test
             List<double> correctCycleTime = new List<double>() { 750, 0 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.CycleTime, correctCycleTime));
         }
+
         /// <remarks>
         /// MS2Density for each segment is correctly calculated.
         /// </remarks>
@@ -225,15 +227,17 @@ namespace SwaMe.Test
             List<int> correctMS2Density = new List<int>() { 3, 5 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.MS2Density, correctMS2Density));
         }
+
         /// <remarks>
         ///Average Peakwidths for each segment is correctly calculated.
         /// </remarks>
         [TestMethod]
         public void PeakWidthsCorrect()
         {
-            List<double> correctPeakWidths= new List<double>() { 2, 2 };
+            List<double> correctPeakWidths = new List<double>() { 2, 2 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.Peakwidths, correctPeakWidths));
         }
+
         /// <remarks>
         /// Average tailing factor for each segment is correctly calculated.
         /// </remarks>
@@ -243,6 +247,7 @@ namespace SwaMe.Test
             List<double> correctTailingFactor = new List<double>() { 2, 1 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.TailingFactor, correctTailingFactor));
         }
+
         /// <remarks>
         /// PeakCapacity for each segment is correctly calculated.
         /// </remarks>
@@ -252,6 +257,7 @@ namespace SwaMe.Test
             List<double> correctPeakCapacity = new List<double>() { 25, 50 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.PeakCapacity, correctPeakCapacity));
         }
+
         /// <remarks>
         /// Peakprecision for each segment is correctly calculated.
         /// </remarks>
@@ -261,6 +267,7 @@ namespace SwaMe.Test
             List<double> correctPeakPrecision = new List<double>() { 0.0046828263654738241, 0.590665785597378 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.PeakPrecision, correctPeakPrecision));
         }
+
         /// <remarks>
         /// MS1TIC total for each segment is correctly calculated.
         /// </remarks>
@@ -270,6 +277,7 @@ namespace SwaMe.Test
             List<double> correctMS1TICTotalList = new List<double>() { 4050, 3050 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.MS1TicTotal, correctMS1TICTotalList));
         }
+
         /// <remarks>
         /// Density(number of ions) in MS1 scans total for each segment is correctly calculated.
         /// </remarks>
@@ -279,6 +287,7 @@ namespace SwaMe.Test
             List<int> correctMS1DensityList = new List<int>() { 3, 4 };
             Assert.IsTrue(Enumerable.SequenceEqual(Result.MS1Density, correctMS1DensityList));
         }
+
         /// <remarks>
         /// peak precision between MS1 scans total for each segment is correctly calculated.
         /// </remarks>

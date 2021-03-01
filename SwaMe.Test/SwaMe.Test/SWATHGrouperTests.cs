@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -181,15 +181,9 @@ namespace SwaMe.Test
 
 
             //BasePeaks:
-            var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F) { };
-            var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F) { };
-            var spectrumpoint3 = new SpectrumPoint(3000, 150.01F, 60F) { };
-            var basePeak1 = new BasePeak(150, 2.5, 150)
-            {
-                BpkRTs = new List<double>() { 2.5 },
-                Spectrum = new List<SpectrumPoint>() { spectrumpoint1, spectrumpoint2 },
-                Mz = 150
-            };
+            var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
+            var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
+            var spectrumpoint3 = new SpectrumPoint(3000, 150.01F, 60F);
             basePeak1.FWHMs.Add(1);
             basePeak1.FWHMs.Add(2);
             basePeak1.Peaksyms.Add(1);
@@ -252,50 +246,55 @@ namespace SwaMe.Test
         {
             Assert.AreEqual(result.totalTIC, 58100);
         }
+
         [TestMethod]
-        public void swathTargetsCorrect()
+        public void SwathTargetsCorrect()
         {
             // Targets should come out of SwathGrouper sorted in ascending order.
             List<double> correctTargets = new List<double>() { 550, 1050 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.swathTargets, correctTargets));
         }
+
         [TestMethod]
-        public void numOfSwathPerGroupCorrect()
+        public void NumOfSwathPerGroupCorrect()
         {
             List<int> correctnumOfSwathPerGroup = new List<int>() { 5, 5 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.numOfSwathPerGroup, correctnumOfSwathPerGroup));
         }
+
         [TestMethod]
-        public void mzTargetRangePerGroupCorrect()
+        public void MzTargetRangePerGroupCorrect()
         {
             List<double> correctmzTargetRange = new List<double>() {3.6, 3.6};
             Assert.IsTrue(Enumerable.SequenceEqual(result.mzRange, correctmzTargetRange));
         }
+
         [TestMethod]
         public void TICsCorrect()
         {
             List<double> correctTICs = new List<double>() { 20050, 38050 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.TICs, correctTICs));
         }
+
         [TestMethod]
-        public void swDensity50Correct()
+        public void SwDensity50Correct()
         {
             List<double> correctswDensity50 = new List<double>() { 4, 17 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.swDensity50, correctswDensity50));
         }
+
         [TestMethod]
-        public void swDensityIQRCorrect()
+        public void SwDensityIQRCorrect()
         {
             List<double?> correctswDensityIQR = new List<double?>() { 1, 16 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.swDensityIQR, correctswDensityIQR));
         }
+
         [TestMethod]
         public void SwathProportionOfTotalTICCorrect()
         {
             List<double> correctSwathProportionOfTotalTIC = new List<double>() { 0.34509466437177283, 0.65490533562822717 };
             Assert.IsTrue(Enumerable.SequenceEqual(result.SwathProportionOfTotalTIC, correctSwathProportionOfTotalTIC));
         }
-
     }
 }
-

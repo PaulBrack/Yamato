@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using ProtoBuf;
 using System.Collections.Generic;
@@ -11,6 +11,4 @@ namespace SwaMe.Pipeline
         [ProtoMember(1)]
         public virtual IList<SpectrumPoint>? SpectrumPoints { get; set; }
     }
-
-
 }
