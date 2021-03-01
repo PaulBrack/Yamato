@@ -8,14 +8,7 @@ namespace SwaMe.Pipeline
 {
     public class BasePeak
     {
-        public double Mz { get; set; }
-        public List<double> Intensities { get; set; }
-        public List<SpectrumPoint> Spectrum { get; set; }
-        public List<double> RTsegments { get; set; } = new List<double>();
-        public List<double> FWHMs = new List<double>();
-        public List<double> Peaksyms = new List<double>();
-        public List<double> FullWidthBaselines = new List<double>();
-        public List<double> BpkRTs;
+        public IList<SpectrumPoint> Spectrum { get; }
 
         public BasePeak (Scan scan, double massTolerance, IEnumerable<SpectrumPoint>spectrum)
         {

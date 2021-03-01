@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System.Collections.Generic;
 using LibraryParser;
@@ -9,7 +9,7 @@ namespace SwaMe.Pipeline
     {
         public double Mz { get; set; }
         public double Intensity { get; set; }
-        public List<Library.Transition> AssociatedTransitions = new List<Library.Transition>();
+        public IList<Library.Transition> AssociatedTransitions = new List<Library.Transition>();
         public double RetentionTime { get; set; }
         public double ExpectedRetentionTime { get; set; }
         public List<SpectrumPoint> Spectrum { get; set; } = new List<SpectrumPoint>();

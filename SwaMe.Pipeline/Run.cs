@@ -11,13 +11,13 @@ namespace SwaMe.Pipeline
     {
         public double StartTime { get; set; } = 0;
         public double LastScanTime { get; set; } = 1000000;
-        public List<string> SourceFileTypes { get; } = new List<string>();
-        public List<string> SourceFileNames { get; } = new List<string>();
+        public IList<string> SourceFileTypes { get; } = new List<string>();
+        public IList<string> SourceFileNames { get; } = new List<string>();
         public string? SourceFilePath { get; set; }
-        public List<string> SourceFileChecksums { get; } = new List<string>();
+        public IList<string> SourceFileChecksums { get; } = new List<string>();
         public string? CompletionTime { get; set; }
-        public List<TScan> Ms1Scans { get; } = new List<TScan>();
-        public List<TScan> Ms2Scans { get; } = new List<TScan>();
+        public IList<TScan> Ms1Scans { get; } = new List<TScan>();
+        public IList<TScan> Ms2Scans { get; } = new List<TScan>();
         /// <remarks>
         /// BEWARE: BasePeaks has concurrent read-calculate-write access.  If writing, please lock on the BasePeaks object.
         /// It is not a concurrent datatype because read-calculate-write accesses are not amenable to being defended in that way.
