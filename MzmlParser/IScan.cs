@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using System;
 
@@ -10,6 +10,12 @@ namespace MzmlParser
     public interface IScan : IDisposable
     {
         int Cycle { get; set; }
+        /// <summary>
+        /// Note that the lower offset is *always positive*, so to get to the lower boundary, use targetMz - lowerOffset.
+        /// </summary>
+        double? IsolationWindowLowerOffset { get; set; }
+        double? IsolationWindowTargetMz { get; set; }
+        double? IsolationWindowUpperOffset { get; set; }
         TandemMsLevel MsLevel { get; set; }
         double ScanStartTime { get; set; }
         double TotalIonCurrent { get; set; }

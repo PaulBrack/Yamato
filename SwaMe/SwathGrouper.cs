@@ -1,3 +1,4 @@
+#nullable enable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace SwaMe
                     .Where(x => x.IsolationWindowTargetMz == swathTargets[swathNumber]); // Turns out ordering is not required; users of this either don't care about order or sort their own results.
                 foreach (var scan in orderedMS2Scans)
                 {
-                    mzTargetRange.Add(scan.IsolationWindowUpperOffset + scan.IsolationWindowLowerOffset);
+                    mzTargetRange.Add(scan.IsolationWindowUpperOffset.Value + scan.IsolationWindowLowerOffset.Value);
                     TICthisSwath += scan.TotalIonCurrent;
                     swDensity.Add(scan.Density);
                     TotalSwathProportionPredictedSingleCharge.Add(scan.ProportionChargeStateOne); //The chargestate one's we pick up is where there is a match for M+1. Therefore we need to double it to add the M.

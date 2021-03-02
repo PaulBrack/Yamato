@@ -47,11 +47,11 @@ namespace SwaMe.Pipeline
         public double BasePeakMz { get; set; }
         public double TotalIonCurrent { get; set; }
         public double ScanStartTime { get; set; }
-        public double IsolationWindowTargetMz { get; set; }
-        public double IsolationWindowUpperOffset { get; set; } = 100000;
-        public double IsolationWindowLowerOffset { get; set; } = 100000;
-        public double IsolationWindowUpperBoundary { get; set; }
-        public double IsolationWindowLowerBoundary { get; set; }
+        public double? IsolationWindowTargetMz { get; set; }
+        public double? IsolationWindowUpperOffset { get; set; }
+        public double? IsolationWindowLowerOffset { get; set; }
+        public double? IsolationWindowUpperBoundary { get; set; }
+        public double? IsolationWindowLowerBoundary { get; set; }
         public int RTsegment { get; set; }
         public int Density { get; set; }
         public double ProportionChargeStateOne { get; set; }

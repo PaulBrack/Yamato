@@ -48,6 +48,7 @@ namespace SwaMe.Pipeline
             logger.Debug("{0} MS2 total scans read", run.Ms2Scans.Count);
             logger.Debug("{0} candidate IRT hits detected", run.IRTHits.Count);
             logger.Debug("{0} base peaks selected", run.BasePeaks.Count);
+            logger.Debug("{0} isolation windows detected: min {1} max {2}", run.IsolationWindows.Count, run.IsolationWindows.Min(x => x.Width), run.IsolationWindows.Max(x => x.Width));
 
             if (MaxThreads != 0)
                 ThreadPool.SetMaxThreads(MaxThreads, MaxThreads);

@@ -38,6 +38,9 @@ namespace SwaMe.Test
             var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
             var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
 
+            var isolationWindow = new IsolationWindow(140, 150, 160);
+
+            var basePeak1 = new BasePeak(150, 2.5, 150, spectrumpoint1, spectrumpoint2);
             contains5ms2ScansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
             {
                 LastScanTime = 70,
@@ -46,9 +49,7 @@ namespace SwaMe.Test
             Contains5ms2ScansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5 });
 
 
-            Contains5ms2ScansRun.BasePeaks.Add(basePeak1);
-            Contains5ms2ScansRun.SourceFileNames.Add(" ");
-            Contains5ms2ScansRun.SourceFileChecksums.Add(" ");
+            contains5ms2ScansRun.IsolationWindows.Add(isolationWindow);
 
             emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
             {
