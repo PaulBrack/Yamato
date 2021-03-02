@@ -121,7 +121,7 @@ namespace MzqcGenerator
                 accession = swaMe.Id, 
                 name = swaMe.Name, 
                 uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", 
-                version = this.GetType().Assembly.GetName().Version.ToString(), 
+                version = GetType().Assembly.GetName().Version.ToString(), 
                 analysisSettings = analysisSettings 
             };
 

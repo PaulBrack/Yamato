@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -224,7 +224,7 @@ namespace SwaMe.Test
         public void PeakWidthsCorrect()
         {
             List<double> correctPeakWidths = new List<double>() { 2, 2 };
-            Assert.IsTrue(Enumerable.SequenceEqual(Result.Peakwidths, correctPeakWidths));
+            Assert.IsTrue(Enumerable.SequenceEqual(Result.PeakWidths, correctPeakWidths));
         }
 
         /// <remarks>

@@ -75,7 +75,7 @@ namespace SwaMe
                 SwathProportionOfTotalTIC = swathMetrics.SwathProportionOfTotalTIC,
                 SwDensity50 = swathMetrics.SwDensity50,
                 SwDensityIQR = swathMetrics.SwDensityIQR,
-                Peakwidths = rtMetrics.Peakwidths,
+                PeakWidths = rtMetrics.PeakWidths,
                 PeakCapacity = rtMetrics.PeakCapacity,
                 MS1PeakPrecision = rtMetrics.MS1PeakPrecision,
                 TicChange50List = rtMetrics.TicChange50List,
@@ -107,7 +107,7 @@ namespace SwaMe
         public IList<double>? SwathProportionOfTotalTIC { get; set; }
         public IList<double>? SwDensity50 { get; set; }
         public IList<double?>? SwDensityIQR { get; set; }
-        public IList<double>? Peakwidths { get; set; }
+        public IList<double>? PeakWidths { get; set; }
         public IList<double>? PeakCapacity { get; set; }
         public IList<double>? MS1PeakPrecision { get; set; }
         public IList<double>? TicChange50List { get; set; }
@@ -141,7 +141,7 @@ namespace SwaMe
                 { "QC:11", SwathProportionOfTotalTIC },
                 { "QC:12", SwDensity50 },
                 { "QC:13", SwDensityIQR },
-                { "QC:14", Peakwidths },
+                { "QC:14", PeakWidths },
                 { "QC:15", PeakCapacity },
                 { "QC:16", MS1PeakPrecision },
                 { "QC:17", TicChange50List },

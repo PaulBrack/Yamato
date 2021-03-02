@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using NLog;
 using LibraryParser;
-using System.Linq;
 using System.IO;
 using SwaMe.Pipeline;
 using System.Collections.Generic;
