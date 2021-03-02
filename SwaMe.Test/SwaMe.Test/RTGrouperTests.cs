@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -78,17 +78,17 @@ namespace SwaMe.Test
             var spectrumpoint3 = new SpectrumPoint(3000, 150.01F, 60F);
             var basePeak1 = new BasePeak(150, 2.5, 150, spectrumpoint1, spectrumpoint2);
             basePeak1.RTsegments.Add(2);
-            basePeak1.FWHMs.Add(1);
-            basePeak1.FWHMs.Add(2);
-            basePeak1.Peaksyms.Add(1);
-            basePeak1.Peaksyms.Add(2);
+            basePeak1.FullWidthHalfMaxes.Add(1);
+            basePeak1.FullWidthHalfMaxes.Add(2);
+            basePeak1.PeakSymmetries.Add(1);
+            basePeak1.PeakSymmetries.Add(2);
             basePeak1.Intensities.Add(2);
             basePeak1.FullWidthBaselines.Add(1);
             basePeak1.FullWidthBaselines.Add(2);
 
             var basePeak2 = new BasePeak(300, 60, 150, spectrumpoint3);
-            basePeak2.FWHMs.Add(2);
-            basePeak2.Peaksyms.Add(1);
+            basePeak2.FullWidthHalfMaxes.Add(2);
+            basePeak2.PeakSymmetries.Add(1);
             basePeak2.FullWidthBaselines.Add(1);
 
             //Runs:

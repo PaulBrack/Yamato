@@ -71,7 +71,7 @@ namespace SwaMe.Pipeline
                 bool found = false;
                 lock (candidate)
                 {
-                    foreach (double rt in candidate.BpkRTs)
+                    foreach (double rt in candidate.BasePeakRetentionTimes)
                     {
                         if (Math.Abs(rt - retentionTime) < AnalysisSettings.RtTolerance) // This is considered to be part of a previous basepeak
                         {
@@ -81,7 +81,7 @@ namespace SwaMe.Pipeline
                     }
                     if (!found) // No matching BpkRt in this BasePeak, so add one.
                     {
-                        candidate.BpkRTs.Add(retentionTime);
+                        candidate.BasePeakRetentionTimes.Add(retentionTime);
                         candidate.Intensities.Add(intensity);
                     }
                 }

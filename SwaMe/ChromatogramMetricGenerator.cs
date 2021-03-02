@@ -33,7 +33,7 @@ namespace SwaMe
             foreach (BasePeak basepeak in run.BasePeaks)
             {
                 // For each peak within the spectrum 
-                foreach (RetentionTime bpkRt in basepeak.BpkRTs)
+                foreach (RetentionTime bpkRt in basepeak.BasePeakRetentionTimes)
                 {
                     // Change these two arrays to be only the spectra surrounding that basepeak retention time:
                     var pointsInRange = basepeak.Spectrum.Where(x => Math.Abs(x.RetentionTime - bpkRt) < run.AnalysisSettings.RtTolerance).ToList();
@@ -53,9 +53,9 @@ namespace SwaMe
                     int peakCount = crawPeaks.Count;
                     if (peakCount == 0)
                     {
-                        basepeak.FWHMs.Add(0);
+                        basepeak.FullWidthHalfMaxes.Add(0);
                         basepeak.FullWidthBaselines.Add(0);
-                        basepeak.Peaksyms.Add(0);
+                        basepeak.PeakSymmetries.Add(0);
                     }
                     else
                     {
@@ -78,8 +78,8 @@ namespace SwaMe
                             else
                                 totalBaseWidth += crawPeak.Fwfpct;
                         }
-                        basepeak.FWHMs.Add(totalFwhm / peakCount);
-                        basepeak.Peaksyms.Add(totalPeakSym / peakCount);
+                        basepeak.FullWidthHalfMaxes.Add(totalFwhm / peakCount);
+                        basepeak.PeakSymmetries.Add(totalPeakSym / peakCount);
                         basepeak.FullWidthBaselines.Add(totalBaseWidth / peakCount);
                     }
                 }

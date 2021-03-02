@@ -157,7 +157,7 @@ namespace SwaMe.Pipeline
             {
                 foreach (BasePeak basePeak in run.BasePeaks.Where(x => Math.Abs(x.Mz - scan.BasePeakMz) <= run.AnalysisSettings.MassTolerance))
                 {
-                    var temp = basePeak.BpkRTs.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
+                    var temp = basePeak.BasePeakRetentionTimes.Where(x => Math.Abs(x - scan.ScanStartTime) < run.AnalysisSettings.RtTolerance);
                     if (temp.Any())
                     {
                         IEnumerable<SpectrumPoint>? matching = spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - basePeak.Mz) <= run.AnalysisSettings.MassTolerance);
@@ -186,9 +186,6 @@ namespace SwaMe.Pipeline
             // Initial setup: isolation window boundaries and throw in some minimal arrays if the mzML has none for this scan.
             if (scan.IsolationWindowTargetMz.HasValue && scan.IsolationWindowLowerOffset.HasValue && scan.IsolationWindowUpperOffset.HasValue)
             {
-                scan.IsolationWindowLowerBoundary = scan.IsolationWindowTargetMz.Value - scan.IsolationWindowLowerOffset.Value;
-                scan.IsolationWindowUpperBoundary = scan.IsolationWindowTargetMz.Value + scan.IsolationWindowUpperOffset.Value;
-
                 lock (run.IsolationWindows)
                 {
                     run.IsolationWindows.Add(new IsolationWindow(scan.IsolationWindowLowerBoundary.Value, scan.IsolationWindowTargetMz.Value, scan.IsolationWindowUpperBoundary.Value));

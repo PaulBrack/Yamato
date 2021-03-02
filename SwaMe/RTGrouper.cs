@@ -82,7 +82,7 @@ namespace SwaMe
             foreach (BasePeak basepeak in run.BasePeaks)
             {
                 //Check to see in which RTsegment this basepeak is:
-                foreach (double rt in basepeak.BpkRTs)
+                foreach (double rt in basepeak.BasePeakRetentionTimes)
                 {
                     if (rt > rtSegs.Last())
                         basepeak.RTsegments.Add(rtSegs.Count() - 1);

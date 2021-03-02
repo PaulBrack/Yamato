@@ -1,8 +1,8 @@
-#nullable enable
+﻿#nullable enable
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SwaMe.Pipeline;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 
 namespace SwaMe.Test
@@ -81,7 +81,7 @@ namespace SwaMe.Test
         public void BasepeakFWHMsCorrectIfOneBasePeak()
         {
             var correctFWHM = 50.666656494140625;
-            Assert.AreEqual(correctFWHM, Basepeak1Run.BasePeaks[0].FWHMs[0]);
+            Assert.AreEqual(correctFWHM, BasePeak1Run.BasePeaks[0].FullWidthHalfMaxes[0]);
         }
 
         /// <remarks>
@@ -91,7 +91,7 @@ namespace SwaMe.Test
         public void BasepeakFWHMsZeroIfBasePeakSpectrumEmpty()
         {
             var correctFWHM = 0;
-            Assert.AreEqual(correctFWHM, EmptyBasePeakRun.BasePeaks[0].FWHMs[0]);
+            Assert.AreEqual(correctFWHM, EmptyBasePeakRun.BasePeaks[0].FullWidthHalfMaxes[0]);
         }
 
         /// <remarks>
@@ -101,7 +101,7 @@ namespace SwaMe.Test
         public void BasePeakPeakSymsCorrectIfOneBasePeak()
         {
             var correctPeakSym = 0.50498342514038086;
-            Assert.AreEqual(correctPeakSym, Basepeak1Run.BasePeaks[0].Peaksyms[0]);
+            Assert.AreEqual(correctPeakSym, BasePeak1Run.BasePeaks[0].PeakSymmetries[0]);
         }
 
         /// <remarks>
@@ -111,7 +111,7 @@ namespace SwaMe.Test
         public void BasepeakPeaksymsZeroIfBasePeakSpectrumEmpty()
         {
             var correctPeakSym = 0;
-            Assert.AreEqual(correctPeakSym, EmptyBasePeakRun.BasePeaks[0].Peaksyms[0]);
+            Assert.AreEqual(correctPeakSym, EmptyBasePeakRun.BasePeaks[0].PeakSymmetries[0]);
         }
 
         /// <remarks>
