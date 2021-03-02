@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using MzmlParser;
 
@@ -17,7 +17,7 @@ namespace SwaMe.Pipeline
 
         Run<Scan> IRunFactory<Scan, Run<Scan>>.CreateRun()
         {
-            return new Run<Scan>() { AnalysisSettings = AnalysisSettings };
+            return new Run<Scan>(AnalysisSettings);
         }
 
         Scan IScanFactory<Scan>.CreateScan()
