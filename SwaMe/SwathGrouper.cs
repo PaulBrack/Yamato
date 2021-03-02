@@ -37,9 +37,9 @@ namespace SwaMe
 
                 double TICthisSwath = 0;
 
-                var orderedMS2Scans = run.Ms2Scans
+                var unorderedMS2Scans = run.Ms2Scans
                     .Where(x => x.IsolationWindowTargetMz == swathTargets[swathNumber]); // Turns out ordering is not required; users of this either don't care about order or sort their own results.
-                foreach (var scan in orderedMS2Scans)
+                foreach (Scan scan in unorderedMS2Scans)
                 {
                     mzTargetRange.Add(scan.IsolationWindowUpperOffset.Value + scan.IsolationWindowLowerOffset.Value);
                     TICthisSwath += scan.TotalIonCurrent;

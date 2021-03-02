@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SwaMe.Pipeline;
@@ -11,27 +11,27 @@ namespace SwaMe.Test
     public class ChromatogramMetricGeneratorTest
     {
         private Run<Scan>? EmptyBasePeakRun;
-        private Run<Scan>? Basepeak1Run;
+        private Run<Scan>? BasePeak1Run;
         private ChromatogramMetricGenerator.RetentionTimesAndIntensities? BasePeak1LastRetentionTimesAndIntensities;
-        private ChromatogramMetricGenerator.RetentionTimesAndIntensities? emptyCMGLastRetentionTimesAndIntensities;
+        private ChromatogramMetricGenerator.RetentionTimesAndIntensities? EmptyCMGLastRetentionTimesAndIntensities;
 
         [TestInitialize]
         public void Initialize()
         {
             EmptyBasePeakRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 });
-            Basepeak1Run = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 });
+            BasePeak1Run = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 });
 
             var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
             var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
 
             var basePeak1 = new BasePeak(150, 2.5, 150, spectrumpoint1, spectrumpoint2);
-            var EmptyBasePeak = new BasePeak(1, 1, 1);
+            var emptyBasePeak = new BasePeak(1, 1, 1);
 
-            Basepeak1Run.BasePeaks.Add(basePeak1);
-            BasePeak1LastRetentionTimesAndIntensities = new ChromatogramMetricGenerator().GenerateChromatogram(Basepeak1Run);
+            BasePeak1Run.BasePeaks.Add(basePeak1);
+            BasePeak1LastRetentionTimesAndIntensities = new ChromatogramMetricGenerator().GenerateChromatogram(BasePeak1Run);
 
-            EmptyBasePeakRun.BasePeaks.Add(EmptyBasePeak);
-            emptyCMGLastRetentionTimesAndIntensities = new ChromatogramMetricGenerator().GenerateChromatogram(EmptyBasePeakRun);
+            EmptyBasePeakRun.BasePeaks.Add(emptyBasePeak);
+            EmptyCMGLastRetentionTimesAndIntensities = new ChromatogramMetricGenerator().GenerateChromatogram(EmptyBasePeakRun);
         }
 
         /// <remarks>
@@ -45,13 +45,13 @@ namespace SwaMe.Test
         }
 
         /// <remarks>
-        /// Intensities zero (but non-null) if there are no basepeaks in the data
+        /// Intensities empty (but non-null) if there are no basepeaks in the data
         /// </remarks>
         [TestMethod]
         public void IntensitiesCorrectIfBasePeakSpectrumEmpty()
         {
             double[] correctIntensities = { };
-            Assert.IsTrue(Enumerable.SequenceEqual(correctIntensities, emptyCMGLastRetentionTimesAndIntensities.Intensities));
+            Assert.IsTrue(Enumerable.SequenceEqual(correctIntensities, EmptyCMGLastRetentionTimesAndIntensities.Intensities));
         }
 
         /// <remarks>
@@ -65,17 +65,17 @@ namespace SwaMe.Test
         }
 
         /// <remarks>
-        /// Starttimes zero if there are no basepeaks in the data
+        /// Starttimes empty (but non-null) if there are no basepeaks in the data
         /// </remarks>
         [TestMethod]
         public void StartTimesCorrectIfBasePeakSpectrumEmpty()
         {
-            double[] correctST = { };
-            Assert.IsTrue(Enumerable.SequenceEqual(correctST, emptyCMGLastRetentionTimesAndIntensities.StartTimes));
+            double[] correctST = Array.Empty<double>();
+            Assert.IsTrue(Enumerable.SequenceEqual(correctST, EmptyCMGLastRetentionTimesAndIntensities.StartTimes));
         }
 
         /// <remarks>
-        /// FWHMS correctly calculated if there is at least one basepeak in the data fed to the function.
+        /// FWHMs correctly calculated if there is at least one basepeak in the data fed to the function.
         /// </remarks>
         [TestMethod]
         public void BasepeakFWHMsCorrectIfOneBasePeak()
@@ -85,7 +85,7 @@ namespace SwaMe.Test
         }
 
         /// <remarks>
-        ///FWHMS zero if there are no basepeaks in the data
+        ///FWHMs zero if there are no basepeaks in the data
         /// </remarks>
         [TestMethod]
         public void BasepeakFWHMsZeroIfBasePeakSpectrumEmpty()
@@ -98,7 +98,7 @@ namespace SwaMe.Test
         /// Tailing factor (also callled peak symmetry) correct if there is at least one basepeak in the data fed to the function.
         /// </remarks>
         [TestMethod]
-        public void BasepeakPeakSymsCorrectIfOneBasePeak()
+        public void BasePeakPeakSymsCorrectIfOneBasePeak()
         {
             var correctPeakSym = 0.50498342514038086;
             Assert.AreEqual(correctPeakSym, Basepeak1Run.BasePeaks[0].Peaksyms[0]);
@@ -121,7 +121,7 @@ namespace SwaMe.Test
         public void BasepeakFullWidthAtBaselineCorrectIfOneBasePeak()
         {
             var correctFullWidthAtBaseline = 96.266693115234375;
-            Assert.AreEqual(correctFullWidthAtBaseline, Basepeak1Run.BasePeaks[0].FullWidthBaselines[0]);
+            Assert.AreEqual(correctFullWidthAtBaseline, BasePeak1Run.BasePeaks[0].FullWidthBaselines[0]);
         }
 
         /// <remarks>
@@ -135,4 +135,3 @@ namespace SwaMe.Test
         }
     }
 }
-

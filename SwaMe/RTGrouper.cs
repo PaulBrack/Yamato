@@ -165,7 +165,7 @@ namespace SwaMe
             //if (run.Ms1Scans.Count()>0) mIMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakIntensity).Average();
             //var mMMS1Bpks = run.Ms1Scans.Select(x => x.BasePeakMz).Average();
             List<double> peakWidths = new List<double>();
-            List<double> TailingFactor = new List<double>();
+            List<double> tailingFactor = new List<double>();
             List<double> peakCapacity = new List<double>();
             List<double> peakPrecision = new List<double>();
             List<double> ms1PeakPrecision = new List<double>();
@@ -173,7 +173,7 @@ namespace SwaMe
             List<int> ms2Density = new List<int>();
             List<double> cycleTime = new List<double>();
             List<double> ms1TicTotal = new List<double>();
-            List<double> Ms2TicTotal = new List<double>();
+            List<double> ms2TicTotal = new List<double>();
 
             for (int segment = 0; segment < division; segment++)
             {
@@ -181,19 +181,19 @@ namespace SwaMe
                 List<double> peakSymTemp = new List<double>();
                 List<double> fullWidthBaselinesTemp = new List<double>();
                 List<double> peakPrecisionTemp = new List<double>();
-                foreach (BasePeak basepeak in run.BasePeaks)
+                foreach (BasePeak basePeak in run.BasePeaks)
                 {
-                    for (int i = 0; i < basepeak.RTsegments.Count(); i++)
+                    for (int i = 0; i < basePeak.RTsegments.Count; i++)
                     {
-                        if (basepeak.RTsegments[i] == segment)
+                        if (basePeak.RTsegments[i] == segment)
                         {
                             //Each rtsegment should have all these values, but due to some of the peaks being decreased after release candidate 1, some basepeaks have rtsegments, but no datapoints. If min intensity is set high enough, this should never happen.
-                            if (basepeak.RTsegments.Count() == basepeak.FWHMs.Count() && basepeak.FWHMs.Count() == basepeak.Peaksyms.Count() && basepeak.FWHMs.Count() == basepeak.Peaksyms.Count() && basepeak.FWHMs.Count() == basepeak.Intensities.Count() && basepeak.FWHMs.Count() == basepeak.FullWidthBaselines.Count())
+                            if (basePeak.RTsegments.Count == basePeak.FullWidthHalfMaxes.Count && basePeak.FullWidthHalfMaxes.Count == basePeak.PeakSymmetries.Count && basePeak.FullWidthHalfMaxes.Count == basePeak.PeakSymmetries.Count && basePeak.FullWidthHalfMaxes.Count == basePeak.Intensities.Count && basePeak.FullWidthHalfMaxes.Count == basePeak.FullWidthBaselines.Count)
                             {
-                                peakWidthsTemp.Add(basepeak.FWHMs[i]);
-                                peakSymTemp.Add(basepeak.Peaksyms[i]);
-                                peakPrecisionTemp.Add(basepeak.Intensities[i] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basepeak.Mz)));
-                                fullWidthBaselinesTemp.Add(basepeak.FullWidthBaselines[i]);
+                                peakWidthsTemp.Add(basePeak.FullWidthHalfMaxes[i]);
+                                peakSymTemp.Add(basePeak.PeakSymmetries[i]);
+                                peakPrecisionTemp.Add(basePeak.Intensities[i] / (meanIntensityOfAllBpks * Math.Pow(2, meanMzOfAllBpks / basePeak.Mz)));
+                                fullWidthBaselinesTemp.Add(basePeak.FullWidthBaselines[i]);
                             }
                         }
                     }
@@ -241,14 +241,14 @@ namespace SwaMe
                 if (peakWidthsTemp.Count > 0)
                 {
                     peakWidths.Add(peakWidthsTemp.Average());
-                    TailingFactor.Add(peakSymTemp.Average());
+                    tailingFactor.Add(peakSymTemp.Average());
                     peakCapacity.Add(rtSegment / fullWidthBaselinesTemp.Average());//PeakCapacity is calculated as per Dolan et al.,2009, PubMed 10536823);
                     peakPrecision.Add(peakPrecisionTemp.Average());
                 }
                 else
                 {
                     peakWidths.Add(0);
-                    TailingFactor.Add(0);
+                    tailingFactor.Add(0);
                     peakCapacity.Add(0);
                     peakPrecision.Add(0);
                 }
@@ -264,10 +264,10 @@ namespace SwaMe
                 }
                 ms2Density.Add(Convert.ToInt32(Math.Round(ms2DensityTemp.Average(), 0)));
                 ms1TicTotal.Add(ms1TicTotalTemp);
-                Ms2TicTotal.Add(ms2TicTotalTemp);
+                ms2TicTotal.Add(ms2TicTotalTemp);
             }
 
-            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, Ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, TailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision, segmentBoundaries);
+            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, tailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision, segmentBoundaries, lastMs2DensityTemp);
             return rtMetrics;
         }
     }

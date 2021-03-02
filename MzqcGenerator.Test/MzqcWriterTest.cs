@@ -1,18 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SwaMe;
 using SwaMe.Pipeline;
 using System.Collections.Generic;
-using static SwaMe.RTGrouper;
 
 namespace MzqcGenerator.Test
 {
     [TestClass]
     public class MzqcWriterTest
     {
-        /// <summary>
-        /// FileMaker is where all the tsv and json files get written. This file writes into the temp folder and checks that the process went smoothly.
-        /// </summary>
-        /// 
         //IRTPeaks
         private static readonly IRTPeak iRTPeak1 = new IRTPeak()
         {
@@ -47,7 +41,7 @@ namespace MzqcGenerator.Test
         private static readonly List<double> SwathProportionOfTotalTIC = new List<double>() { 0.20, 0.80 };
         private static readonly List<double> SwathProportionPredictedSingleChargeAvg = new List<double>() { 0.30, 0.70 };
 
-        private static readonly SwathMetrics swathMetrics = new SwathMetrics(SwathTargets, 1000, NumOfSwathPerGroup, MzRange, TICs, SwDensity50, SwDensityIQR,
+        private static readonly SwaMe.SwathMetrics swathMetrics = new SwaMe.SwathMetrics(SwathTargets, 1000, NumOfSwathPerGroup, MzRange, TICs, SwDensity50, SwDensityIQR,
             SwathProportionOfTotalTIC, SwathProportionPredictedSingleChargeAvg)
         { };
 
@@ -73,12 +67,8 @@ namespace MzqcGenerator.Test
         private static readonly List<double> MS1PeakPrecision = new List<double>() { 36, 68 };
         private static readonly List<double> PeakCapacity = new List<double>() { 44, 120 };
         private static readonly List<string> segmentBoundaries = new List<string>() { "2.5_3.3", "3.3_4.0" };
-
-
-        private static readonly RTMetrics RTMetrics = new RTMetrics(MS1TICTotal, MS2TICTotal, CycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, TailingFactor,
-            PeakCapacity, PeakPrecision, MS1PeakPrecision, segmentBoundaries)
-        { };
-
+        private static readonly SwaMe.RTGrouper.RTMetrics RTMetrics = new SwaMe.RTGrouper.RTMetrics(MS1TICTotal, MS2TICTotal, CycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, TailingFactor,
+            PeakCapacity, PeakPrecision, MS1PeakPrecision, segmentBoundaries, default);
 
         [TestInitialize]
         public void Initialize()

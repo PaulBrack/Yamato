@@ -95,29 +95,29 @@ namespace SwaMe
             foreach (IRTPeak irtpeak in run.IRTPeaks)
             {
                 float totalFWHM = 0;
-                float totalpeaksym = 0;
-                int count = 0;
+                float totalPeakSymmetry = 0;
+                int totalPeakCount = 0;
                 foreach (LibraryParser.Library.Transition? transition in irtpeak.AssociatedTransitions)
                 {
                     // TODO: Why are these criteria different?  PJC 2021-03-01
                     RetentionTime[] startTimes = irtpeak.Spectrum.Where(x=>Math.Abs(x.Mz-transition.ProductMz)<run.AnalysisSettings.MassTolerance && Math.Abs(x.RetentionTime-irtpeak.RetentionTime)<run.AnalysisSettings.RtTolerance).Select(x => (double)x.RetentionTime).ToArray();
                     Intensity[] intensities = irtpeak.Spectrum.Where(x => Math.Abs(x.Mz - transition.ProductMz) < run.AnalysisSettings.MassTolerance).Select(x => (double)x.Intensity).ToArray();
-                    CrawdadPeakFinder cPF = new CrawdadPeakFinder();
-                    cPF.SetChromatogram(startTimes, intensities);
-                    IList<CrawdadPeak> crawPeaks = cPF.CalcPeaks();
-                    foreach (CrawdadPeak crawPeak in crawPeaks)
+                    CrawdadPeakFinder crawdadPeakFinder = new CrawdadPeakFinder();
+                    crawdadPeakFinder.SetChromatogram(startTimes, intensities);
+                    IList<CrawdadPeak> crawdadPeaks = crawdadPeakFinder.CalcPeaks();
+                    foreach (CrawdadPeak crawdadPeak in crawdadPeaks)
                     {
-                        totalFWHM += crawPeak.Fwhm;
-                        if (crawPeak.Fvalue > 0)
-                            totalpeaksym += crawPeak.Fwfpct / (crawPeak.Fvalue * 2);
+                        totalFWHM += crawdadPeak.Fwhm;
+                        if (crawdadPeak.Fvalue > 0)
+                            totalPeakSymmetry += crawdadPeak.Fwfpct / (crawdadPeak.Fvalue * 2);
                         else
-                            totalpeaksym += crawPeak.Fwfpct;
-                        count++;
+                            totalPeakSymmetry += crawdadPeak.Fwfpct;
+                        totalPeakCount++;
                     }
                 }
                
-                irtpeak.FWHM = totalFWHM/count; //average fwhm
-                irtpeak.Peaksym = totalpeaksym / count; // Because we have ordered the possible peaks according to their intensities, this value corresponds to their intensity rank 
+                irtpeak.FullWidthHalfMax = totalFWHM / totalPeakCount; //average fwhm
+                irtpeak.PeakSymmetry = totalPeakSymmetry / totalPeakCount; // Because we have ordered the possible peaks according to their intensities, this value corresponds to their intensity rank 
             }
         }
 

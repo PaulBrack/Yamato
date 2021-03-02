@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+#nullable enable
+
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using SwaMe.Pipeline;
 using MzmlParser;
+using System;
 
 namespace SwaMe.Test
 {
@@ -46,8 +49,7 @@ namespace SwaMe.Test
                 LastScanTime = 70,
                 StartTime = 2.5
             };
-            contains5ms2ScansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5 });
-
+            contains5ms2ScansRun.Ms2Scans.AddRange(new [] { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5 });
 
             contains5ms2ScansRun.BasePeaks.Add(basePeak1);
             contains5ms2ScansRun.SourceFileNames.Add(" ");
