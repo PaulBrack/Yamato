@@ -13,7 +13,6 @@ namespace LibraryParser
             Peptides = new Dictionary<string, Peptide>();
             Transitions = new Dictionary<string, Transition>();
             ProteinDecoys = new Dictionary<string, Protein>();
-            RtList = new OrderedDictionary();
         }
 
         public class Protein
@@ -74,7 +73,6 @@ namespace LibraryParser
 
         public IDictionary<string, Protein> Proteins { get; }
         public IDictionary<string, Protein> ProteinDecoys { get; }
-        public OrderedDictionary RtList { get; }
         public IDictionary<string, Peptide> Peptides { get; }
         public IDictionary<string, Transition> Transitions { get; }
     }
