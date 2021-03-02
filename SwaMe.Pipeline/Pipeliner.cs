@@ -100,6 +100,9 @@ namespace SwaMe.Pipeline
 
         private static void FindIrtPeptideCandidates(Scan scan, Run<Scan> run, IList<SpectrumPoint> spectrum)
         {
+            if (null == run.AnalysisSettings.IrtLibrary)
+                return;
+
             foreach (Library.Peptide peptide in run.AnalysisSettings.IrtLibrary.PeptideList.Values)
             {
                 var irtIntensities = new List<float>();
