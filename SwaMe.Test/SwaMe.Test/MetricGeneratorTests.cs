@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
@@ -46,9 +46,12 @@ namespace SwaMe.Test
                 LastScanTime = 70,
                 StartTime = 2.5
             };
-            Contains5ms2ScansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5 });
+            contains5ms2ScansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5 });
 
 
+            contains5ms2ScansRun.BasePeaks.Add(basePeak1);
+            contains5ms2ScansRun.SourceFileNames.Add(" ");
+            contains5ms2ScansRun.SourceFileChecksums.Add(" ");
             contains5ms2ScansRun.IsolationWindows.Add(isolationWindow);
 
             emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
@@ -56,14 +59,11 @@ namespace SwaMe.Test
                 LastScanTime = 0,
                 StartTime = 1000000
             };
-            Emptyms2scansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan6 }); //6 does not have upper and lower offsets
+            emptyms2scansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan6 }); //6 does not have upper and lower offsets
 
-            Emptyms2scansRun.BasePeaks.Add(basePeak1);
-            Emptyms2scansRun.SourceFileNames.Add(" ");
-            Emptyms2scansRun.SourceFileChecksums.Add(" ");
-
-            MetricGenerator = new MetricGenerator();
-
+            emptyms2scansRun.BasePeaks.Add(basePeak1);
+            emptyms2scansRun.SourceFileNames.Add(" ");
+            emptyms2scansRun.SourceFileChecksums.Add(" ");
         }
 
         /// <remarks>
