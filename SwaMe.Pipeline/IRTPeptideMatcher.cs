@@ -64,7 +64,7 @@ namespace SwaMe.Pipeline
                 foreach (double targetMz in candidateHit.ProductTargetMzs)
                 {
                     var spectrum = matchingScan.Spectrum;
-                    if (spectrum != null && spectrum.SpectrumPoints != null && spectrum.SpectrumPoints.Count > 0)
+                    if (spectrum != null && spectrum.SpectrumPoints != null && spectrum.SpectrumPoints.Length > 0)
                     {
                         List<SpectrumPoint>? match = matchingScan.Spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
                         if (match.Any())
