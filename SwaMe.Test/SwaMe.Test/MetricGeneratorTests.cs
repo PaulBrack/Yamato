@@ -50,11 +50,7 @@ namespace SwaMe.Test
             contains5ms2ScansRun.SourceFileNames.Add(" ");
             contains5ms2ScansRun.SourceFileChecksums.Add(" ");
 
-            emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
-            {
-                LastScanTime = 0,
-                StartTime = 1000000
-            };
+            emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 });
             emptyms2scansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan6 }); //6 does not have upper and lower offsets
             FixupIsolationWindows(emptyms2scansRun);
 

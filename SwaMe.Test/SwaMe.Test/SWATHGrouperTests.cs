@@ -218,9 +218,7 @@ namespace SwaMe.Test
                 {
                     RtTolerance = 2.5
                 },
-                Ms2Scans = new ConcurrentBag<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan6 },//9 does not have upper and lower offsets
-                LastScanTime = 0,
-                StartTime = 1000000
+                Ms2Scans = new ConcurrentBag<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan6 } // 9 does not have upper and lower offsets
             };
 
             emptyms2scansRun.BasePeaks.Add(basePeak1);

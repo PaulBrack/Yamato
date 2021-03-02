@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -106,11 +106,7 @@ namespace SwaMe.Test
             Ms2andms1Run.SourceFileNames.Add(" ");
             Ms2andms1Run.SourceFileChecksums.Add(" ");
 
-            Emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
-            {
-                LastScanTime = 0,
-                StartTime = 1000000
-            };
+            Emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 });
             Emptyms2scansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan9 }); //9 does not have upper and lower offsets
 
             Emptyms2scansRun.BasePeaks.Add(basePeak1);
