@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using MzmlParser;
 using ProtoBuf;
@@ -39,8 +39,7 @@ namespace SwaMe.Pipeline
             TempDirectory = tempDirectory;
         }
 
-        public bool CacheSpectraToDisk { get; set; }
-        public string? Base64IntensityArray { get; set; }
+        public bool CacheSpectraToDisk { get; }
         public int Cycle { get; set; }
         public TandemMsLevel MsLevel { get; set; }
         public double BasePeakIntensity { get; set; }
@@ -55,7 +54,7 @@ namespace SwaMe.Pipeline
         public int RTsegment { get; set; }
         public int Density { get; set; }
         public double ProportionChargeStateOne { get; set; }
-        public string? TempDirectory { get; set; }
+        public string? TempDirectory { get; }
 
         private Spectrum? m_Spectrum;
 
