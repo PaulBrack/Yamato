@@ -20,13 +20,13 @@ namespace LibraryParser.Test
         
         public void ProteinCountIsCorrect()
         {
-            Assert.AreEqual(251, library.ProteinList.Count);
+            Assert.AreEqual(251, library.Proteins.Count);
         }
 
         [TestMethod]
         public void ProteinDecoyCountIsCorrect()
         {
-            Assert.AreEqual(251, library.ProteinDecoyList.Count);
+            Assert.AreEqual(251, library.ProteinDecoys.Count);
         }
 
         [TestMethod]
@@ -48,10 +48,10 @@ namespace LibraryParser.Test
         }
 
         [TestMethod]
-        public void ProteinIdIsFilled()
+        public void FirstAndLastProteinsAreRead()
         {
-            Assert.AreEqual("1/sp|O75882|ATRN_HUMAN", ((Protein)(library.ProteinList[0])).Id);
-            Assert.AreEqual("1/sp|P01719|LV501_HUMAN", ((Protein)(library.ProteinList[library.ProteinList.Count -1])).Id);
+            Assert.IsTrue(library.Proteins.ContainsKey("1/sp|O75882|ATRN_HUMAN"));
+            Assert.IsTrue(library.Proteins.ContainsKey("1/sp|P01719|LV501_HUMAN"));
         }
 
         [TestMethod]

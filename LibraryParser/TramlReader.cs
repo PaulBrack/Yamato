@@ -1,3 +1,5 @@
+﻿#nullable enable
+
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -48,25 +50,21 @@ namespace LibraryParser
 
         private void AddProtein(Library library, XmlReader xmlReader)
         {
-            var protein = new Library.Protein();
-            protein.Id = xmlReader.GetAttribute("id");
-            protein.AssociatedPeptideIds = new List<string>();
+            var protein = new Library.Protein(xmlReader.GetAttribute("id"));
             if (protein.Id.StartsWith("DECOY"))
             {
-                library.ProteinDecoyList.Add(protein.Id, protein);
+                library.ProteinDecoys.Add(protein.Id, protein);
             }
             else
             {
+                library.Proteins.Add(protein.Id, protein);
                 protein.UniprotIds = ParseUniprotIds(protein.Id);
             }
         }
 
         private void AddPeptide(Library library, XmlReader reader)
         {
-            var peptide = new Library.Peptide();
-            peptide.Id = reader.GetAttribute("id");
-            peptide.Sequence = reader.GetAttribute("sequence");
-            peptide.AssociatedTransitionIds = new List<string>();
+            var peptide = new Library.Peptide(reader.GetAttribute("id"), reader.GetAttribute("sequence"));
             bool cvParamsRead = false;
 
             while (reader.Read() && !cvParamsRead)
@@ -103,21 +101,19 @@ namespace LibraryParser
             string proteinRef = xmlReader.GetAttribute("ref");
             if (!proteinRef.StartsWith("DECOY"))
             {
-                Library.Protein correspondingProtein = (Library.Protein)(library.ProteinList[proteinRef]);
+                Library.Protein correspondingProtein = library.Proteins[proteinRef];
                 correspondingProtein.AssociatedPeptideIds.Add(lastPeptideRead);
             }
             else
             {
-                Library.Protein correspondingProtein = (Library.Protein)(library.ProteinDecoyList[proteinRef]);
+                Library.Protein correspondingProtein = library.ProteinDecoys[proteinRef];
                 correspondingProtein.AssociatedPeptideIds.Add(lastPeptideRead);
             }
         }
 
         private void AddTransition(Library library, XmlReader reader)
         {
-            var transition = new Library.Transition();
-            transition.PeptideId = reader.GetAttribute("peptideRef");
-            transition.Id = reader.GetAttribute("id");
+            Library.Transition? transition = new Library.Transition(reader.GetAttribute("id"), reader.GetAttribute("peptideRef"));
             Enums.IonType? ionType = null;
             bool cvParamsRead = false;
             while (reader.Read() && !cvParamsRead)
@@ -176,21 +172,21 @@ namespace LibraryParser
         {
             List<double> Alltransitions = new List<double>();
             using XmlReader reader = XmlReader.Create(path);
-                while (reader.Read())
-                {
+            while (reader.Read())
+            {
                 if (reader.IsStartElement() && reader.LocalName == "Transition")
+                {
+                    Enums.IonType? ionType = null;
+                    while (reader.Read())
+                    {
+                        if (reader.IsStartElement())
                         {
-                            Enums.IonType? ionType = null;
-                            while (reader.Read())
-                            {
-                                if (reader.IsStartElement())
-                                {
-                                    if (reader.LocalName == "Product")
-                                        ionType = Enums.IonType.Product;
+                            if (reader.LocalName == "Product")
+                                ionType = Enums.IonType.Product;
                             else if (reader.LocalName == "cvParam" && reader.GetAttribute("accession") == "MS:1000827")
-                                        {
-                                            if (ionType == Enums.IonType.Product)
-                                                Alltransitions.Add(double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture));
+                            { 
+                                if (ionType == Enums.IonType.Product)
+                                    Alltransitions.Add(double.Parse(reader.GetAttribute("value"), System.Globalization.CultureInfo.InvariantCulture));
                             }
                         }
                     }

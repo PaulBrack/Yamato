@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
@@ -7,78 +9,73 @@ namespace LibraryParser
     {
         public Library()
         {
-            this.ProteinList = new OrderedDictionary();
-            this.PeptideList = new OrderedDictionary();
-            this.TransitionList = new OrderedDictionary();
-            this.ProteinDecoyList = new OrderedDictionary();
-            this.RtList = new OrderedDictionary();
+            Proteins = new Dictionary<string, Protein>();
+            PeptideList = new OrderedDictionary();
+            TransitionList = new OrderedDictionary();
+            ProteinDecoys = new Dictionary<string, Protein>();
+            RtList = new OrderedDictionary();
         }
 
         public class Protein
         {
+            public string Id { get; }
+            // public string? Accession { get; set; } Unused. TODO: Remove.
+            public IList<string> AssociatedPeptideIds { get; }
             public IList<string>? UniprotIds { get; set; }
+
+            public Protein(string id)
+                : this(id, new List<string>())
+            {
+            }
+
+            public Protein(string id, IList<string> associatedPeptideIds)
+            {
+                Id = id;
+                AssociatedPeptideIds = associatedPeptideIds;
+            }
         }
 
         public class Peptide
         {
-            public string Id;
-            public string ProteinId;
-            public string Sequence;
-            public string GroupLabel;
-            public int ChargeState;
-            public double RetentionTime;
-            public double CollisionEnergy;
-            public List<Transition> AssociatedTransitions;
-            public List<string> AssociatedTransitionIds;
+            public string Id { get; }
+            public string? ProteinId { get; set; }
+            public string Sequence { get; }
+            public string? GroupLabel { get; set; }
+            public int ChargeState { get; set; }
+            public double RetentionTime { get; set; }
+            public double CollisionEnergy { get; set; }
+            public List<Transition> AssociatedTransitions { get; } = new List<Transition>();
+            public List<string> AssociatedTransitionIds { get; } = new List<string>();
 
-            public Peptide() {
-                AssociatedTransitions = new List<Transition>();
+            public Peptide(string id, string sequence) {
+                Id = id;
+                Sequence = sequence;
             }
         }
 
         public class Transition
         {
-            public string Id;
-            public double PrecursorMz;
-            public double ProductMz;
-            public int ProductIonChargeState;
-            public int ProductIonSeriesOrdinal;
-            public int ProductInterpretationRank;
-            public double ProductIonIntensity;
-            public string IonType;
-            public string PeptideId;
+            public string Id { get; }
+            public double PrecursorMz { get; set; }
+            public double ProductMz { get; set; }
+            public int ProductIonChargeState { get; set; }
+            public int ProductIonSeriesOrdinal { get; set; }
+            public int ProductInterpretationRank { get; set; }
+            public double ProductIonIntensity { get; set; }
+            public string? IonType { get; set; }
+            public string PeptideId { get; set; }
+
+            public Transition(string id, string peptideId)
+            {
+                Id = id;
+                PeptideId = peptideId;
+            }
         }
 
-        public OrderedDictionary ProteinList
-        {
-            get;
-            set;
-        }
-
-        public OrderedDictionary ProteinDecoyList
-        {
-            get;
-            set;
-        }
-
-        public OrderedDictionary RtList
-        {
-            get;
-            set;
-        }
-
-        public OrderedDictionary PeptideList
-        {
-            get;
-            set;
-        }
-
-        public OrderedDictionary TransitionList
-        {
-            get;
-            set;
-        }
-
+        public IDictionary<string, Protein> Proteins { get; }
+        public IDictionary<string, Protein> ProteinDecoys { get; }
+        public OrderedDictionary RtList { get; }
+        public OrderedDictionary PeptideList { get; }
         public OrderedDictionary TransitionList { get; }
     }
 }
