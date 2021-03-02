@@ -109,7 +109,7 @@ namespace SwaMe.Pipeline
                 var irtMzs = new List<float>();
 
                 // Optimisation: Convert peptideTransitions to an Array at the end; if it's left as an IEnumerable then the whole expression is evaluated twice.
-                Library.Transition[] peptideTransitions = run.AnalysisSettings.IrtLibrary.TransitionList.Values.OfType<Library.Transition>().Where(x => x.PeptideId == peptide.Id).ToArray();
+                Library.Transition[] peptideTransitions = run.AnalysisSettings.IrtLibrary.Transitions.Values.Where(x => x.PeptideId == peptide.Id).ToArray();
                 int transitionsLeftToSearch = peptideTransitions.Length;
                 foreach (Library.Transition transition in peptideTransitions)
                 {

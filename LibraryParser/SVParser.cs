@@ -126,13 +126,13 @@ namespace LibraryParser
                 ProductIonIntensity = ParseLocalisedDouble(line[intensityIndex])
             };
             string keystring = $"{transition.Id}-{transition.PrecursorMz}";
-            if (library.TransitionList.Contains(keystring))
+            if (library.Transitions.ContainsKey(keystring))
             {
                 logger.Warn("Two of the same peptide - transition combinations were detected. The second entry was not added as a valid transition. Please check your file for duplication.");
             }
             else
             {
-                library.TransitionList.Add(keystring, transition);
+                library.Transitions.Add(keystring, transition);
                 var correspondingPeptide = library.Peptides[precursorMz.ToString(CultureInfo.InvariantCulture)];
                 correspondingPeptide.AssociatedTransitions.Add(transition);
             }

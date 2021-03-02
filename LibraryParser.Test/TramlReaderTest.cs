@@ -9,6 +9,8 @@ namespace LibraryParser.Test
     {
         private static Library library;
 
+        const string exampleTransitionId = "11_y9_1_AAAAAAVSGSAAAEAK_2";
+
         [ClassInitialize]
         public static void Initialize(TestContext t)
         {
@@ -16,8 +18,6 @@ namespace LibraryParser.Test
         }
 
         [TestMethod]
-
-        
         public void ProteinCountIsCorrect()
         {
             Assert.AreEqual(251, library.Proteins.Count);
@@ -44,7 +44,7 @@ namespace LibraryParser.Test
         [TestMethod]
         public void TransitionCountIsCorrect()
         {
-            Assert.AreEqual(57738, library.TransitionList.Count);
+            Assert.AreEqual(57738, library.Transitions.Count);
         }
 
         [TestMethod]
@@ -99,37 +99,37 @@ namespace LibraryParser.Test
         [TestMethod]
         public void TransitionIdIsFilled()
         {
-            Assert.AreEqual("11_y9_1_AAAAAAVSGSAAAEAK_2", ((Transition)(library.TransitionList[0])).Id);
+            Assert.AreEqual(exampleTransitionId, library.Transitions[exampleTransitionId].Id);
         }
 
         [TestMethod]
         public void TransitionPeptideRefIsFilled()
         {
-            Assert.AreEqual("1_AAAAAAVSGSAAAEAK_2", ((Transition)(library.TransitionList[0])).PeptideId);
+            Assert.AreEqual("1_AAAAAAVSGSAAAEAK_2", library.Transitions[exampleTransitionId].PeptideId);
         }
 
         [TestMethod]
         public void TransitionPrecursorMzIsFilled()
         {
-            Assert.AreEqual(658.843873083, ((Transition)(library.TransitionList[0])).PrecursorMz );
+            Assert.AreEqual(658.843873083, library.Transitions[exampleTransitionId].PrecursorMz );
         }
 
         [TestMethod]
         public void TransitionProductMzIsFilled()
         {
-            Assert.AreEqual(791.389373008, ((Transition)(library.TransitionList[0])).ProductMz);
+            Assert.AreEqual(791.389373008, library.Transitions[exampleTransitionId].ProductMz);
         }
 
         [TestMethod]
         public void TransitionProductIonSeriesOrdinalIsFilled()
         {
-            Assert.AreEqual(9, ((Transition)(library.TransitionList[0])).ProductIonSeriesOrdinal);
+            Assert.AreEqual(9, library.Transitions[exampleTransitionId].ProductIonSeriesOrdinal);
         }
 
         [TestMethod]
         public void TransitionProductInterpretationRankIsFilled()
         {
-            Assert.AreEqual(1, ((Transition)(library.TransitionList[0])).ProductInterpretationRank);
+            Assert.AreEqual(1, library.Transitions[exampleTransitionId].ProductInterpretationRank);
         }
 
         [TestMethod]
@@ -141,7 +141,7 @@ namespace LibraryParser.Test
         [TestMethod]
         public void TransitionProductIonIntensityIsFilled()
         {
-            Assert.AreEqual(10000, ((Transition)(library.TransitionList[0])).ProductIonIntensity);
+            Assert.AreEqual(10000, library.Transitions[exampleTransitionId].ProductIonIntensity);
         }
     }
 }

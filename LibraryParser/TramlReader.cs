@@ -162,7 +162,7 @@ namespace LibraryParser
                 }
             }
 
-            library.TransitionList.Add(transition.Id, transition);
+            library.Transitions.Add(transition.Id, transition);
             var correspondingPeptide = library.Peptides[transition.PeptideId];
             correspondingPeptide.AssociatedTransitionIds.Add(transition.Id);
             correspondingPeptide.AssociatedTransitions.Add(transition);
