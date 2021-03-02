@@ -182,7 +182,7 @@ namespace MzmlParser
                             case "MS:1000016":
                                 scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
                                 run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
-                                run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime);//technically this is the starttime of the last scan not the completion time
+                                run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime); // Technically this is the start time of the last scan, not the completion time.
                                 break;
                             case "MS:1000829":
                                 scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);

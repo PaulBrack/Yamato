@@ -1,9 +1,12 @@
+#nullable enable
+
 using System.Linq;
 using System.Collections.Concurrent;
 using System.Threading;
 using System;
 using LibraryParser;
 using System.Collections.Generic;
+using static LibraryParser.Library;
 
 namespace SwaMe.Pipeline
 {
@@ -12,10 +15,9 @@ namespace SwaMe.Pipeline
         private static readonly CountdownEvent cde = new CountdownEvent(1);
         public static CancellationToken _cancellationToken { get; set; }
 
-
         public static void ChooseIrtPeptides(Run<Scan> run)
         {
-            var chosenCandidates = new ConcurrentBag<CandidateHit>();
+            ConcurrentBag<CandidateHit>? chosenCandidates = new ConcurrentBag<CandidateHit>();
             foreach (string peptideSequence in run.IRTHits.Select(x => x.PeptideSequence).Distinct())
             {
                 var candidate = ChoosePeptideCandidate(run, peptideSequence);
@@ -31,7 +33,7 @@ namespace SwaMe.Pipeline
             {
                 if (_cancellationToken.IsCancellationRequested)
                 {
-                    throw new OperationCanceledException("Reading MZML was cancelled");
+                    throw new OperationCanceledException("AddIrtSpectra was cancelled");
                 }
                 cde.AddCount();
                 ThreadPool.QueueUserWorkItem(state => FindIrtSpectra(run, candidateHit));
@@ -41,24 +43,21 @@ namespace SwaMe.Pipeline
             {
                 if (_cancellationToken.IsCancellationRequested)
                 {
-                    throw new OperationCanceledException("Reading MZML was cancelled");
+                    throw new OperationCanceledException("AddIrtSpectra was cancelled");
                 }
                 Thread.Sleep(500);
             }
             cde.Wait();
             cde.Reset(1);
-
         }
 
         private static void FindIrtSpectra(Run<Scan> run, CandidateHit candidateHit)
         {
-            var matchingScans = run.Ms2Scans.Where(x => Math.Abs(x.ScanStartTime - candidateHit.RetentionTime) < run.AnalysisSettings.RtTolerance/*
-                               && candidateHit.PrecursorTargetMz > x.IsolationWindowLowerBoundary
-                               && candidateHit.PrecursorTargetMz < x.IsolationWindowUpperBoundary*/);
+            IEnumerable<Scan>? matchingScans = run.Ms2Scans.Where(x => Math.Abs(x.ScanStartTime - candidateHit.RetentionTime) < run.AnalysisSettings.RtTolerance);
 
-            var libraryPeptides = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Library.Peptide>().ToList();
+            var libraryPeptides = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Peptide>().ToList();
             List<SpectrumPoint> matchingSpectrum = new List<SpectrumPoint>();
-            Library.Peptide peptide = new Library.Peptide();
+            Peptide? peptide = default;
 
             foreach (var matchingScan in matchingScans)
             {
@@ -67,45 +66,43 @@ namespace SwaMe.Pipeline
                     var spectrum = matchingScan.Spectrum;
                     if (spectrum != null && spectrum.SpectrumPoints != null && spectrum.SpectrumPoints.Count > 0)
                     {
-                        var match = matchingScan.Spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
+                        List<SpectrumPoint>? match = matchingScan.Spectrum.SpectrumPoints.Where(x => Math.Abs(x.Mz - targetMz) < run.AnalysisSettings.IrtMassTolerance).ToList();
                         if (match.Any())
-                            matchingSpectrum.Add(match.First());//In a scan only one point is taken for each transition
+                            matchingSpectrum.Add(match.First()); // In a scan only one point is taken for each transition
                     }
                 }
             }
             if (matchingSpectrum.Any())
             {
                 peptide = libraryPeptides.Where(x => x.Sequence == candidateHit.PeptideSequence).Single();
-
             }
 
-            IRTPeak iRTPeak = new IRTPeak();
-            iRTPeak.RetentionTime = candidateHit.RetentionTime;
-            iRTPeak.Mz = candidateHit.PrecursorTargetMz;
-            iRTPeak.AssociatedTransitions = peptide.AssociatedTransitions;
-            iRTPeak.Spectrum = matchingSpectrum;
+            IRTPeak iRTPeak = new IRTPeak
+            {
+                RetentionTime = candidateHit.RetentionTime,
+                Mz = candidateHit.PrecursorTargetMz,
+                AssociatedTransitions = (null == peptide)
+                    ? (IList<Transition>)Array.Empty<Transition>()
+                    : peptide.AssociatedTransitions,
+                Spectrum = matchingSpectrum
+            };
             run.IRTPeaks.Add(iRTPeak);
             cde.Signal();
         }
 
         private static CandidateHit ChoosePeptideCandidate(Run<Scan> run, string peptideSequence)
         {
-
-
-            var hits = run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).ToList(); // pick the potential hits for this peptide
+            List<CandidateHit> hits = run.IRTHits.Where(x => x.PeptideSequence == peptideSequence).ToList(); // pick the potential hits for this peptide
             hits = hits.Where(x => x.Intensities.Count() == hits.OrderBy(y => y.Intensities.Count()).Last().Intensities.Count()).ToList(); // pick the hits matching the most transitions
-            var bestHit = hits.OrderBy(x => x.Intensities.Min()).Last(); // pick the hit with the highest minimum intensity value
-
-
-
+            CandidateHit bestHit = hits.OrderBy(x => x.Intensities.Min()).Last(); // pick the hit with the highest minimum intensity value
 
             //Let's pull out the reference peptide
-            var refPeptideTransitionMzs = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Library.Peptide>().ToList().Where(x => x.Sequence == peptideSequence).Single().AssociatedTransitions.Select(x => x.ProductMz).OrderBy(x => x);
-            var bestHitTransitionMzs = bestHit.ActualMzs.OrderBy(x => x);
+            IOrderedEnumerable<double>? refPeptideTransitionMzs = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Peptide>().ToList().Where(x => x.Sequence == peptideSequence).Single().AssociatedTransitions.Select(x => x.ProductMz).OrderBy(x => x);
+            IOrderedEnumerable<float>? bestHitTransitionMzs = bestHit.ActualMzs.OrderBy(x => x);
 
             foreach (var mz in bestHitTransitionMzs)
             {
-                var possHit = refPeptideTransitionMzs.Where(x => Math.Abs(x - mz) <= run.AnalysisSettings.IrtMassTolerance);
+                IEnumerable<double>? possHit = refPeptideTransitionMzs.Where(x => Math.Abs(x - mz) <= run.AnalysisSettings.IrtMassTolerance);
                 if (possHit.Count() == 1)
                 {
                     bestHit.TotalMassError += Math.Abs(possHit.First() - mz);
