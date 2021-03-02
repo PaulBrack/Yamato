@@ -24,24 +24,18 @@ namespace SwaMe.Test
         [TestInitialize]
         public void Initialize()
         {
+            bool cacheSpectraToDisk = false;
             string tempPath = Path.GetTempPath();
 
-            Scan ms2scan1 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 1000, tempPath);
-            Scan ms2scan2 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 5000, tempPath);
-            Scan ms2scan3 = new Scan(false, 5, 5, 0, TandemMsLevel.Ms2, 4, 1, 1000, tempPath);
-            Scan ms2scan4 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 4, 2, 51000, tempPath);
-            Scan ms2scan5 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 5, 2, 1000, tempPath);
-            Scan ms2scan6 = new Scan(false, tempPath)
-            {
-                ScanStartTime = 0,
-                MsLevel = TandemMsLevel.Ms2,
-                Density = 5
-            };
+            Scan ms2scan1 = new Scan(cacheSpectraToDisk, 148, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 1000, tempPath);
+            Scan ms2scan2 = new Scan(cacheSpectraToDisk, 150, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 5000, tempPath);
+            Scan ms2scan3 = new Scan(cacheSpectraToDisk, 153.5, 5, 5, 0, TandemMsLevel.Ms2, 4, 1, 1000, tempPath);
+            Scan ms2scan4 = new Scan(cacheSpectraToDisk, 148, 1, 1, 0, TandemMsLevel.Ms2, 4, 2, 51000, tempPath);
+            Scan ms2scan5 = new Scan(cacheSpectraToDisk, 150, 1, 1, 0, TandemMsLevel.Ms2, 5, 2, 1000, tempPath);
+            Scan ms2scan6 = new Scan(cacheSpectraToDisk, 153.5, default, default, 0, TandemMsLevel.Ms2, 5, tempPath); // No upper and lower offsets
 
             var spectrumpoint1 = new SpectrumPoint(2000, 150, 2.58F);
             var spectrumpoint2 = new SpectrumPoint(3000, 150.01F, 3.00F);
-
-            var isolationWindow = new IsolationWindow(140, 150, 160);
 
             var basePeak1 = new BasePeak(150, 2.5, 150, spectrumpoint1, spectrumpoint2);
             contains5ms2ScansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
@@ -50,11 +44,11 @@ namespace SwaMe.Test
                 StartTime = 2.5
             };
             contains5ms2ScansRun.Ms2Scans.AddRange(new [] { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan5 });
+            FixupIsolationWindows(contains5ms2ScansRun);
 
             contains5ms2ScansRun.BasePeaks.Add(basePeak1);
             contains5ms2ScansRun.SourceFileNames.Add(" ");
             contains5ms2ScansRun.SourceFileChecksums.Add(" ");
-            contains5ms2ScansRun.IsolationWindows.Add(isolationWindow);
 
             emptyms2scansRun = new Run<Scan>(new AnalysisSettings { RtTolerance = 2.5 })
             {
@@ -62,10 +56,18 @@ namespace SwaMe.Test
                 StartTime = 1000000
             };
             emptyms2scansRun.Ms2Scans.AddRange(new List<Scan>() { ms2scan1, ms2scan2, ms2scan3, ms2scan4, ms2scan6 }); //6 does not have upper and lower offsets
+            FixupIsolationWindows(emptyms2scansRun);
 
             emptyms2scansRun.BasePeaks.Add(basePeak1);
             emptyms2scansRun.SourceFileNames.Add(" ");
             emptyms2scansRun.SourceFileChecksums.Add(" ");
+        }
+
+        private void FixupIsolationWindows(Run<Scan> run)
+        {
+            foreach (Scan scan in run.Ms2Scans)
+                if (scan.IsolationWindowTargetMz.HasValue && scan.IsolationWindowLowerOffset.HasValue && scan.IsolationWindowUpperOffset.HasValue)
+                    run.IsolationWindows.Add(new IsolationWindow(scan.IsolationWindowLowerBoundary.Value, scan.IsolationWindowTargetMz.Value, scan.IsolationWindowUpperBoundary.Value));
         }
 
         /// <remarks>

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -255,7 +255,7 @@ namespace SwaMe.Test
         [TestMethod]
         public void MzTargetRangePerGroupCorrect()
         {
-            List<double> correctmzTargetRange = new List<double>() {3.6, 3.6};
+            List<double?> correctmzTargetRange = new List<double?>() {3.6, 3.6};
             Assert.IsTrue(Enumerable.SequenceEqual(result.MzRange, correctmzTargetRange));
         }
 

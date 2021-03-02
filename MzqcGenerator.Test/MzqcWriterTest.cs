@@ -34,7 +34,7 @@ namespace MzqcGenerator.Test
         //SwathMetrics
         private static readonly List<double> SwathTargets = new List<double>() { 550, 1050 };
         private static readonly List<int> NumOfSwathPerGroup = new List<int>() { 5, 5 };
-        private static readonly List<double> MzRange = new List<double>() { 5, 18 };
+        private static readonly List<double?> MzRange = new List<double?>() { 5, 18 };
         private static readonly List<double> TICs = new List<double>() { 20500, 40000 };
         private static readonly List<double> SwDensity50 = new List<double>() { 2, 8 };
         private static readonly List<double?> SwDensityIQR = new List<double?>() { 1, 2 };

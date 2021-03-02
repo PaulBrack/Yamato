@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,14 +19,14 @@ namespace SwaMe.Test
         public void Initialize()
         {
             string tempPath = Path.GetTempPath();
-            Scan ms2scan1 = new Scan(false, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 100.00, tempPath);
-            Scan ms2scan2 = new Scan(false, 1, 1, 20, TandemMsLevel.Ms2, 2, 1, 100000.02, tempPath);
-            Scan ms2scan3 = new Scan(false, 5, 5, 30, TandemMsLevel.Ms2, 4, 2, 30, tempPath);
-            Scan ms2scan4 = new Scan(false, 5, 5, 32, TandemMsLevel.Ms2, 4, 2, 20010.33, tempPath);
-            Scan ms2scan5 = new Scan(false, 5, 5, 34, TandemMsLevel.Ms2, 4, 2, 50.33, tempPath);
-            Scan ms2scan6 = new Scan(false, 1, 1, 35, TandemMsLevel.Ms2, 4, 2, 4000, tempPath);
-            Scan ms2scan7 = new Scan(false, 1, 1, 70, TandemMsLevel.Ms2, 5, 3, 60000, tempPath);
-            Scan ms2scan8 = new Scan(false, 1, 1, 70, TandemMsLevel.Ms2, 5, 3, 6000, tempPath);
+            Scan ms2scan1 = new Scan(false, 148, 1, 1, 0, TandemMsLevel.Ms2, 2, 1, 100.00, tempPath);
+            Scan ms2scan2 = new Scan(false, 150, 1, 1, 20, TandemMsLevel.Ms2, 2, 1, 100000.02, tempPath);
+            Scan ms2scan3 = new Scan(false, 145, 5, 5, 30, TandemMsLevel.Ms2, 4, 2, 30, tempPath);
+            Scan ms2scan4 = new Scan(false, 150, 5, 5, 32, TandemMsLevel.Ms2, 4, 2, 20010.33, tempPath);
+            Scan ms2scan5 = new Scan(false, 155, 5, 5, 34, TandemMsLevel.Ms2, 4, 2, 50.33, tempPath);
+            Scan ms2scan6 = new Scan(false, 158, 1, 1, 35, TandemMsLevel.Ms2, 4, 2, 4000, tempPath);
+            Scan ms2scan7 = new Scan(false, 148, 1, 1, 70, TandemMsLevel.Ms2, 5, 3, 60000, tempPath);
+            Scan ms2scan8 = new Scan(false, 150, 1, 1, 70, TandemMsLevel.Ms2, 5, 3, 6000, tempPath);
             Scan ms2scan9 = new Scan(false, tempPath)
             {
                 ScanStartTime = 0,

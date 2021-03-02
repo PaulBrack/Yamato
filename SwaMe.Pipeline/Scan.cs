@@ -15,9 +15,10 @@ namespace SwaMe.Pipeline
             TempDirectory = tempDirectory;
         }
 
-        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, TandemMsLevel msLevel, int density, string? tempDirectory)
+        public Scan(bool cacheSpectraToDisk, double? isolationWindowTargetMz, double? isolationWindowLowerOffset, double? isolationWindowUpperOffset, double scanStartTime, TandemMsLevel msLevel, int density, string? tempDirectory = default)
         {
             CacheSpectraToDisk = cacheSpectraToDisk;
+            IsolationWindowTargetMz = isolationWindowTargetMz;
             IsolationWindowLowerOffset = isolationWindowLowerOffset;
             IsolationWindowUpperOffset = isolationWindowUpperOffset;
             ScanStartTime = scanStartTime;
@@ -26,9 +27,10 @@ namespace SwaMe.Pipeline
             TempDirectory = tempDirectory;
         }
 
-        public Scan(bool cacheSpectraToDisk, int isolationWindowLowerOffset, int isolationWindowUpperOffset, double scanStartTime, TandemMsLevel msLevel, int density, int cycle, double totalIonCurrent, string tempDirectory)
+        public Scan(bool cacheSpectraToDisk, double? isolationWindowTargetMz, double? isolationWindowLowerOffset, double? isolationWindowUpperOffset, double scanStartTime, TandemMsLevel msLevel, int density, int cycle, double totalIonCurrent, string? tempDirectory = default)
         {
             CacheSpectraToDisk = cacheSpectraToDisk;
+            IsolationWindowTargetMz = isolationWindowTargetMz;
             IsolationWindowLowerOffset = isolationWindowLowerOffset;
             IsolationWindowUpperOffset = isolationWindowUpperOffset;
             ScanStartTime = scanStartTime;
@@ -49,8 +51,8 @@ namespace SwaMe.Pipeline
         public double? IsolationWindowTargetMz { get; set; }
         public double? IsolationWindowUpperOffset { get; set; }
         public double? IsolationWindowLowerOffset { get; set; }
-        public double? IsolationWindowUpperBoundary { get; set; }
-        public double? IsolationWindowLowerBoundary { get; set; }
+        public double? IsolationWindowUpperBoundary => IsolationWindowTargetMz + IsolationWindowUpperOffset;
+        public double? IsolationWindowLowerBoundary => IsolationWindowTargetMz - IsolationWindowLowerOffset;
         public int RTsegment { get; set; }
         public int Density { get; set; }
         public double ProportionChargeStateOne { get; set; }

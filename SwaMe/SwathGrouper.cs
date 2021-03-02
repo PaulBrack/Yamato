@@ -22,13 +22,8 @@ namespace SwaMe
             List<int> numOfSwathPerGroup = new List<int>();
             List<double> TICs = new List<double>();
             List<double> swDensity = new List<double>();
-            List<double> swDensity50 = new List<double>();
-            List<double?> swDensityIQR = new List<double?>();
-            List<double> mzTargetRange = new List<double>();
-            List<double> averageMzTargetRange = new List<double>();
-            List<double> SwathProportionOfTotalTIC = new List<double>();
-            List<double> TotalSwathProportionPredictedSingleCharge = new List<double>();
-            List<double> SwathProportionPredictedSingleChargeAvg = new List<double>();
+            IList<double?> mzTargetRange = new List<double?>();
+            IList<double?> averageMzTargetRange = new List<double?>();
 
             // Loop through all the swaths of the same number and add to
             for (int swathNumber = 0; swathNumber < swathTargets.Length; swathNumber++)
@@ -39,15 +34,18 @@ namespace SwaMe
 
                 var unorderedMS2Scans = run.Ms2Scans
                     .Where(x => x.IsolationWindowTargetMz == swathTargets[swathNumber]); // Turns out ordering is not required; users of this either don't care about order or sort their own results.
+                bool allTargetRangesAreKnown = true;
                 foreach (Scan scan in unorderedMS2Scans)
                 {
-                    mzTargetRange.Add(scan.IsolationWindowUpperOffset.Value + scan.IsolationWindowLowerOffset.Value);
+                    double? thisMzTargetRange = scan.IsolationWindowUpperOffset + scan.IsolationWindowLowerOffset;
+                    mzTargetRange.Add(thisMzTargetRange);
+                    allTargetRangesAreKnown &= thisMzTargetRange.HasValue;
                     TICthisSwath += scan.TotalIonCurrent;
                     swDensity.Add(scan.Density);
                     TotalSwathProportionPredictedSingleCharge.Add(scan.ProportionChargeStateOne); //The chargestate one's we pick up is where there is a match for M+1. Therefore we need to double it to add the M.
                     track++;
                 }
-                averageMzTargetRange.Add(mzTargetRange.Average());
+                averageMzTargetRange.Add(allTargetRangesAreKnown ? mzTargetRange.Average() : default);
                 numOfSwathPerGroup.Add(track);
                 TICs.Add(TICthisSwath);
                 TICthisSwath = 0;

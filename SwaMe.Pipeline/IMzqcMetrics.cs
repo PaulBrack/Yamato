@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 
 namespace SwaMe.Pipeline
 {
@@ -7,6 +9,6 @@ namespace SwaMe.Pipeline
     /// </summary>
     public interface IMzqcMetrics
     {
-        IDictionary<string, dynamic> RenderableMetrics { get; }
+        IDictionary<string, dynamic?> RenderableMetrics { get; }
     }
 }
