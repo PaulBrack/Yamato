@@ -30,6 +30,11 @@ namespace SwaMe
             public IList<double> TicChangeIqrList { get; }
             public IList<string> SegmentBoundaries { get; }
 
+            /// <summary>
+            /// Testing: Raw densities of final segment.
+            /// </summary>
+            public IList<int>? Density { get; }
+
             public RTMetrics(IList<double> ms1TicTotal,
                 IList<double> ms2TicTotal,
                 IList<double> cycleTime,
@@ -42,7 +47,8 @@ namespace SwaMe
                 IList<double> peakCapacity,
                 IList<double> peakPrecision,
                 IList<double> ms1PeakPrecision,
-                IList<string> segmentBoundaries)
+                IList<string> segmentBoundaries,
+                IList<int>? density)
             {
                 Peakwidths = peakWidths;
                 TailingFactor = tailingFactor;
@@ -57,6 +63,7 @@ namespace SwaMe
                 TicChange50List = ticChange50List;
                 TicChangeIqrList = ticChangeIQRList;
                 SegmentBoundaries = segmentBoundaries;
+                Density = density;
             }
         }
 
@@ -68,14 +75,14 @@ namespace SwaMe
 
             if (run.StartTime.HasValue)
             {
-            for (int i = 0; i < division; i++)
-            {
+                for (int i = 0; i < division; i++)
+                {
                     rtSegs[i] = run.StartTime.Value + rtSegment * i;
-                if (i > 0)
+                    if (i > 0)
                         segmentBoundaries.Add(rtSegs[i - 1] + "_" + rtSegs[i]); // segmentBoundaries is a string denoting the startOfTheRTsegment_endOfTheRTsegment for reference
-                else
-                    segmentBoundaries.Add(run.StartTime + "_" + rtSegs[i]);
-            }
+                    else
+                        segmentBoundaries.Add(run.StartTime + "_" + rtSegs[i]);
+                }
             }
 
             //dividing basepeaks into segments
@@ -174,6 +181,7 @@ namespace SwaMe
             List<double> cycleTime = new List<double>();
             List<double> ms1TicTotal = new List<double>();
             List<double> ms2TicTotal = new List<double>();
+            List<int>? lastMs2DensityTemp = default;
 
             for (int segment = 0; segment < division; segment++)
             {
@@ -265,6 +273,8 @@ namespace SwaMe
                 ms2Density.Add(Convert.ToInt32(Math.Round(ms2DensityTemp.Average(), 0)));
                 ms1TicTotal.Add(ms1TicTotalTemp);
                 ms2TicTotal.Add(ms2TicTotalTemp);
+
+                lastMs2DensityTemp = ms2DensityTemp;
             }
 
             RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, tailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision, segmentBoundaries, lastMs2DensityTemp);

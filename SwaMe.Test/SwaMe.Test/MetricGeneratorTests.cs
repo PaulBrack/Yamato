@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -82,7 +82,7 @@ namespace SwaMe.Test
         }
 
         /// <remarks>
-        /// In the event that the last and first scan times were not able to be recorded, the RTDuration should be set to zero.
+        /// In the event that the last or first scan times were not able to be recorded, the RTDuration should be set to zero.
         /// </remarks>
         [TestMethod]
         public void RTDurationZeroIfMissingLastScanTimeOrFirstScanTime()
@@ -122,8 +122,8 @@ namespace SwaMe.Test
         {
             MetricGenerator metricGenerator = new MetricGenerator();
             var metrics = metricGenerator.GenerateMetrics(contains5ms2ScansRun, 1, false);
-            List<int> correctDensity = new List<int>() { 2, 2, 4, 4, 5 };
-            Assert.IsTrue(Enumerable.SequenceEqual(metrics.MS2Density, correctDensity));
+            List<int>? correctDensity = new List<int>() { 2, 2, 4, 4, 5 };
+            Assert.IsTrue(Enumerable.SequenceEqual(metrics.Density, correctDensity));
         }
     }
 }
