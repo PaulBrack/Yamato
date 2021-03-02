@@ -1,4 +1,4 @@
-using LibraryParser;
+﻿using LibraryParser;
 using NLog;
 using NLog.Config;
 using SwaMe.Pipeline;
@@ -176,7 +176,7 @@ namespace SwaMe.Desktop
                     analysisSettings.IrtLibrary = svReader.LoadLibrary(irtFilePath);
                 }
             }
-            using (Run<Scan> run = pipeliner.LoadMzml(inputFilePath, analysisSettings))
+            using (Run<Scan> run = pipeliner.LoadMzmlAndRunPipeline(inputFilePath, analysisSettings))
             {
                 AnalysisSettingsFileWriter Aw = new AnalysisSettingsFileWriter();
                 if (inputFiles.Count() > 1 && lastFile)//multiple files and this is the last
