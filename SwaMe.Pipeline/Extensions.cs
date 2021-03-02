@@ -23,7 +23,7 @@ namespace SwaMe.Pipeline
             return list.Select(x => new T[3] { x.Item1, x.Item2, x.Item3 }).ToArray();
         }
 
-        public static TSource MaxEvaluatedWith<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource, int> comparator)
+        public static TSource MaxEvaluatedWith<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource, bool> comparator)
         {
             bool first = true;
             TSource maxSoFar = default;
@@ -37,7 +37,7 @@ namespace SwaMe.Pipeline
                 else
                 {
                     // If we get here, first is false so maxSoFar has a value. TODO: Some code assertion to that effect that doesn't affect performance.
-                    if (comparator(s, maxSoFar) > 0)
+                    if (comparator(s, maxSoFar))
                         maxSoFar = s;
                 }
             }
