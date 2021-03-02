@@ -225,20 +225,20 @@ namespace MzmlParser
                             {
                                 // Not a MS1 scan, but we know MS1 scans exist in the data.  Given assumption 1, this must be a MS2 scan in the existing cycle.
                                 // Do nothing.
-                        }
-                        else
-                        {
+                            }
+                            else
+                            {
                                 // Not a MS1 scan, and we don't even know whether the source holds any MS1 scans.
                                 // Given assumption 2, this is the first scan of a new cycle if its m/z is lower than that of the previous scan.
                                 if (!scan.IsolationWindowTargetMz.HasValue)
                                     throw new Exception("At least one MS2 scan has no isolation window target m/z (MS:1000827). As there are also no cycles encoded in the IDs, we cannot detect a cycle ID and cannot continue.");
                                 if (previousTargetMz >= scan.IsolationWindowTargetMz.Value)
-                                currentCycle++;
+                                    currentCycle++;
                                 previousTargetMz = scan.IsolationWindowTargetMz.Value;
                             }
                         }
-                            scan.Cycle = currentCycle;
-                        }
+                        scan.Cycle = currentCycle;
+                    }
 
 
                     ProcessScanThreadedOrNot(scanAndTempProperties);
@@ -343,6 +343,8 @@ namespace MzmlParser
             else if (scan.MsLevel == TandemMsLevel.Ms2)
             {
                 int scanCount = run.SafelyAddMs2Scan(scan);
+                if (scanCount % 10000 == 0)
+                    logger.Info("{0} MS2 scans read", scanCount);
             }
             else
                 throw new ArgumentOutOfRangeException("scan.MsLevel", "MS Level must be 1 or 2");
