@@ -17,7 +17,7 @@ namespace LibraryParser
         public void LogResults(Library library, Logger logger, string path)
         {
             logger.Debug("Loading iRT library {0}", path);
-            logger.Debug("{0} peptides loaded", library.PeptideList.Count);
+            logger.Debug("{0} peptides loaded", library.Peptides.Count);
             logger.Debug("{0} transitions loaded", library.TransitionList.Count);
         }
     }

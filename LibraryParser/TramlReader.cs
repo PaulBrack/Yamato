@@ -93,7 +93,7 @@ namespace LibraryParser
                 }
             }
 
-            library.PeptideList.Add(peptide.Id, peptide);
+            library.Peptides.Add(peptide.Id, peptide);
         }
 
         private void AddPeptideReference(Library library, XmlReader xmlReader)
@@ -163,7 +163,7 @@ namespace LibraryParser
             }
 
             library.TransitionList.Add(transition.Id, transition);
-            var correspondingPeptide = (Library.Peptide)(library.PeptideList[transition.PeptideId]);
+            var correspondingPeptide = library.Peptides[transition.PeptideId];
             correspondingPeptide.AssociatedTransitionIds.Add(transition.Id);
             correspondingPeptide.AssociatedTransitions.Add(transition);
         }

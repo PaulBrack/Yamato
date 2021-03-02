@@ -38,7 +38,7 @@ namespace LibraryParser.Test
         [TestMethod]
         public void PeptideCountIsCorrect()
         {
-            Assert.AreEqual(9632, library.PeptideList.Count);
+            Assert.AreEqual(9632, library.Peptides.Count);
         }
 
         [TestMethod]
@@ -70,25 +70,30 @@ namespace LibraryParser.Test
         [TestMethod]
         public void PeptideIdIsFilled()
         {
-            Assert.AreEqual("1_AAAAAAVSGSAAAEAK_2", ((Peptide)(library.PeptideList[0])).Id);
+            string peptideId = "1_AAAAAAVSGSAAAEAK_2";
+            Assert.IsTrue(library.Peptides.ContainsKey(peptideId));
+            Assert.AreEqual(peptideId, library.Peptides[peptideId].Id);
         }
 
         [TestMethod]
         public void PeptideSequenceIsFilled()
         {
-            Assert.AreEqual("AAAAAAVSGSAAAEAK", ((Peptide)(library.PeptideList[0])).Sequence);
+            string peptideId = "1_AAAAAAVSGSAAAEAK_2";
+            Assert.AreEqual("AAAAAAVSGSAAAEAK", library.Peptides[peptideId].Sequence);
         }
 
         [TestMethod]
         public void PeptideChargeStateIsFilled()
         {
-            Assert.AreEqual(2, ((Peptide)(library.PeptideList[0])).ChargeState);
+            string peptideId = "1_AAAAAAVSGSAAAEAK_2";
+            Assert.AreEqual(2, library.Peptides[peptideId].ChargeState);
         }
 
         [TestMethod]
         public void PeptideRetentionTimeIsFilled()
         {
-            Assert.AreEqual(-12.8, ((Peptide)(library.PeptideList[0])).RetentionTime);
+            string peptideId = "1_AAAAAAVSGSAAAEAK_2";
+            Assert.AreEqual(-12.8, library.Peptides[peptideId].RetentionTime);
         }
 
         [TestMethod]

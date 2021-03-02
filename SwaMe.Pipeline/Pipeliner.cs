@@ -103,7 +103,7 @@ namespace SwaMe.Pipeline
             if (null == run.AnalysisSettings.IrtLibrary)
                 return;
 
-            foreach (Library.Peptide peptide in run.AnalysisSettings.IrtLibrary.PeptideList.Values)
+            foreach (Library.Peptide peptide in run.AnalysisSettings.IrtLibrary.Peptides.Values)
             {
                 var irtIntensities = new List<float>();
                 var irtMzs = new List<float>();

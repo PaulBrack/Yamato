@@ -112,7 +112,7 @@ namespace LibraryParser
         {
             string id = line[pepMzIndex].Replace(",", ".");
             var peptide = new Library.Peptide(id, line[sequenceIndex]);
-            library.PeptideList.Add(peptide.Id, peptide);
+            library.Peptides.Add(peptide.Id, peptide);
         }
 
         private void AddTransition(Library library, string[] line, double mzLastPeptide, int transMzIndex, int intensityIndex, double precursorMz)
@@ -133,7 +133,7 @@ namespace LibraryParser
             else
             {
                 library.TransitionList.Add(keystring, transition);
-                var correspondingPeptide = (Library.Peptide)(library.PeptideList[key: Convert.ToString(precursorMz).Replace(",", ".")]);
+                var correspondingPeptide = library.Peptides[precursorMz.ToString(CultureInfo.InvariantCulture)];
                 correspondingPeptide.AssociatedTransitions.Add(transition);
             }
         }

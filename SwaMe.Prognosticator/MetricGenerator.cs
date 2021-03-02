@@ -108,7 +108,7 @@ namespace Prognosticator
 
             if (Run.AnalysisSettings.IrtLibrary != null && Run.IRTHits.Count > 0)
             {
-                var libraryPeptides = Run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Peptide>().OrderBy(x => x.RetentionTime);
+                var libraryPeptides = Run.AnalysisSettings.IrtLibrary.Peptides.Values.OrderBy(x => x.RetentionTime);
                 var orderedIrtPeptideSequences = libraryPeptides.Select(x => x.Sequence).ToList();
                 var orderedIrtHits = Run.IRTHits.OrderBy(x => orderedIrtPeptideSequences.IndexOf(x.PeptideSequence));
 
@@ -116,9 +116,9 @@ namespace Prognosticator
                 {
                     MeanIrtMassError = Run.IRTHits.Average(x => x.AverageMassErrorPpm),
                     MaxIrtMassError = Run.IRTHits.Max(x => x.AverageMassErrorPpm),
-                    IrtPeptideFoundProportion = Run.IRTHits.Count() / Run.AnalysisSettings.IrtLibrary.PeptideList.Count,
+                    IrtPeptideFoundProportion = Run.IRTHits.Count() / Run.AnalysisSettings.IrtLibrary.Peptides.Count,
                     IrtPeptides = orderedIrtHits.ToList(),
-                    IrtPeptidesFound = Run.IRTHits.Count / (double)Run.AnalysisSettings.IrtLibrary.PeptideList.Count,
+                    IrtPeptidesFound = Run.IRTHits.Count / (double)Run.AnalysisSettings.IrtLibrary.Peptides.Count,
                     IrtSpread = Run.IRTHits.Select(x => x.RetentionTime).Max() - Run.IRTHits.Select(x => x.RetentionTime).Min(),
                     IrtOrderedness = GetOrderednessAsPercent(orderedIrtHits.Select(x => x.RetentionTime).ToArray())
                 };

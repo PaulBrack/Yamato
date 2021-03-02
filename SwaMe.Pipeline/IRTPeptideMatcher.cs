@@ -55,7 +55,7 @@ namespace SwaMe.Pipeline
         {
             IEnumerable<Scan>? matchingScans = run.Ms2Scans.Where(x => Math.Abs(x.ScanStartTime - candidateHit.RetentionTime) < run.AnalysisSettings.RtTolerance);
 
-            var libraryPeptides = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Peptide>().ToList();
+            var libraryPeptides = run.AnalysisSettings.IrtLibrary.Peptides.Values.ToList(); // TODO: Get this ONCE!
             List<SpectrumPoint> matchingSpectrum = new List<SpectrumPoint>();
             Peptide? peptide = default;
 
@@ -97,7 +97,7 @@ namespace SwaMe.Pipeline
             CandidateHit bestHit = hits.OrderBy(x => x.Intensities.Min()).Last(); // pick the hit with the highest minimum intensity value
 
             //Let's pull out the reference peptide
-            IOrderedEnumerable<double>? refPeptideTransitionMzs = run.AnalysisSettings.IrtLibrary.PeptideList.Values.Cast<Peptide>().ToList().Where(x => x.Sequence == peptideSequence).Single().AssociatedTransitions.Select(x => x.ProductMz).OrderBy(x => x);
+            IOrderedEnumerable<double>? refPeptideTransitionMzs = run.AnalysisSettings.IrtLibrary.Peptides.Values.ToList().Where(x => x.Sequence == peptideSequence).Single().AssociatedTransitions.Select(x => x.ProductMz).OrderBy(x => x);
             IOrderedEnumerable<float>? bestHitTransitionMzs = bestHit.ActualMzs.OrderBy(x => x);
 
             foreach (var mz in bestHitTransitionMzs)
