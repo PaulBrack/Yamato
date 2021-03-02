@@ -102,6 +102,22 @@ namespace SwaMe
         public double Ms2Density50 { get; set; }
         public double Ms2DensityIqr { get; set; }
         public double Ms1ScanCount { get; set; }
+        public IList<int>? NumOfSwathPerGroup { get; set; }
+        public IList<double?>? MzRange { get; set; }
+        public IList<double>? SwathProportionOfTotalTIC { get; set; }
+        public IList<double>? SwDensity50 { get; set; }
+        public IList<double?>? SwDensityIQR { get; set; }
+        public IList<double>? Peakwidths { get; set; }
+        public IList<double>? PeakCapacity { get; set; }
+        public IList<double>? MS1PeakPrecision { get; set; }
+        public IList<double>? TicChange50List { get; set; }
+        public IList<double>? TicChangeIqrList { get; set; }
+        public IList<double>? CycleTime { get; set; }
+        public IList<int>? MS2Density { get; set; }
+        public IList<int>? MS1Density { get; set; }
+        public IList<double>? MS2TicTotal { get; set; }
+        public IList<double>? MS1TicTotal { get; set; }
+        public IList<double>? TailingFactor { get; set; }
 
         /// <summary>
         /// Testing: Raw densities of final segment.

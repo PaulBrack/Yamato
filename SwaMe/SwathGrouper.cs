@@ -19,11 +19,16 @@ namespace SwaMe
                 totalTIC += scan.TotalIonCurrent;
 
             //Loop through every swath of a certain swathNumber:
-            List<int> numOfSwathPerGroup = new List<int>();
-            List<double> TICs = new List<double>();
+            IList<int> numOfSwathPerGroup = new List<int>();
+            IList<double> TICs = new List<double>();
             List<double> swDensity = new List<double>();
+            IList<double> swDensity50 = new List<double>();
+            IList<double?> swDensityIQR = new List<double?>();
             IList<double?> mzTargetRange = new List<double?>();
             IList<double?> averageMzTargetRange = new List<double?>();
+            IList<double> SwathProportionOfTotalTIC = new List<double>();
+            IList<double> TotalSwathProportionPredictedSingleCharge = new List<double>();
+            IList<double> SwathProportionPredictedSingleChargeAvg = new List<double>();
 
             // Loop through all the swaths of the same number and add to
             for (int swathNumber = 0; swathNumber < swathTargets.Length; swathNumber++)
