@@ -1,7 +1,7 @@
 using CVLibrarian;
+using MzmlParser;
 using Newtonsoft.Json;
 using NLog;
-using SwaMe.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,9 @@ using System.Linq;
 
 namespace MzqcGenerator
 {
-    public class MzqcWriter
+    public class MzqcWriter<TScan, TRun>
+        where TScan : IScan
+        where TRun : IRun<TScan>
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private IDictionary<string, JsonClasses.QualityParameters> QualityParametersByAccession { get; }
@@ -84,7 +86,7 @@ namespace MzqcGenerator
         }
 
         /// <param name="outputFileName">The path to the output file to be opened, or null to send to stdout</param>
-        public void BuildMzqcAndWrite(string outputFileName, Run<Scan> run, IDictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
+        public void BuildMzqcAndWrite(string outputFileName, TRun run, IDictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
         {
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
@@ -117,7 +119,7 @@ namespace MzqcGenerator
                 accession = swaMe.Id, 
                 name = swaMe.Name, 
                 uri = "https://github.com/PaulBrack/Yamato/tree/master/Console", 
-                version = typeof(MzqcWriter).Assembly.GetName().Version.ToString(), 
+                version = this.GetType().Assembly.GetName().Version.ToString(), 
                 analysisSettings = analysisSettings 
             };
 

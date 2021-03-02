@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CVLibrarian\CVLibrarian.csproj" />
-    <ProjectReference Include="..\SwaMe.Pipeline\SwaMe.Pipeline.csproj" />
+    <ProjectReference Include="..\MzmlParser\MzmlParser.csproj" />
   </ItemGroup>
 
 </Project>

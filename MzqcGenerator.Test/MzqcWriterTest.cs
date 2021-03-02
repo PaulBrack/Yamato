@@ -83,10 +83,12 @@ namespace MzqcGenerator.Test
         [TestInitialize]
         public void Initialize()
         {
-            var mg = new MetricGenerator();
-            var metrics = mg.GenerateMetrics(RunWithoutIRT, 100, false);
-
-            new MzqcWriter().BuildMzqcAndWrite("test.json", RunWithoutIRT, metrics.RenderableMetrics, "", null);
+            new MzqcWriter<Scan, Run<Scan>>().BuildMzqcAndWrite(
+                "test.json",
+                RunWithoutIRT,
+                new SwaMe.MetricGenerator().GenerateMetrics(RunWithoutIRT, 100, false).RenderableMetrics,
+                "",
+                null);
         }
 
         /*

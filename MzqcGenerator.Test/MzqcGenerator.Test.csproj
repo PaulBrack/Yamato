@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SwaMe.Prognosticator\SwaMe.Prognosticator.csproj" />
     <ProjectReference Include="..\SwaMe\SwaMe.csproj" />
   </ItemGroup>
 

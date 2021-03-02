@@ -96,7 +96,7 @@ namespace Yamato.Console
                     Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt));
                     Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator().GenerateMetrics(run));
 
-                    new MzqcGenerator.MzqcWriter().BuildMzqcAndWrite(options.OutputFile, run, mergedRenderedMetrics, options.InputFile, analysisSettings);
+                    new MzqcGenerator.MzqcWriter<Scan, Run<Scan>>().BuildMzqcAndWrite(options.OutputFile, run, mergedRenderedMetrics, options.InputFile, analysisSettings);
                     Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
 
                     if (analysisSettings.CacheSpectraToDisk)
