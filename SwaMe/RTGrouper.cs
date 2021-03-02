@@ -66,13 +66,16 @@ namespace SwaMe
             rtSegs = new double[division];
             List<string> segmentBoundaries = new List<string>();
 
+            if (run.StartTime.HasValue)
+            {
             for (int i = 0; i < division; i++)
             {
-                rtSegs[i] = run.StartTime + rtSegment * i;
+                    rtSegs[i] = run.StartTime.Value + rtSegment * i;
                 if (i > 0)
-                    segmentBoundaries.Add(rtSegs[i - 1] + "_" + rtSegs[i]);//segmentBoundaries is a string denoting the startOfTheRTsegment_endOfTheRTsegment for reference
+                        segmentBoundaries.Add(rtSegs[i - 1] + "_" + rtSegs[i]); // segmentBoundaries is a string denoting the startOfTheRTsegment_endOfTheRTsegment for reference
                 else
                     segmentBoundaries.Add(run.StartTime + "_" + rtSegs[i]);
+            }
             }
 
             //dividing basepeaks into segments

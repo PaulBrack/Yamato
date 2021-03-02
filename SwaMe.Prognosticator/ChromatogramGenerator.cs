@@ -9,14 +9,13 @@ namespace Prognosticator
     public static class ChromatogramGenerator
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        public static Run<Scan> CreateAllChromatograms(Run<Scan> run)
+        public static void CreateAllChromatograms(Run<Scan> run)
         {
             run.Chromatograms.Ms1Tic = ExtractMs1TotalIonChromatogram(run);
             run.Chromatograms.Ms2Tic = ExtractMs2TotalIonChromatogram(run);
             run.Chromatograms.Ms1Bpc = ExtractMs1BasePeakChromatogram(run);
             run.Chromatograms.Ms2Bpc = ExtractMs2BasePeakChromatogram(run);
             run.Chromatograms.CombinedTic = CreateCombinedChromatogram(run);
-            return run;
         }
 
         public static List<(double, double)> ExtractMs1TotalIonChromatogram(Run<Scan> run)

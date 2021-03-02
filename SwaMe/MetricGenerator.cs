@@ -12,10 +12,10 @@ namespace SwaMe
         public Metrics GenerateMetrics(Run<Scan> run, int division, bool irt)
         {
             double rtDuration;
-            if (run.LastScanTime != 0 && run.StartTime != 1000000)
+            if (run.LastScanTime.HasValue && run.StartTime.HasValue)
             {
                 //Acquire RTDuration: last minus first
-                rtDuration = run.LastScanTime - run.StartTime;
+                rtDuration = run.LastScanTime.Value - run.StartTime.Value;
             }
             else
             {

@@ -11,8 +11,8 @@ namespace SwaMe.Pipeline
     public class Run<TScan> : IRun<TScan>
         where TScan: IScan
     {
-        public double StartTime { get; set; } = 0;
-        public double LastScanTime { get; set; } = 1000000;
+        public double? StartTime { get; set; }
+        public double? LastScanTime { get; set; }
         public IList<string> SourceFileTypes { get; } = new List<string>();
         public IList<string> SourceFileNames { get; } = new List<string>();
         public string? SourceFilePath { get; set; }

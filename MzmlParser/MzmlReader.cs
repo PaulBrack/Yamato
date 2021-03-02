@@ -51,8 +51,6 @@ namespace MzmlParser
         public TRun LoadMzml(string path)
         {
             TRun run = RunFactory.CreateRun();
-            run.StartTime = 100;
-            run.LastScanTime = 0;
             parseBinaryData = scanConsumers.Any(scanConsumer => scanConsumer.RequiresBinaryData);
 
             if (Threading)
@@ -181,8 +179,8 @@ namespace MzmlParser
                                 break;
                             case "MS:1000016":
                                 scan.ScanStartTime = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
-                                run.StartTime = Math.Min(run.StartTime, scan.ScanStartTime);
-                                run.LastScanTime = Math.Max(run.LastScanTime, scan.ScanStartTime); // Technically this is the start time of the last scan, not the completion time.
+                                run.StartTime = MinOrOnly(run.StartTime, scan.ScanStartTime);
+                                run.LastScanTime = MaxOrOnly(run.LastScanTime, scan.ScanStartTime); // Technically this is the start time of the last scan, not the completion time.
                                 break;
                             case "MS:1000829":
                                 scan.IsolationWindowUpperOffset = double.Parse(reader.GetAttribute("value"), CultureInfo.InvariantCulture);
@@ -246,6 +244,20 @@ namespace MzmlParser
                 }
             }
         }
+
+        private double? MaxOrOnly(double? x, double? y) =>
+            x.HasValue
+                ? y.HasValue
+                    ? Math.Max(x.Value, y.Value)
+                    : x
+                : y;
+
+        private double? MinOrOnly(double? x, double? y) =>
+            x.HasValue
+                ? y.HasValue
+                    ? Math.Min(x.Value, y.Value)
+                    : x
+                : y;
 
         private TandemMsLevel ToTandemMsLevel(int rawLevel) =>
             rawLevel switch

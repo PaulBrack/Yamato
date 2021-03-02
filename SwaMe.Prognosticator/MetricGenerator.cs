@@ -1,4 +1,6 @@
-﻿using SwaMe.Pipeline;
+﻿#nullable enable
+
+using SwaMe.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,33 +10,39 @@ namespace Prognosticator
 {
     public class MetricGenerator
     {
-        public double[] Ms1QuartileDivisions { get; private set; }
-        public double[] Ms2QuartileDivisions { get; private set; }
-        public Run<Scan> Run { get; private set; }
+        public double[]? Ms1QuartileDivisions { get; private set; }
+        public double[]? Ms2QuartileDivisions { get; private set; }
+        public Run<Scan> Run { get; }
 
-        public IList<IMzqcMetrics> GenerateMetrics(Run<Scan> run)
+        public MetricGenerator(Run<Scan> run)
         {
-            Run = ChromatogramGenerator.CreateAllChromatograms(run);
-            Ms1QuartileDivisions = ExtractQuartileDivisionTimes(run, Run.LastScanTime, 1);
-            Ms2QuartileDivisions = ExtractQuartileDivisionTimes(run, Run.LastScanTime, 2);
+            Run = run;
+        }
+
+        public IList<IMzqcMetrics> GenerateMetrics()
+        {
+            ChromatogramGenerator.CreateAllChromatograms(Run);
+            Ms1QuartileDivisions = ExtractQuartileDivisionTimes(Run, Run.LastScanTime, 1);
+            Ms2QuartileDivisions = ExtractQuartileDivisionTimes(Run, Run.LastScanTime, 2);
 
             return AssembleMetrics();
         }
 
-        private static double[] ExtractQuartileDivisionSummedIntensities(Run<Scan> run, double? washTime, int msLevel)
+        private static double[]? ExtractQuartileDivisionSummedIntensities(Run<Scan> run, double? washTime, int msLevel)
         {
             List<(double, double)> chromatogram = LoadChromatogram(run, msLevel);
 
-            List<double> quartileDivisionSummedIntensities = new List<double>();
 
-            double runEndTime = washTime ?? run.LastScanTime;
+            double? runEndTime = washTime ?? run.LastScanTime;
 
             var total = chromatogram.Sum(x => x.Item2);
-
-            quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.25).Sum(x => x.Item2));
-            quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.5 && x.Item1 >= runEndTime * 0.25).Sum(x => x.Item2));
-            quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime * 0.75 && x.Item1 >= runEndTime * 0.5).Sum(x => x.Item2));
-            quartileDivisionSummedIntensities.Add(chromatogram.Where(x => x.Item1 < runEndTime && x.Item1 >= runEndTime * 0.75).Sum(x => x.Item2));
+            double[] quartileDivisionSummedIntensities = new double[]
+            {
+                chromatogram.Where(x => x.Item1 < runEndTime * 0.25).Sum(x => x.Item2),
+                chromatogram.Where(x => x.Item1 < runEndTime * 0.5 && x.Item1 >= runEndTime * 0.25).Sum(x => x.Item2),
+                chromatogram.Where(x => x.Item1 < runEndTime * 0.75 && x.Item1 >= runEndTime * 0.5).Sum(x => x.Item2),
+                chromatogram.Where(x => x.Item1 < runEndTime && x.Item1 >= runEndTime * 0.75).Sum(x => x.Item2)
+            };
 
             //express these as fractions of the whole
             return quartileDivisionSummedIntensities.Select(x => x / total).ToArray();
@@ -167,8 +175,8 @@ namespace Prognosticator
         public double[][] MS2BPC { get; set; }
         public double[][] CombinedTIC { get; set; }
         public double MS1MS2Ratio { get; set; }
-        public double MS1WeightedMedianSkew { get; set; }
-        public double MS2WeightedMedianSkew { get; set; }
+        public double? MS1WeightedMedianSkew { get; set; }
+        public double? MS2WeightedMedianSkew { get; set; }
         public double[] MS1TICQuartilesByRT { get; set; }
         public double[] MS2TICQuartilesByRT { get; set; }
 
