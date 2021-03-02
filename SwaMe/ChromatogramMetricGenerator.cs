@@ -84,7 +84,7 @@ namespace SwaMe
                     }
                 }
             }
-            return testOutput;
+            return testOutput ?? new RetentionTimesAndIntensities(Array.Empty<RetentionTime>(), Array.Empty<Intensity>());
         }
 
         /// <summary>
