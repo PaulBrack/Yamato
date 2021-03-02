@@ -32,16 +32,16 @@ namespace SwaMe.Pipeline
                 victim.Add(toTransfer);
         }
 
-        public static void AddRenderedMzqcMetricsTo(IDictionary<string, dynamic> mergedRenderedMetrics, IMzqcMetrics rawMetrics)
+        public static void AddRenderedMzqcMetricsTo(IDictionary<string, dynamic?> mergedRenderedMetrics, IMzqcMetrics rawMetrics)
         {
-            foreach (KeyValuePair<string, dynamic> pair in rawMetrics.RenderableMetrics)
+            foreach (KeyValuePair<string, dynamic?> pair in rawMetrics.RenderableMetrics)
                 mergedRenderedMetrics.Add(pair);
         }
 
-        public static void AddRenderedMzqcMetricsTo(IDictionary<string, dynamic> mergedRenderedMetrics, IList<IMzqcMetrics> rawMetricList)
+        public static void AddRenderedMzqcMetricsTo(IDictionary<string, dynamic?> mergedRenderedMetrics, IList<IMzqcMetrics> rawMetricList)
         {
             foreach (IMzqcMetrics rawMetrics in rawMetricList)
-                foreach (KeyValuePair<string, dynamic> pair in rawMetrics.RenderableMetrics)
+                foreach (KeyValuePair<string, dynamic?> pair in rawMetrics.RenderableMetrics)
                     mergedRenderedMetrics.Add(pair);
         }
 

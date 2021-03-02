@@ -180,8 +180,8 @@ namespace Prognosticator
         public double[] MS1TICQuartilesByRT { get; set; }
         public double[] MS2TICQuartilesByRT { get; set; }
 
-        public IDictionary<string, dynamic> RenderableMetrics =>
-            new Dictionary<string, dynamic>()
+        public IDictionary<string, dynamic?> RenderableMetrics =>
+            new Dictionary<string, dynamic?>()
             {
                 { "QC:99", MS1TICQuartiles },
                 { "QC:98", MS2TICQuartiles },

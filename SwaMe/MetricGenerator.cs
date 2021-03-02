@@ -97,7 +97,7 @@ namespace SwaMe
         public double SwathSizeDifference { get; set; }
         public double Ms2ScanCount { get; set; }
         public double NumOfSwaths { get; set; }
-        public IList<double> TargetMz { get; set; }
+        public IList<double>? TargetMz { get; set; }
         public double TotalMS2IonCount { get; set; }
         public double Ms2Density50 { get; set; }
         public double Ms2DensityIqr { get; set; }
@@ -124,8 +124,8 @@ namespace SwaMe
         /// </summary>
         public IList<int>? Density { get; set; }
 
-        public IDictionary<string, dynamic> RenderableMetrics =>
-            new Dictionary<string, dynamic>
+        public IDictionary<string, dynamic?> RenderableMetrics =>
+            new Dictionary<string, dynamic?>
             {
                 { "QC:4000053", RtDuration },
                 { "QC:02", SwathSizeDifference },

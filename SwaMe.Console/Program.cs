@@ -1,3 +1,5 @@
+#nullable enable
+
 using CommandLine;
 using System;
 using System.Diagnostics;
@@ -92,7 +94,7 @@ namespace Yamato.Console
                     using Run<Scan> run = pipeliner.LoadMzmlAndRunPipeline(options.InputFile, analysisSettings);
 
                     Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
-                    IDictionary<string, dynamic> mergedRenderedMetrics = new Dictionary<string, dynamic>();
+                    IDictionary<string, dynamic?> mergedRenderedMetrics = new Dictionary<string, dynamic?>();
                     Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt));
                     Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator(run).GenerateMetrics());
 
@@ -155,10 +157,10 @@ namespace Yamato.Console
         public bool? LoadFromDirectory { get; set; }
 
         [Option('i', "inputfile", Required = true, HelpText = "Input file path, or - to use standard input.")]
-        public string InputFile { get; set; }
+        public string? InputFile { get; set; }
 
         [Option('o', "outputfile", Required = true, HelpText = "Output file path, or - to use standard output (NOTE: Use production logging or your log output will also go to stdout).")]
-        public string OutputFile { get; set; }
+        public string? OutputFile { get; set; }
 
         [Option('v', "verbose", Required = false, HelpText = "Enable verbose logging.")]
         public bool Verbose { get; set; } = false;
@@ -173,7 +175,7 @@ namespace Yamato.Console
         public bool? Threading { get; set; } = true;
 
         [Option('r', "irtFile", Required = false, HelpText = "iRT file path")]
-        public string IRTFile { get; set; } = null;
+        public string? IRTFile { get; set; } = null;
 
         [Option("irttolerance", Required = false, HelpText = "iRT mass tolerance")]
         public double IrtMassTolerance { get; set; } = 0.005;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using CVLibrarian;
 using MzmlParser;
 using Newtonsoft.Json;
@@ -86,7 +88,7 @@ namespace MzqcGenerator
         }
 
         /// <param name="outputFileName">The path to the output file to be opened, or null to send to stdout</param>
-        public void BuildMzqcAndWrite(string outputFileName, TRun run, IDictionary<string, dynamic> qcParams, string inputFileInclPath, object analysisSettings)
+        public void BuildMzqcAndWrite(string outputFileName, TRun run, IDictionary<string, dynamic?> qcParams, string inputFileInclPath, object analysisSettings)
         {
             List<JsonClasses.QualityParameters> qualityParameters = new List<JsonClasses.QualityParameters>();
             foreach (var metric in qcParams)
