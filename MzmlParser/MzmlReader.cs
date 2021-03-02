@@ -160,12 +160,12 @@ namespace MzmlParser
                 }
             }
 
-            bool cvParamsRead = false;
+            bool closed = false;
             double previousTargetMz = 0;
             int currentCycle = 0;
             bool hasAtLeastOneMS1 = false;
             ScanAndTempProperties<TScan, TRun> scanAndTempProperties = new ScanAndTempProperties<TScan, TRun>(scan, run);
-            while (reader.Read() && !cvParamsRead)
+            while (reader.Read() && !closed)
             {
                 if (reader.IsStartElement())
                 {
@@ -206,32 +206,43 @@ namespace MzmlParser
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.LocalName == "spectrum")
                 {
+                    // Work out which cycle the scan's in if not explicit.
                     if (!CycleInfoInID)
                     {
+                        // Guess the cycle, because it's not encoded in the ID.
+                        // ASSUMPTION 1: MS1 scan comes first in the cycle (and hence also first in the file) if it exists.
+                        // ASSUMPTION 2: If MS1 scans don't exist in the data, scans are done in increasing m/z order, so we can detect a new cycle by detecting a drop in the isolation window target m/z.
                         if (scan.MsLevel == TandemMsLevel.Ms1)
                         {
+                            // First scan of a new cycle.
                             currentCycle++;
-                            scan.Cycle = currentCycle;
                             hasAtLeastOneMS1 = true;
                         }
-                        //if there is ScanAndTempProperties ms1:
-                        else if (hasAtLeastOneMS1)
-                        {
-                            scan.Cycle = currentCycle;
-                        }
-                        //if there is no ms1:
                         else
                         {
-                            if (previousTargetMz >= scan.IsolationWindowTargetMz)
+                            // Not a MS1 scan.
+                            if (hasAtLeastOneMS1)
+                            {
+                                // Not a MS1 scan, but we know MS1 scans exist in the data.  Given assumption 1, this must be a MS2 scan in the existing cycle.
+                                // Do nothing.
+                        }
+                        else
+                        {
+                                // Not a MS1 scan, and we don't even know whether the source holds any MS1 scans.
+                                // Given assumption 2, this is the first scan of a new cycle if its m/z is lower than that of the previous scan.
+                                if (!scan.IsolationWindowTargetMz.HasValue)
+                                    throw new Exception("At least one MS2 scan has no isolation window target m/z (MS:1000827). As there are also no cycles encoded in the IDs, we cannot detect a cycle ID and cannot continue.");
+                                if (previousTargetMz >= scan.IsolationWindowTargetMz.Value)
                                 currentCycle++;
+                                previousTargetMz = scan.IsolationWindowTargetMz.Value;
+                            }
+                        }
                             scan.Cycle = currentCycle;
                         }
-                    }
 
-                    previousTargetMz = scan.IsolationWindowTargetMz;
 
                     ProcessScanThreadedOrNot(scanAndTempProperties);
-                    cvParamsRead = true;
+                    closed = true;
                 }
             }
         }
