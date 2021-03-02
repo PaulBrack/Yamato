@@ -15,7 +15,7 @@ namespace SwaMe
 
             int length = list.Count;
             double Q1 = list[length / 4];
-            double Q3 = list[length / 4 * 3];
+            double Q3 = list[length * 3 / 4];
             return Q3 - Q1;
         }
 
@@ -28,7 +28,7 @@ namespace SwaMe
                 throw new ArgumentException($"At least 5 list items required to calculate IQR, got {list.Count}", nameof(list));
             int length = list.Count;
             int Q1 = list[length / 4];
-            int Q3 = list[length / 4 * 3];
+            int Q3 = list[length * 3 / 4];
             return Q3 - Q1;
         }
     }
