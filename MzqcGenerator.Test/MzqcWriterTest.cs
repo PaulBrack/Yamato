@@ -18,15 +18,15 @@ namespace MzqcGenerator.Test
         {
             Mz = 550,
             RetentionTime = 20,
-            FWHM = 18,
-            Peaksym = 0.5
+            FullWidthHalfMax = 18,
+            PeakSymmetry = 0.5
         };
         private static readonly IRTPeak iRTPeak2 = new IRTPeak()
         {
             Mz = 825,
             RetentionTime = 30,
-            FWHM = 30,
-            Peaksym = 0.9
+            FullWidthHalfMax = 30,
+            PeakSymmetry = 0.9
         };
 
         //Run
