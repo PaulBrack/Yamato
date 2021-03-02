@@ -1,4 +1,4 @@
-using LibraryParser;
+﻿using LibraryParser;
 using NLog;
 using NLog.Config;
 using SwaMe.Pipeline;
@@ -191,7 +191,7 @@ namespace SwaMe.Desktop
                 logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                 IDictionary<string, dynamic> mergedRenderedMetrics = new Dictionary<string, dynamic>();
                 Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt));
-                Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator().GenerateMetrics(run));
+                Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator(run).GenerateMetrics());
 
                 new MzqcGenerator.MzqcWriter<Scan, Run<Scan>>().BuildMzqcAndWrite("", run, mergedRenderedMetrics, inputFilePath, analysisSettings);
                 logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));

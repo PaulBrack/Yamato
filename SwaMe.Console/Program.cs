@@ -94,7 +94,7 @@ namespace Yamato.Console
                     Logger.Info("Generating metrics...", Convert.ToInt32(sw.Elapsed.TotalSeconds));
                     IDictionary<string, dynamic> mergedRenderedMetrics = new Dictionary<string, dynamic>();
                     Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new SwaMe.MetricGenerator().GenerateMetrics(run, division, irt));
-                    Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator().GenerateMetrics(run));
+                    Utilities.AddRenderedMzqcMetricsTo(mergedRenderedMetrics, new Prognosticator.MetricGenerator(run).GenerateMetrics());
 
                     new MzqcGenerator.MzqcWriter<Scan, Run<Scan>>().BuildMzqcAndWrite(options.OutputFile, run, mergedRenderedMetrics, options.InputFile, analysisSettings);
                     Logger.Info("Generated metrics in {0} seconds", Convert.ToInt32(sw.Elapsed.TotalSeconds));
