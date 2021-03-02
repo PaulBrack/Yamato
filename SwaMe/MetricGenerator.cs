@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
@@ -9,7 +11,7 @@ namespace SwaMe
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public Metrics GenerateMetrics(Run<Scan> run, int division, bool irt)
+        public Metrics GenerateMetrics(Run<Scan> run, int divisions, bool irt)
         {
             double rtDuration;
             if (run.LastScanTime.HasValue && run.StartTime.HasValue)
@@ -48,14 +50,14 @@ namespace SwaMe
             }
 
             // This method will group the scans into swaths of the same number, return the number of swaths in a full cycle (maxswath) and call a FileMaker method to write out the metrics.
-            SwathGrouper swathGrouper = new SwathGrouper { };
+            SwathGrouper swathGrouper = new SwathGrouper();
             SwathMetrics swathMetrics = swathGrouper.GroupBySwath(run);
 
             //Retrieving Density metrics
             int[] densities = run.Ms2Scans.Select(g => g.Density).OrderBy(density => density).ToArray();
 
             RTGrouper rtGrouper = new RTGrouper();
-            RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, division, rtDuration);
+            RTGrouper.RTMetrics rtMetrics = rtGrouper.DivideByRT(run, divisions, rtDuration);
             
             return new Metrics
             {
