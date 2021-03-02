@@ -11,12 +11,11 @@ namespace SwaMe
     public class RTGrouper
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        public double[] rtSegs;
 
         /// <remarks>Immutable</remarks>
         public class RTMetrics
         {
-            public IList<double> Peakwidths { get; }
+            public IList<double> PeakWidths { get; }
             public IList<double> TailingFactor { get; }
             public IList<double> PeakCapacity { get; }
             public IList<double> PeakPrecision { get; }
@@ -34,6 +33,10 @@ namespace SwaMe
             /// Testing: Raw densities of final segment.
             /// </summary>
             public IList<int>? Density { get; }
+            /// <summary>
+            /// Testing: Retention time segments.
+            /// </summary>
+            public IList<double>? RtSegs { get; }
 
             public RTMetrics(IList<double> ms1TicTotal,
                 IList<double> ms2TicTotal,
@@ -48,9 +51,10 @@ namespace SwaMe
                 IList<double> peakPrecision,
                 IList<double> ms1PeakPrecision,
                 IList<string> segmentBoundaries,
-                IList<int>? density)
+                IList<int>? density,
+                IList<double>? rtSegs)
             {
-                Peakwidths = peakWidths;
+                PeakWidths = peakWidths;
                 TailingFactor = tailingFactor;
                 PeakCapacity = peakCapacity;
                 PeakPrecision = peakPrecision;
@@ -64,13 +68,14 @@ namespace SwaMe
                 TicChangeIqrList = ticChangeIQRList;
                 SegmentBoundaries = segmentBoundaries;
                 Density = density;
+                RtSegs = rtSegs;
             }
         }
 
         public RTMetrics DivideByRT(Run<Scan> run, int division, double rtDuration)
         {
             double rtSegment = rtDuration / division;
-            rtSegs = new double[division];
+            double[] rtSegs = new double[division];
             List<string> segmentBoundaries = new List<string>();
 
             if (run.StartTime.HasValue)
@@ -277,7 +282,7 @@ namespace SwaMe
                 lastMs2DensityTemp = ms2DensityTemp;
             }
 
-            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, tailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision, segmentBoundaries, lastMs2DensityTemp);
+            RTMetrics rtMetrics = new RTMetrics(ms1TicTotal, ms2TicTotal, cycleTime, ticChange50List, ticChangeIqrList, ms1Density, ms2Density, peakWidths, tailingFactor, peakCapacity, peakPrecision, ms1PeakPrecision, segmentBoundaries, lastMs2DensityTemp, rtSegs);
             return rtMetrics;
         }
     }

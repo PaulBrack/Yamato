@@ -128,7 +128,7 @@ namespace SwaMe.Test
         public void RtSegsCorrect()
         {
             double[] correctsegments = { 0, 50 };
-            Assert.IsTrue(Enumerable.SequenceEqual(RTGrouper.rtSegs, correctsegments));
+            Assert.IsTrue(Enumerable.SequenceEqual(Result.RtSegs, correctsegments));
         }
 
         /// <remarks>

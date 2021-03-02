@@ -68,7 +68,7 @@ namespace MzqcGenerator.Test
         private static readonly List<double> PeakCapacity = new List<double>() { 44, 120 };
         private static readonly List<string> segmentBoundaries = new List<string>() { "2.5_3.3", "3.3_4.0" };
         private static readonly SwaMe.RTGrouper.RTMetrics RTMetrics = new SwaMe.RTGrouper.RTMetrics(MS1TICTotal, MS2TICTotal, CycleTime, TICchange50List, TICchangeIQRList, MS1Density, MS2Density, Peakwidths, TailingFactor,
-            PeakCapacity, PeakPrecision, MS1PeakPrecision, segmentBoundaries, default);
+            PeakCapacity, PeakPrecision, MS1PeakPrecision, segmentBoundaries, default, default);
 
         [TestInitialize]
         public void Initialize()
